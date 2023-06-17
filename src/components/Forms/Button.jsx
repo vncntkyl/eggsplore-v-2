@@ -7,12 +7,14 @@ export default function Button({
   type = "button",
   className,
   disabled,
+  onClick,
 }) {
   return (
     <button
       disabled={disabled}
       type={type}
       className={classNames("bg-white p-2", className)}
+      onClick={onClick}
     >
       {value}
     </button>

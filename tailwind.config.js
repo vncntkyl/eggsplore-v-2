@@ -19,6 +19,7 @@ export default {
       },
       animation: {
         "slide-down": "slide-down 500ms ease-in-out forwards",
+        "bounce-light": "bounce-light 1000ms ease-in-out infinite",
         "slide-right": "slide-right 200ms ease-in-out forwards",
         fade: "fade 200ms ease-in-out forwards",
       },
@@ -49,10 +50,32 @@ export default {
             opacity: "1",
           },
         },
+        "bounce-light": {
+          "0%": {
+            transform: "translateY(0%)",
+          },
+          "50%": {
+            transform: "translateY(-5%)",
+          },
+          "100%": {
+            transform: "translateY(0%)",
+          },
+        },
       },
       colors: {
         main: "#B95446",
         secondary: "#f46b45",
+        tertiary: "#ffa68e",
+        "blue-light": "#306088",
+        "blue-light-1": "#b4d3fd",
+        "red-light": "#d43953",
+        "red-light-1": "#FDB4B4",
+        "red-dark": "#883030",
+        "red-dark-1": "#5c1c1c",
+        "yellow-light": "#fdf6b4",
+        "yellow-dark": "#807519",
+        "green-light": "#B5FDB4",
+        "green-dark": "#198065",
       },
     },
   },
