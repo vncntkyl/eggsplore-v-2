@@ -76,6 +76,18 @@ export default {
         "yellow-dark": "#807519",
         "green-light": "#B5FDB4",
         "green-dark": "#198065",
+        default: "#efedf8",
+        "default-dark": "#dbd8eb",
+      },
+      width: {
+        sidebar: "20rem",
+      },
+      height: {
+        navbar: "5rem",
+      },
+      spacing: {
+        sidebar: "20rem",
+        navbar: "5rem",
       },
     },
   },
