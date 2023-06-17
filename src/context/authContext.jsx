@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState([]);
   const navigate = useNavigate();
   const signInUser = async (username, password) => {
-    const url = "http://localhost/unmg_pms/api/login.php";
+    const url = "http://localhost/eggsplore-v-2/api/login.php";
     //const url = "../api/login.php";
 
     try {
