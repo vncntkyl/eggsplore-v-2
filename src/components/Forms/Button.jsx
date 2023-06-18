@@ -8,14 +8,16 @@ export default function Button({
   className,
   disabled,
   onClick,
+  icon,
 }) {
   return (
     <button
       disabled={disabled}
       type={type}
-      className={classNames("bg-white p-2", className)}
+      className={classNames("flex flex-row items-center gap-2", className)}
       onClick={onClick}
     >
+      {icon}
       {value}
     </button>
   );
