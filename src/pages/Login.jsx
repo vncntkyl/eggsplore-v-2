@@ -17,7 +17,6 @@ export default function Login() {
   const username = useRef();
   const password = useRef();
   const navigate = useNavigate();
-  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -37,7 +36,7 @@ export default function Login() {
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center p-2 lg:p-0">
+    <div className="w-screen h-screen flex justify-center items-center p-2 lg:p-0 bg-default">
       <div className="flex flex-col lg:flex-row w-full md:w-[70%] lg:w-[80%] xl:w-1/2 max-h-[500px] rounded-xl overflow-hidden shadow-lg">
         <div className="bg-login bg-cover bg-center min-h-[75px] sm:min-h-[200px] lg:h-full lg:bg-transparent w-full lg:w-1/2">
           <img
