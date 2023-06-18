@@ -14,4 +14,5 @@
     .body {
         min-height: calc(theme(height.screen) - theme(height.navbar));
     }
+
 }

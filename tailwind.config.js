@@ -19,6 +19,7 @@ export default {
       },
       animation: {
         "slide-down": "slide-down 500ms ease-in-out forwards",
+        "modal-slide-down": "container-slide-down 500ms ease-in-out forwards",
         "bounce-light": "bounce-light 1000ms ease-in-out infinite",
         "slide-right": "slide-right 200ms ease-in-out forwards",
         fade: "fade 200ms ease-in-out forwards",
@@ -32,6 +33,16 @@ export default {
           "100%": {
             opacity: "1",
             transform: "translateY(0)",
+          },
+        },
+        "container-slide-down": {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(-50%) translateY(-100%)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(-50%) translateY(-50%)",
           },
         },
         "slide-right": {
