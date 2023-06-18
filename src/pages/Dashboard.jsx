@@ -1,22 +1,55 @@
+/* eslint-disable react/prop-types */
+import {
+  AdminDashboard,
+  StaffMenu,
+  Navbar,
+  Sidebar,
+} from "../components/Blocks";
+import classNames from "classnames";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../components/Forms";
 import { useAuth } from "../context/authContext";
+import Loader from "../components/Fragments/Loader";
 
 export default function Dashboard() {
-  const { setCurrentUser } = useAuth();
+  const [user, setUser] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { getUserType, getCurrentUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    sessionStorage.clear();
-    setCurrentUser([]);
-    navigate("/login");
-  };
-  return (
-    <div>
-      <div>Dashboard</div>
-      <div>
-        <Button type="button" value="Logout" onClick={handleLogout} />
+  const Body = ({ children }) => {
+    return (
+      <div
+        className={classNames(
+          "pt-navbar",
+          getUserType() === "administrator" ? "pl-sidebar" : "xl:px-sidebar"
+        )}
+      >
+        {children}
       </div>
+    );
+  };
+
+  useEffect(() => {
+    if (!sessionStorage.getItem("currentUser")) {
+      navigate("/login");
+      return;
+    } else {
+      setUser(JSON.parse(getCurrentUser()));
+      setLoading(false);
+    }
+  }, [sessionStorage]);
+
+  return !loading ? (
+    <div className="min-h-screen bg-default">
+      <Navbar isStaff={getUserType() === "staff"} user={user} />
+      {getUserType() === "administrator" && <Sidebar />}
+      {/* dashboard content */}
+      <Body>
+        {getUserType() === "administrator" ? <AdminDashboard /> : <StaffMenu />}
+      </Body>
     </div>
+  ) : (
+    <Loader />
   );
 }

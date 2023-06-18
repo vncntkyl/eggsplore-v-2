@@ -5,8 +5,15 @@ export function useFunction() {
   return useContext(FunctionContext);
 }
 export function FunctionProvider({ children }) {
-  function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+  function capitalize(str = "", separator = " ") {
+    const tempStr = str.split(separator);
+    tempStr.forEach((str, index) => {
+      tempStr[index] = str.charAt(0).toUpperCase() + str.slice(1);
+    });
+    return tempStr.join(" ");
+  }
+  function trimString(str = "") {
+    return str.substring(0, 75);
   }
 
   function saveItem(key, value) {
@@ -15,13 +22,10 @@ export function FunctionProvider({ children }) {
   function getItem(key) {
     return sessionStorage.getItem(key);
   }
-  function getCurrentUser() {
-    return sessionStorage.getItem("currentUser");
-  }
 
   const value = {
-    getCurrentUser,
     capitalize,
+    trimString,
     saveItem,
     getItem,
   };

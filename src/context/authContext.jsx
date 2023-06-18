@@ -29,18 +29,31 @@ export function AuthProvider({ children }) {
     }
   };
 
+  function getCurrentUser() {
+    return sessionStorage.getItem("currentUser");
+  }
+
+  function getUserType() {
+    if (sessionStorage.getItem("currentUser")) {
+      return JSON.parse(sessionStorage.getItem("currentUser")).user_type;
+    }
+    return null;
+  }
+
   useEffect(() => {
     if (sessionStorage.getItem("currentUser")) {
-      setCurrentUser(sessionStorage.getItem("currentUser"));
+      setCurrentUser(JSON.parse(sessionStorage.getItem("currentUser")));
     } else {
       navigate("/login");
     }
-  }, [currentUser]);
+  }, [sessionStorage]);
 
   const values = {
     currentUser,
     signInUser,
     setCurrentUser,
+    getCurrentUser,
+    getUserType,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

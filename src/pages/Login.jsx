@@ -28,7 +28,7 @@ export default function Login() {
     if (typeof result === "object") {
       saveItem("currentUser", JSON.stringify(result));
       setFormStatus(null);
-      navigate("/dashboard");
+      navigate("/");
     } else {
       setFormStatus("warning");
       setLoginResult(result);
@@ -81,7 +81,7 @@ export default function Login() {
                 )
               }
               className={[
-                "transition-all py-3 rounded-[10rem] font-semibold text-[1.1rem] text-main w-[50%] m-auto shadow-lg hover:animate-bounce-light",
+                "transition-all p-2 bg-white py-3 rounded-[10rem] font-semibold text-[1.1rem] text-main w-[50%] m-auto shadow-lg hover:animate-bounce-light",
                 formStatus !== "null" &&
                   "flex items-center justify-center font-semibold",
               ]}
