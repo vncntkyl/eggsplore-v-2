@@ -27,5 +27,12 @@ class Controller
             echo "Server Down!!!";
         }
     }
+    function getError($e)
+    {
+        echo "An exception occurred: " . $e->getMessage();
+        echo "Error code: " . $e->getCode();
+        echo "File: " . $e->getFile();
+        echo "Line: " . $e->getLine();
+    }
 }
 ?>
