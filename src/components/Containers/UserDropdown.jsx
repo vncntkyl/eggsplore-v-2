@@ -13,10 +13,10 @@ export default function UserDropdown() {
     navigate("/login");
   };
   return (
-    <div className="absolute top-full right-0 min-w-full bg-white rounded-md overflow-hidden shadow-md animate-slide-down">
+    <div className="absolute top-full right-0 min-w-full bg-white rounded-md overflow-hidden shadow-md animate-slide-down p-2">
       <Button
         value="Change Password"
-        className="p-2 hover:bg-default w-full whitespace-nowrap"
+        className="p-1 px-2 hover:bg-default w-full whitespace-nowrap rounded-md"
         icon={<BsFillGearFill className="text-[1.1rem]" />}
       />
       <Button
@@ -24,7 +24,7 @@ export default function UserDropdown() {
         value="Logout"
         onClick={handleLogout}
         icon={<RiLogoutBoxRLine className="text-[1.1rem]" />}
-        className="p-2 hover:bg-default w-full"
+        className="p-1 hover:bg-default w-full rounded-md"
       />
     </div>
   );

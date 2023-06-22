@@ -1,6 +1,8 @@
+/* eslint-disable react/prop-types */
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { developmentURLs as url } from "./config";
 
 const AuthContext = React.createContext();
 
@@ -11,15 +13,13 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState([]);
   const navigate = useNavigate();
-  const signInUser = async (username, password) => {
-    const url = "http://localhost/eggsplore-v-2/api/login.php";
-    //const url = "../api/login.php";
 
+  const signInUser = async (username, password) => {
     try {
       const fd_login = new FormData();
       fd_login.append("user_login", username);
       fd_login.append("password", password);
-      const loginResponse = await axios.post(url, fd_login);
+      const loginResponse = await axios.post(url.loginURL, fd_login);
 
       if (loginResponse.status === 200) {
         return loginResponse.data;
@@ -29,16 +29,30 @@ export function AuthProvider({ children }) {
     }
   };
 
-  function getCurrentUser() {
+  const getBuilding = async (id = null) => {
+    try {
+      const response = await axios.get(url.getBuildingURL, {
+        params: {
+          getBuilding: id ? id : "all",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+  const getCurrentUser = () => {
     return sessionStorage.getItem("currentUser");
-  }
+  };
 
-  function getUserType() {
+  const getUserType = () => {
     if (sessionStorage.getItem("currentUser")) {
       return JSON.parse(sessionStorage.getItem("currentUser")).user_type;
     }
     return null;
-  }
+  };
 
   useEffect(() => {
     if (sessionStorage.getItem("currentUser")) {
@@ -50,10 +64,12 @@ export function AuthProvider({ children }) {
 
   const values = {
     currentUser,
+    navigate,
     signInUser,
-    setCurrentUser,
-    getCurrentUser,
+    getBuilding,
     getUserType,
+    getCurrentUser,
+    setCurrentUser,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
