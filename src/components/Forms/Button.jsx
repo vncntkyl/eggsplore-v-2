@@ -9,12 +9,13 @@ export default function Button({
   disabled,
   onClick,
   icon,
+  important
 }) {
   return (
     <button
       disabled={disabled}
       type={type}
-      className={classNames("flex flex-row items-center gap-2", className)}
+      className={important ? className : classNames("flex flex-row items-center gap-2", className)}
       onClick={onClick}
     >
       {icon}

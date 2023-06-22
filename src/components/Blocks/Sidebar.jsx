@@ -7,7 +7,7 @@ import { useState } from "react";
 export default function Sidebar() {
   const [a, b] = useState(false);
   return (
-    <div className="w-sidebar bg-main fixed top-0 left-0 h-screen">
+    <div className="w-sidebar bg-main fixed top-0 left-0 h-screen z-[3]">
       <div className="h-navbar flex items-center justify-center font-semibold text-white text-[1.25rem] text-center px-2">
         Edwin and Lina Poultry Farm
       </div>

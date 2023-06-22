@@ -22,7 +22,7 @@ export default function Dashboard() {
       <div
         className={classNames(
           "pt-navbar",
-          getUserType() === "administrator" ? "pl-sidebar" : "xl:px-sidebar"
+          getUserType() === "administrator" ? "pl-sidebar" : "xl:px-sidebar-1/2 2xl:px-sidebar"
         )}
       >
         {children}

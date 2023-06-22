@@ -39,14 +39,14 @@ export default function Navbar({ isStaff, user }) {
   return (
     <div
       className={classNames(
-        "fixed top-0 h-navbar bg-white w-full shadow-md",
+        "fixed top-0 h-navbar bg-white w-full shadow-md z-[2]",
         !isStaff && "pl-sidebar"
       )}
     >
       <div
         className={classNames(
           "h-navbar flex flex-row items-center  px-4",
-          isStaff ? "xl:px-sidebar justify-between" : "justify-end"
+          isStaff ? "xl:px-sidebar-1/2 2xl:px-sidebar justify-between" : "justify-end"
         )}
       >
         {isStaff && (
@@ -61,7 +61,7 @@ export default function Navbar({ isStaff, user }) {
               type="button"
               value={<NotificationBell />}
               onClick={() => toggleNotification((prev) => !prev)}
-              className="p-0 items-center justify-end"
+              className="p-2 items-center justify-end"
             />
             {notification && <NotificationDropdown />}
           </div>
