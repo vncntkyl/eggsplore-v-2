@@ -75,6 +75,7 @@ export default {
       },
       colors: {
         main: "#B95446",
+        black: "#222222",
         secondary: "#f46b45",
         tertiary: "#ffa68e",
         "blue-light": "#306088",
@@ -92,12 +93,14 @@ export default {
       },
       width: {
         sidebar: "20rem",
+        "sidebar-1/2": "10rem",
       },
       height: {
         navbar: "5rem",
       },
       spacing: {
         sidebar: "20rem",
+        "sidebar-1/2": "10rem",
         navbar: "5rem",
       },
     },
