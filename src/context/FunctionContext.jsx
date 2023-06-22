@@ -5,6 +5,7 @@ export function useFunction() {
   return useContext(FunctionContext);
 }
 export function FunctionProvider({ children }) {
+  //STRING FUNCTIONS
   function capitalize(str = "", separator = " ") {
     const tempStr = str.split(separator);
     tempStr.forEach((str, index) => {
@@ -16,6 +17,18 @@ export function FunctionProvider({ children }) {
     return str.substring(0, 75);
   }
 
+  function toLink(string = "") {
+    return string.toLowerCase().split(" ").join("_");
+  }
+  function toTitle(string = "") {
+    return string.toLowerCase().split("_").join(" ");
+  }
+  function createBreadCrumb(path = "") {
+    let tempString = path.substring(1);
+    return tempString.split("/");
+  }
+
+  //SESSION FUNCTIONS
   function saveItem(key, value) {
     sessionStorage.setItem(key, value);
   }
@@ -24,10 +37,13 @@ export function FunctionProvider({ children }) {
   }
 
   const value = {
+    createBreadCrumb,
     capitalize,
     trimString,
     saveItem,
     getItem,
+    toTitle,
+    toLink,
   };
 
   return (
