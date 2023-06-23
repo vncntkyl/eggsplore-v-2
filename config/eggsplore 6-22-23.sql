@@ -54,7 +54,7 @@ CREATE TABLE `ep_users` (
   `last_name` varchar(50) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `user_type` enum('administrator','staff') NOT NULL,
+  `user_type` enum('admin','staff') NOT NULL,
   `status` int(1) NOT NULL COMMENT '1-active\r\n2-inactive'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
