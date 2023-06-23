@@ -4,23 +4,23 @@ import GeneralManagement from "./GeneralManagement";
 
 export default function AdminDashboard() {
   return (
-    <div className="p-4 body">
+    <div className="p-4 body flex flex-col gap-2 mx-12">
       <Breadcrumb />
       <Routes>
-        <Route path="/*" element={<>dashboard</>} />
-        <Route path="/dashboard/*" element={<>dashboard</>} />
-        <Route path="/chick_procurement/*" element={<>chick_procurement</>} />
-        <Route path="/chicken_maintenance/*" element={<>chicken_maintenance</>} />
+        <Route path="/*" element={<></>} />
+        <Route path="/dashboard/*" element={<></>} />
+        <Route path="/chick_procurement/*" element={<></>} />
+        <Route path="/chicken_maintenance/*" element={<></>} />
         <Route
           path="/eggs_control_and_monitoring/*"
-          element={<>eggs_control_and_monitoring</>}
+          element={<></>}
         />
         <Route
           path="/eggs_delivery_monitoring/*"
-          element={<>eggs_delivery_monitoring</>}
+          element={<></>}
         />
-        <Route path="/sales/*" element={<>sales</>} />
-        <Route path="/financials/*" element={<>financials</>} />
+        <Route path="/sales/*" element={<></>} />
+        <Route path="/financials/*" element={<></>} />
         <Route path="/general_management/*" element={<GeneralManagement />} />
       </Routes>
     </div>

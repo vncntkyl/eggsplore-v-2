@@ -29,6 +29,20 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const getUser = async (id = null) => {
+    try {
+      const response = await axios.get(url.getUserURL, {
+        params: {
+          getUser: id ? id : "all",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
   const getBuilding = async (id = null) => {
     try {
       const response = await axios.get(url.getBuildingURL, {
@@ -65,6 +79,7 @@ export function AuthProvider({ children }) {
   const values = {
     currentUser,
     navigate,
+    getUser,
     signInUser,
     getBuilding,
     getUserType,

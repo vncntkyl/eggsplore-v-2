@@ -27,7 +27,13 @@ export function FunctionProvider({ children }) {
     let tempString = path.substring(1);
     return tempString.split("/");
   }
+  function getPath(){
+    return window.location.pathname;
+  }
 
+  function getFullName(user){
+    return `${user.first_name} ${user.middle_name.substring(0,1)}. ${user.last_name}`
+  }
   //SESSION FUNCTIONS
   function saveItem(key, value) {
     sessionStorage.setItem(key, value);
@@ -38,9 +44,11 @@ export function FunctionProvider({ children }) {
 
   const value = {
     createBreadCrumb,
+    getFullName,
     capitalize,
     trimString,
     saveItem,
+    getPath,
     getItem,
     toTitle,
     toLink,

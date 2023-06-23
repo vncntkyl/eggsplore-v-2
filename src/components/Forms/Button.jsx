@@ -1,5 +1,4 @@
-/* eslint-disable react/prop-types */
-
+import React from "react";
 import classNames from "classnames";
 
 export default function Button({
@@ -9,13 +8,17 @@ export default function Button({
   disabled,
   onClick,
   icon,
-  important
+  important,
 }) {
   return (
     <button
       disabled={disabled}
       type={type}
-      className={important ? className : classNames("flex flex-row items-center gap-2", className)}
+      className={
+        important
+          ? className
+          : classNames("flex flex-row items-center gap-2", className)
+      }
       onClick={onClick}
     >
       {icon}

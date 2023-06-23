@@ -3,11 +3,11 @@ import { useFunction } from "../../context/FunctionContext";
 import { Link } from "react-router-dom";
 import { GrNext } from "react-icons/gr";
 export default function Breadcrumb() {
-  const { createBreadCrumb, capitalize, toTitle } = useFunction();
+  const { createBreadCrumb, capitalize, toTitle, getPath } = useFunction();
   const [crumbs, setCrumbs] = useState([]);
 
   useEffect(() => {
-    setCrumbs(createBreadCrumb(window.location.pathname));
+    setCrumbs(createBreadCrumb(getPath()));
   }, []);
   return (
     <div className="flex flex-row items-center gap-1 font-semibold">
@@ -17,13 +17,13 @@ export default function Breadcrumb() {
           <div key={index} className="flex flex-row items-center gap-1">
             {index !== crumbs.length - 1 ? (
               <>
-                <Link to={path} className="underline">
+                <Link to={path} className="underline text-[1.075rem] text-black">
                   {capitalize(toTitle(crumb))}
                 </Link>
                 <GrNext />
               </>
             ) : (
-              <>{capitalize(toTitle(crumb))}</>
+              <><span className="text-[1.25rem] text-main">{capitalize(toTitle(crumb))}</span></>
             )}
           </div>
         );

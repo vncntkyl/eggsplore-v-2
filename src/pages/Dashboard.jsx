@@ -22,7 +22,7 @@ export default function Dashboard() {
       <div
         className={classNames(
           "pt-navbar",
-          getUserType() === "administrator" ? "pl-sidebar" : "xl:px-sidebar-1/2 2xl:px-sidebar"
+          getUserType() === "admin" ? "pl-sidebar" : "xl:px-sidebar-1/2 2xl:px-sidebar"
         )}
       >
         {children}
@@ -43,10 +43,10 @@ export default function Dashboard() {
   return !loading ? (
     <div className="min-h-screen bg-default">
       <Navbar isStaff={getUserType() === "staff"} user={user} />
-      {getUserType() === "administrator" && <Sidebar />}
+      {getUserType() === "admin" && <Sidebar />}
       {/* dashboard content */}
       <Body>
-        {getUserType() === "administrator" ? <AdminDashboard /> : <StaffMenu />}
+        {getUserType() === "admin" ? <AdminDashboard /> : <StaffMenu />}
       </Body>
     </div>
   ) : (
