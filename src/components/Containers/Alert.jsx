@@ -11,7 +11,7 @@ export default function Alert({ type = "info", title, message, onClose }) {
   return (
     <>
       <div
-        className="fixed top-0 w-screen h-screen flex items-center justify-center bg-[#00000035] z-[21]"
+        className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-[#00000030] z-[21]"
         onClick={onClose}
       ></div>
       <div className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] rounded-md shadow-sm w-fit overflow-hidden z-[22] animate-modal-slide-down">

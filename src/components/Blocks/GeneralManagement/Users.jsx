@@ -5,15 +5,113 @@ import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
 import { HiPencilAlt } from "react-icons/hi";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";
-import Modal from "../../Containers/Modal";
+import { Modal, Alert } from "../../Containers";
 
 export default function Users() {
   const [activePanel, setActivePanel] = useState("admin");
   const [modalTitle, setModalTitle] = useState(null);
   const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState({
+    first_name: "",
+    middle_name: "",
+    last_name: "",
+    username: "",
+    password: "",
+  });
+  const [alert, toggleAlert] = useState({
+    type: "success",
+    title: "",
+    message: "",
+    show: false,
+  });
   const [userBuildings, setUserBuildings] = useState([]);
+  const [selectedUser, setUser] = useState(null);
+
   const { capitalize, getFullName, toTitle } = useFunction();
-  const { getUser, getBuilding } = useAuth();
+  const { getUser, getBuilding, registerUser, deleteUser, updateUser } =
+    useAuth();
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const response = await updateUser(JSON.stringify(newUser));
+    setModalTitle(null);
+    if (response === 1) {
+      toggleAlert({
+        type: "success",
+        title: "Account Update Complete",
+        message: "User has been updated.",
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Update Error",
+        message: "There has been an error on updating the account. Please try again.",
+        show: true,
+      });
+    }
+  };
+  const handleRegistration = async (e) => {
+    e.preventDefault();
+    const user = { ...newUser, user_type: activePanel, status: 1 };
+    const response = await registerUser(user);
+    setModalTitle(null);
+    if (response === 1) {
+      toggleAlert({
+        type: "success",
+        title: "Registration Complete",
+        message: "New " + activePanel + " has been registered.",
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Registration Error",
+        message: "There has been an error on registration. Please try again.",
+        show: true,
+      });
+    }
+  };
+
+  const handleClose = () => {
+    setModalTitle(null);
+    toggleAlert({
+      type: "success",
+      title: "",
+      message: "",
+      show: false,
+    });
+    setNewUser({
+      first_name: "",
+      middle_name: "",
+      last_name: "",
+      username: "",
+      password: "",
+    });
+  };
+
+  const handleDelete = async () => {
+    const response = await deleteUser(selectedUser.user_id);
+    setModalTitle(null);
+    if (response == 1) {
+      toggleAlert({
+        type: "success",
+        title: "Deletion Complete",
+        message: `User ${capitalize(selectedUser.first_name)} ${capitalize(
+          selectedUser.last_name
+        )} has been deleted.`,
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Deletion Error",
+        message:
+          "There has been an error on account deletion. Please try again.",
+        show: true,
+      });
+    }
+  };
 
   useEffect(() => {
     const setup = async () => {
@@ -99,14 +197,26 @@ export default function Users() {
                         <div className="flex items-center justify-center gap-1">
                           {activePanel === "staff" && (
                             <Button
-                              onClick={() => setModalTitle("edit user")}
+                              onClick={() => {
+                                setNewUser({
+                                  first_name: user.first_name,
+                                  middle_name: user.middle_name,
+                                  last_name: user.last_name,
+                                  username: user.username,
+                                  update: true,
+                                });
+                                setModalTitle("edit user");
+                              }}
                               className="bg-yellow p-1 rounded"
                               value={<HiPencilAlt className="text-white" />}
                             />
                           )}
                           <Button
                             className="bg-red-light p-1 rounded"
-                            onClick={() => setModalTitle("confirmation")}
+                            onClick={() => {
+                              setUser(user);
+                              setModalTitle("confirmation");
+                            }}
                             value={<AiFillDelete className="text-white" />}
                           />
                         </div>
@@ -121,54 +231,92 @@ export default function Users() {
       {modalTitle && (
         <Modal
           title={capitalize(modalTitle)}
-          onClose={() => setModalTitle(null)}
+          onClose={() => handleClose()}
           content={
-            modalTitle === "register user" ? (
+            ["register user", "edit user"].includes(modalTitle) ? (
               <>
-                <form className="flex flex-col gap-2">
-                  {["first_name", "middle_name", "last_name", "username"].map(
-                    (lbl, index) => {
+                <form
+                  autoComplete="off"
+                  className="flex flex-col gap-2"
+                  onSubmit={
+                    Object.keys(newUser).includes("update")
+                      ? handleUpdate
+                      : handleRegistration
+                  }
+                >
+                  {Object.keys(newUser)
+                    .filter((key) => key !== "update")
+                    .map((lbl, index) => {
                       return (
                         <TextInput
+                          type={lbl !== "password" ? "text" : "password"}
                           key={index}
                           id={lbl}
+                          value={
+                            modalTitle === "edit user" ? newUser[lbl] : null
+                          }
                           withLabel={capitalize(toTitle(lbl))}
                           orientation="row"
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap w-1/3 text-start"
                           inputClasses="bg-default w-2/3 rounded px-2"
+                          onChange={(e) => {
+                            setNewUser((current) => ({
+                              ...current,
+                              [lbl]: e.target.value,
+                            }));
+                          }}
                         />
                       );
-                    }
-                  )}
-                  <TextInput
-                    type="password"
-                    id="password"
-                    withLabel="Password"
-                    orientation="row"
-                    classes="p-1 items-center justify-between"
-                    labelClasses="whitespace-nowrap w-1/3 text-start"
-                    inputClasses="bg-default w-2/3 rounded px-2"
-                  />
+                    })}
                   <div className="flex items-center justify-end gap-2">
                     <Button
                       type="submit"
-                      value="Register"
+                      value={newUser.update ? "Save Changes" : "Register"}
                       className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
                     />
                     <Button
                       value="Cancel"
+                      onClick={() => handleClose()}
                       className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
                     />
                   </div>
                 </form>
               </>
-            ) : modalTitle === "edit user" ? (
-              <></>
             ) : (
-              <></>
+              <>
+                <p>
+                  Are you sure to remove user{" "}
+                  <span className="font-semibold">
+                    {capitalize(
+                      selectedUser.first_name + " " + selectedUser.last_name
+                    )}
+                    ?
+                  </span>
+                </p>
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    value="Delete"
+                    onClick={() => handleDelete()}
+                    className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                  />
+                  <Button
+                    value="Cancel"
+                    onClick={() => handleClose()}
+                    className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
+                  />
+                </div>
+              </>
             )
           }
+        />
+      )}
+      {alert.show && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          title={alert.title}
+          onClose={() => handleClose()}
         />
       )}
     </>

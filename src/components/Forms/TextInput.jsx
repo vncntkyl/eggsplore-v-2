@@ -13,6 +13,7 @@ export default function TextInput({
   orientation = "row",
   inputRef,
   onChange,
+  value,
 }) {
   return (
     <div className={classNames("flex gap-2", `flex-${orientation}`, classes)}>
@@ -22,6 +23,7 @@ export default function TextInput({
         </label>
       )}
       <input
+        value={value}
         type={type}
         id={id}
         placeholder={textHint}

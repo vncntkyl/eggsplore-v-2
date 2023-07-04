@@ -29,15 +29,58 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const registerUser = async (newUser) => {
+    try {
+      const fd_register = new FormData();
+      fd_register.append("userdata", JSON.stringify(newUser));
+      const register_response = await axios.post(
+        url.registerUserURL,
+        fd_register
+      );
+      if (register_response.status === 200) {
+        return register_response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+
   const getUser = async (id = null) => {
     try {
-      const response = await axios.get(url.getUserURL, {
+      const response = await axios.get(url.manageUserURL, {
         params: {
           getUser: id ? id : "all",
         },
       });
       if (response.status === 200) {
         return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+
+  const deleteUser = async (id) => {
+    try {
+      const response = await axios.delete(url.manageUserURL, {
+        params: {
+          id: id,
+        },
+      });
+      if (response.status === 200) {
+        console.log(response.data);
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+  const updateUser = async (user) => {
+    try {
+      const fd = new FormData();
+      fd.append("userdata", user);
+      const response = await axios.post(url.manageUserURL, fd);
+      if (response.status === 200) {
+        console.log(response.data);
       }
     } catch (e) {
       return e.message;
@@ -81,8 +124,11 @@ export function AuthProvider({ children }) {
     navigate,
     getUser,
     signInUser,
+    deleteUser,
+    updateUser,
     getBuilding,
     getUserType,
+    registerUser,
     getCurrentUser,
     setCurrentUser,
   };

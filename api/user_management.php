@@ -14,4 +14,13 @@ if (isset($_GET['getUser'])) {
         echo json_encode($result);
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] === "DELETE") {
+    $id = $_GET['id'];
+    echo $user->deleteUser($id) ? 1 : 0;
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userdata = json_decode($_POST['userdata']);
+    echo $user->updateUser($userdata);
+}
 ?>
