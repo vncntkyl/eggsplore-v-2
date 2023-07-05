@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState([]);
   const navigate = useNavigate();
 
+  //USER MANAGEMENT
   const signInUser = async (username, password) => {
     try {
       const fd_login = new FormData();
@@ -28,7 +29,6 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
-
   const registerUser = async (newUser) => {
     try {
       const fd_register = new FormData();
@@ -44,7 +44,6 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
-
   const getUser = async (id = null) => {
     try {
       const response = await axios.get(url.manageUserURL, {
@@ -59,7 +58,6 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
-
   const deleteUser = async (id) => {
     try {
       const response = await axios.delete(url.manageUserURL, {
@@ -74,21 +72,33 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
-  const updateUser = async (user) => {
+  const updateUser = async (user, id) => {
     try {
       const fd = new FormData();
       fd.append("userdata", user);
+      fd.append("user_id", id);
       const response = await axios.post(url.manageUserURL, fd);
       if (response.status === 200) {
-        console.log(response.data);
+        return response.data;
       }
     } catch (e) {
       return e.message;
     }
   };
+  const getCurrentUser = () => {
+    return sessionStorage.getItem("currentUser");
+  };
+  const getUserType = () => {
+    if (sessionStorage.getItem("currentUser")) {
+      return JSON.parse(sessionStorage.getItem("currentUser")).user_type;
+    }
+    return null;
+  };
+
+  //BUILDING MANAGEMENT
   const getBuilding = async (id = null) => {
     try {
-      const response = await axios.get(url.getBuildingURL, {
+      const response = await axios.get(url.manageBuildingURL, {
         params: {
           getBuilding: id ? id : "all",
         },
@@ -100,15 +110,107 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
-  const getCurrentUser = () => {
-    return sessionStorage.getItem("currentUser");
+  const addBuilding = async (newBuilding) => {
+    try {
+      const fd_register = new FormData();
+      fd_register.append("add_bldg", 1);
+      fd_register.append("number", newBuilding.number);
+      fd_register.append("capacity", newBuilding.capacity);
+      const response = await axios.post(url.manageBuildingURL, fd_register);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+  const updateBuilding = async (bldg, id) => {
+    try {
+      const bldg_data = {
+        id: id,
+        number: bldg.number,
+        capacity: bldg.capacity,
+      };
+      const response = await axios.put(url.manageBuildingURL, bldg_data);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+  const deleteBuilding = async (id) => {
+    try {
+      const response = await axios.delete(url.manageBuildingURL, {
+        params: {
+          id: id,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
   };
 
-  const getUserType = () => {
-    if (sessionStorage.getItem("currentUser")) {
-      return JSON.parse(sessionStorage.getItem("currentUser")).user_type;
+  //FEEDS MANAGEMENT
+  const getFeeds = async (id = null) => {
+    try {
+      const response = await axios.get(url.manageFeedsURL, {
+        params: {
+          id: id ? id : "all",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
     }
-    return null;
+  };
+  const addFeeds = async (newFeeds) => {
+    try {
+      const fd_register = new FormData();
+      fd_register.append("method", "add");
+      fd_register.append("feeds_name", newFeeds.name);
+      fd_register.append("feeds_description", newFeeds.description);
+      const response = await axios.post(url.manageFeedsURL, fd_register);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+  const updateFeeds = async (feed, id) => {
+    try {
+      const feeds_data = {
+        id: id,
+        name: feed.name,
+        description: feed.description,
+      };
+      const response = await axios.put(url.manageFeedsURL, feeds_data);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+  const deleteFeeds = async (id) => {
+    try {
+      const response = await axios.delete(url.manageFeedsURL, {
+        params: {
+          id: id,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
   };
 
   useEffect(() => {
@@ -123,12 +225,19 @@ export function AuthProvider({ children }) {
     currentUser,
     navigate,
     getUser,
+    getFeeds,
+    addFeeds,
     signInUser,
     deleteUser,
     updateUser,
     getBuilding,
+    addBuilding,
     getUserType,
+    updateFeeds,
+    deleteFeeds,
     registerUser,
+    updateBuilding,
+    deleteBuilding,
     getCurrentUser,
     setCurrentUser,
   };

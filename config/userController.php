@@ -47,11 +47,11 @@ class User extends Controller
             $this->getError($e);
         }
     }
-    function updateUser($user)
+    function updateUser($user, $id)
     {
         try {
             $this->setStatement("UPDATE ep_users SET first_name = ?, middle_name = ?, last_name = ?, username = ? WHERE user_id = ?");
-            return $this->statement->execute([$user->first_name, $user->middle_name, $user->last_name, $user->username]);
+            return $this->statement->execute([$user->first_name, $user->middle_name, $user->last_name, $user->username, $id]);
         } catch (PDOException $e) {
             $this->getError($e);
         }

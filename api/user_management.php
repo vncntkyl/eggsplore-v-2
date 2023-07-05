@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === "DELETE") {
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userdata = json_decode($_POST['userdata']);
-    echo $user->updateUser($userdata);
+    $user_id = $_POST['user_id'];
+    echo $user->updateUser($userdata, $user_id) ? 1 : 0;
 }
 ?>

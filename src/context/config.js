@@ -1,12 +1,14 @@
 export const developmentURLs = {
   loginURL: "http://localhost/eggsplore-v-2/api/login.php",
-  getBuildingURL: "http://localhost/eggsplore-v-2/api/building_management.php",
-  manageUserURL: "http://localhost/eggsplore-v-2/api/user_management.php",
   registerUserURL: "http://localhost/eggsplore-v-2/api/register.php",
+  manageUserURL: "http://localhost/eggsplore-v-2/api/user_management.php",
+  manageFeedsURL: "http://localhost/eggsplore-v-2/api/feeds_management.php",
+  manageBuildingURL: "http://localhost/eggsplore-v-2/api/building_management.php",
 };
 export const buildURLs = {
-  loginURL: "../api/login.php",
-  getBuildingURL: "../api/building_management.php",
+  manageBuildingURL: "../api/building_management.php",
+  manageFeedsURL: "../api/feeds_management.php",
   manageUserURL: "../api/user_management.php",
   registerUserURL: "../api/register.php",
+  loginURL: "../api/login.php",
 };
