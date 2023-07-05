@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { GrNext } from "react-icons/gr";
 import Users from "./GeneralManagement/Users";
+import Buildings from "./GeneralManagement/Buildings";
+import Feeds from "./GeneralManagement/Feeds";
 
 export default function GeneralManagement() {
   const { toTitle, capitalize, getPath } = useFunction();
@@ -89,8 +91,8 @@ export default function GeneralManagement() {
       >
         <Routes>
           <Route path="/users/*" element={<Users />} />
-          <Route path="/buildings/*" element={<></>} />
-          <Route path="/feeds/*" element={<></>} />
+          <Route path="/buildings/*" element={<Buildings />} />
+          <Route path="/feeds/*" element={<Feeds />} />
           <Route path="/medications/*" element={<></>} />
           <Route path="/delivery_locations/*" element={<></>} />
         </Routes>
