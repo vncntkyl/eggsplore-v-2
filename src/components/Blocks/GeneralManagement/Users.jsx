@@ -9,6 +9,7 @@ import { Modal, Alert } from "../../Containers";
 
 export default function Users() {
   const [activePanel, setActivePanel] = useState("admin");
+  const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState({
@@ -33,7 +34,10 @@ export default function Users() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const response = await updateUser(JSON.stringify(newUser));
+    const response = await updateUser(
+      JSON.stringify(newUser),
+      selectedUser.user_id
+    );
     setModalTitle(null);
     if (response === 1) {
       toggleAlert({
@@ -46,10 +50,12 @@ export default function Users() {
       toggleAlert({
         type: "warning",
         title: "Update Error",
-        message: "There has been an error on updating the account. Please try again.",
+        message:
+          "There has been an error on updating the account. Please try again.",
         show: true,
       });
     }
+    doRefresh((count) => (count = count + 1));
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -71,10 +77,12 @@ export default function Users() {
         show: true,
       });
     }
+    doRefresh((count) => (count = count + 1));
   };
 
   const handleClose = () => {
     setModalTitle(null);
+    setUser(null);
     toggleAlert({
       type: "success",
       title: "",
@@ -111,6 +119,7 @@ export default function Users() {
         show: true,
       });
     }
+    doRefresh((count) => (count = count + 1));
   };
 
   useEffect(() => {
@@ -120,8 +129,14 @@ export default function Users() {
       const building_designations = await getBuilding("relation");
       setUserBuildings(building_designations);
     };
+
     setup();
-  }, []);
+    const realtimeData = setInterval(setup, 1000);
+
+    return () => {
+      clearInterval(realtimeData);
+    };
+  }, [refresh]);
 
   return (
     <>
@@ -171,7 +186,7 @@ export default function Users() {
                 .filter((user) => user.user_type === activePanel)
                 .map((user) => {
                   return (
-                    <tr key={user.user_id}>
+                    <tr key={user.user_id} className="hover:bg-slate-200">
                       <td align="center" className="p-2">
                         {capitalize(getFullName(user))}
                       </td>
@@ -180,17 +195,10 @@ export default function Users() {
                       </td>
                       {activePanel === "staff" && (
                         <td align="center" className="p-2">
-                          <div className="flex flex-col">
-                            {userBuildings
-                              .filter((ub) => ub.user_id === user.user_id)
-                              .map((bldg) => {
-                                return (
-                                  <span key={bldg.id} className="">
-                                    {bldg.name}
-                                  </span>
-                                );
-                              })}
-                          </div>
+                          {userBuildings
+                            .filter((ub) => ub.user_id === user.user_id)
+                            .map((bldg) => bldg.number)
+                            .join(",")}
                         </td>
                       )}
                       <td align="center" className="p-2">
@@ -198,6 +206,7 @@ export default function Users() {
                           {activePanel === "staff" && (
                             <Button
                               onClick={() => {
+                                setUser(user);
                                 setNewUser({
                                   first_name: user.first_name,
                                   middle_name: user.middle_name,
