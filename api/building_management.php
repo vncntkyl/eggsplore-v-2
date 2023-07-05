@@ -14,4 +14,21 @@ if (isset($_GET['getBuilding'])) {
         echo json_encode($result);
     }
 }
+switch ($_SERVER['REQUEST_METHOD']) {
+    case "POST":
+        if (isset($_POST['add_bldg'])) {
+            $bldg_name = $_POST['number'];
+            $bldg_capacity = $_POST['capacity'];
+            echo $bldg->addBuilding($bldg_name,$bldg_capacity) ? 1 : 0;
+        }
+        break;
+    case "PUT":
+        $data = json_decode(file_get_contents('php://input'));
+        echo $bldg->updateBuilding($data) ? 1 : 0;
+        break;
+    case "DELETE":
+        $id = $_GET['id'];
+        echo $bldg->deleteBuilding($id) ? 1 : 0;
+        break;
+}
 ?>
