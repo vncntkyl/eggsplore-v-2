@@ -6,6 +6,8 @@ import { GrNext } from "react-icons/gr";
 import Users from "./GeneralManagement/Users";
 import Buildings from "./GeneralManagement/Buildings";
 import Feeds from "./GeneralManagement/Feeds";
+import Medicine from "./GeneralManagement/Medicine";
+import Locations from "./GeneralManagement/Locations";
 
 export default function GeneralManagement() {
   const { toTitle, capitalize, getPath } = useFunction();
@@ -37,10 +39,9 @@ export default function GeneralManagement() {
       >
         {[
           "users",
-          "buildings",
+          "buildings_and_delivery_locations",
           "feeds",
           "medications",
-          "delivery_locations",
         ].map((link, index) => {
           return (
             <Link
@@ -63,10 +64,14 @@ export default function GeneralManagement() {
                     : "group-hover/link:bg-default"
                 )}
               >
-                <span>{capitalize(toTitle(link))}</span>
+                <span>
+                  {link !== "buildings"
+                    ? capitalize(toTitle(link))
+                    : capitalize("buildings and Delivery Locations")}
+                </span>
                 <GrNext
                   className={classNames(
-                    "transition-all",
+                    "transition-all ",
                     getPath() === `/general_management/${link}`
                       ? "block"
                       : "animate-slide-right hidden group-hover/link:block"
@@ -91,10 +96,19 @@ export default function GeneralManagement() {
       >
         <Routes>
           <Route path="/users/*" element={<Users />} />
-          <Route path="/buildings/*" element={<Buildings />} />
+          <Route
+            path="/buildings_and_delivery_locations/*"
+            element={
+              <>
+                <div className="flex flex-col gap-2 ">
+                  <Buildings />
+                  <Locations />
+                </div>
+              </>
+            }
+          />
           <Route path="/feeds/*" element={<Feeds />} />
-          <Route path="/medications/*" element={<></>} />
-          <Route path="/delivery_locations/*" element={<></>} />
+          <Route path="/medications/*" element={<Medicine />} />
         </Routes>
       </div>
     </div>

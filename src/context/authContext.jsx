@@ -231,7 +231,7 @@ export function AuthProvider({ children }) {
   const addMedicine = async (newMedicine) => {
     try {
       const fd = new FormData();
-      fd.append("method","add");
+      fd.append("method", "add");
       fd.append("medicine_name", newMedicine.medicine_name);
       fd.append("dosage_instructions", newMedicine.dosage_instructions);
       fd.append("usage_indication", newMedicine.usage_indication);
@@ -274,6 +274,63 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
+
+  //LOCATION MANAGEMENT
+  const getLocation = async (id = null) => {
+    try {
+      const response = await axios.get(url.manageLocationsURL, {
+        params: {
+          id: id ? id : "all",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+  const addLocation = async (newLocation) => {
+    try {
+      const fd = new FormData();
+      fd.append("method", "add");
+      fd.append("location_name", newLocation.location_name);
+      const response = await axios.post(url.manageLocationsURL, fd);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+  const updateLocation = async (location, id) => {
+    try {
+      const location_data = {
+        location_id: id,
+        location_name: location.location_name,
+      };
+      const response = await axios.put(url.manageLocationsURL, location_data);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+  const deleteLocation = async (id) => {
+    try {
+      const response = await axios.delete(url.manageLocationsURL, {
+        params: {
+          id: id,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
   useEffect(() => {
     if (sessionStorage.getItem("currentUser")) {
       setCurrentUser(JSON.parse(sessionStorage.getItem("currentUser")));
@@ -291,6 +348,8 @@ export function AuthProvider({ children }) {
     signInUser,
     deleteUser,
     updateUser,
+    getLocation,
+    addLocation,
     getBuilding,
     getMedicine,
     addMedicine,
@@ -299,6 +358,8 @@ export function AuthProvider({ children }) {
     updateFeeds,
     deleteFeeds,
     registerUser,
+    updateLocation,
+    deleteLocation,
     updateMedicine,
     deleteMedicine,
     updateBuilding,

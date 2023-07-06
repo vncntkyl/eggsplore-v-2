@@ -1,40 +1,41 @@
 import { useEffect, useState } from "react";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";
-import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
 import { Button, TextInput } from "../../Forms";
+import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
 import { HiPencilAlt } from "react-icons/hi";
-import { Modal, Alert } from "../../Containers";
+import { Alert, Modal } from "../../Containers";
 
-export default function Buildings() {
+export default function Locations() {
+  const { capitalize, toTitle } = useFunction();
+  const { getLocation, addLocation, updateLocation, deleteLocation } =
+    useAuth();
+
   const [refresh, doRefresh] = useState(0);
-  const [buildings, setBuildings] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [modalTitle, setModalTitle] = useState(null);
-  const [selectedBuilding, setBuilding] = useState(null);
+  const [selectedLocation, setLocation] = useState(null);
   const [alert, toggleAlert] = useState({
     type: "success",
     title: "",
     message: "",
     show: false,
   });
-  const [newBuilding, setNewBuilding] = useState({
-    number: 0,
-    capacity: 0,
+  const [newLocation, setNewLocation] = useState({
+    location_name: "",
   });
-
-  const { capitalize, toTitle } = useFunction();
-  const { getBuilding, addBuilding, updateBuilding, deleteBuilding } =
-    useAuth();
-
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const response = await updateBuilding(newBuilding, selectedBuilding.id);
+    const response = await updateLocation(
+      newLocation,
+      selectedLocation.location_id
+    );
     setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
-        title: "Building Update Complete",
-        message: "Building information has been updated.",
+        title: "Location Update Complete",
+        message: "Location information has been updated.",
         show: true,
       });
     } else {
@@ -42,7 +43,7 @@ export default function Buildings() {
         type: "warning",
         title: "Update Error",
         message:
-          "There has been an error on updating the building information. Please try again.",
+          response,
         show: true,
       });
     }
@@ -50,13 +51,13 @@ export default function Buildings() {
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
-    const response = await addBuilding(newBuilding);
+    const response = await addLocation(newLocation);
     setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
         title: "Registration Complete",
-        message: "New building has been registered.",
+        message: "New delivery location has been registered.",
         show: true,
       });
     } else {
@@ -67,46 +68,46 @@ export default function Buildings() {
         show: true,
       });
     }
-    doRefresh((count) => count = count + 1);
+    doRefresh((count) => (count = count + 1));
   };
   const handleDelete = async () => {
-    const response = await deleteBuilding(selectedBuilding.id);
+    const response = await deleteLocation(selectedLocation.location_id);
     setModalTitle(null);
     if (response == 1) {
       toggleAlert({
         type: "success",
         title: "Deletion Complete",
-        message: `${capitalize(selectedBuilding.number)} has been deleted.`,
+        message: `${capitalize(
+          selectedLocation.location_name
+        )} has been deleted.`,
         show: true,
       });
     } else {
       toggleAlert({
         type: "warning",
         title: "Deletion Error",
-        message:
-          "An error has occured. Please try again.",
+        message: "An error has occured. Please try again.",
         show: true,
       });
     }
-    doRefresh((count) => count = count + 1);
+    doRefresh((count) => (count = count + 1));
   };
 
   const handleClose = () => {
     setModalTitle(null);
-    setBuilding(null);
+    setLocation(null);
     toggleAlert({
       type: "success",
       title: "",
       message: "",
       show: false,
     });
-    setNewBuilding({ number: 0, capacity: 0 });
+    setNewLocation({ location_name: "" });
   };
-
   useEffect(() => {
     const setup = async () => {
-      const response = await getBuilding();
-      setBuildings(response);
+      const response = await getLocation();
+      setLocations(response);
     };
     setup();
     const realtimeData = setInterval(setup, 1000);
@@ -115,18 +116,19 @@ export default function Buildings() {
       clearInterval(realtimeData);
     };
   }, [refresh]);
-
   return (
     <>
       <div>
-        <p className="font-semibold text-[1.1rem] mb-1 text-main">Building Management</p>
+        <p className="font-semibold text-[1.1rem] mb-1 text-main">
+          Delivery Locations Management
+        </p>
         <div className="flex flex-row items-center justify-between">
           <Button
-            onClick={() => setModalTitle("add building")}
+            onClick={() => setModalTitle("add location")}
             value={
               <div className="flex items-center gap-1">
                 <AiFillPlusCircle />
-                <span>Add Building</span>
+                <span>Add Location</span>
               </div>
             }
             className={
@@ -138,32 +140,27 @@ export default function Buildings() {
           <table className="w-full rounded-md shadow-md overflow-hidden">
             <thead>
               <tr className="bg-main text-white">
-                <th>Building No. </th>
-                <th>Capacity</th>
+                <th>Location</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {buildings.map((bldg) => {
+              {locations.map((location) => {
                 return (
-                  <tr key={bldg.id} className="hover:bg-slate-200">
+                  <tr key={location.location_id} className="hover:bg-slate-200">
                     <td align="center" className="p-2">
-                      {bldg.number}
-                    </td>
-                    <td align="center" className="p-2">
-                      {bldg.capacity}
+                      {location.location_name}
                     </td>
                     <td align="center" className="p-2">
                       <div className="flex items-center justify-center gap-1">
                         <Button
                           onClick={() => {
-                            setBuilding(bldg);
-                            setNewBuilding({
-                              number: bldg.number,
-                              capacity: bldg.capacity,
+                            setLocation(location);
+                            setNewLocation({
+                              location_name: location.location_name,
                               update: true,
                             });
-                            setModalTitle("edit building");
+                            setModalTitle("edit location");
                           }}
                           className="bg-yellow p-1 rounded"
                           value={<HiPencilAlt className="text-white" />}
@@ -171,7 +168,7 @@ export default function Buildings() {
                         <Button
                           className="bg-red-light p-1 rounded"
                           onClick={() => {
-                            setBuilding(bldg);
+                            setLocation(location);
                             setModalTitle("confirmation");
                           }}
                           value={<AiFillDelete className="text-white" />}
@@ -190,28 +187,27 @@ export default function Buildings() {
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
           content={
-            ["add building", "edit building"].includes(modalTitle) ? (
+            ["add location", "edit location"].includes(modalTitle) ? (
               <>
                 <form
                   autoComplete="off"
                   className="flex flex-col gap-2"
                   onSubmit={
-                    Object.keys(newBuilding).includes("update")
+                    Object.keys(newLocation).includes("update")
                       ? handleUpdate
                       : handleRegistration
                   }
                 >
-                  {Object.keys(newBuilding)
+                  {Object.keys(newLocation)
                     .filter((key) => key !== "update")
                     .map((lbl, index) => {
                       return (
                         <TextInput
-                          type="number"
                           key={index}
                           id={lbl}
                           value={
-                            modalTitle === "edit building"
-                              ? newBuilding[lbl]
+                            modalTitle === "edit location"
+                              ? newLocation[lbl]
                               : null
                           }
                           withLabel={capitalize(toTitle(lbl))}
@@ -220,7 +216,7 @@ export default function Buildings() {
                           labelClasses="whitespace-nowrap w-1/3 text-start"
                           inputClasses="bg-default w-2/3 rounded px-2"
                           onChange={(e) => {
-                            setNewBuilding((current) => ({
+                            setNewLocation((current) => ({
                               ...current,
                               [lbl]: e.target.value,
                             }));
@@ -231,7 +227,7 @@ export default function Buildings() {
                   <div className="flex items-center justify-end gap-2">
                     <Button
                       type="submit"
-                      value={newBuilding.update ? "Save Changes" : "Register"}
+                      value={newLocation.update ? "Save Changes" : "Register"}
                       className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
                     />
                     <Button
@@ -247,7 +243,7 @@ export default function Buildings() {
                 <p>
                   Are you sure to remove{" "}
                   <span className="font-semibold">
-                    {capitalize(selectedBuilding.number)}?
+                    {capitalize(selectedLocation.location_name)}?
                   </span>
                 </p>
                 <div className="flex items-center justify-end gap-2">
