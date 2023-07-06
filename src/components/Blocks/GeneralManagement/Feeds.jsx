@@ -141,23 +141,23 @@ export default function Feeds() {
               </tr>
             </thead>
             <tbody>
-              {feeds.map((bldg) => {
+              {feeds.map((feed) => {
                 return (
-                  <tr key={bldg.id} className="hover:bg-slate-200">
+                  <tr key={feed.id} className="hover:bg-slate-200">
                     <td align="center" className="p-2 w-1/5">
-                      {capitalize(bldg.name)}
+                      {capitalize(feed.name)}
                     </td>
                     <td align="center" className="p-2 w-3/5">
-                      {bldg.description}
+                      {feed.description}
                     </td>
                     <td align="center" className="p-2 w-1/5">
                       <div className="flex items-center justify-center gap-1">
                         <Button
                           onClick={() => {
-                            setFeed(bldg);
+                            setFeed(feed);
                             setNewFeed({
-                              name: bldg.name,
-                              description: bldg.description,
+                              name: feed.name,
+                              description: feed.description,
                               update: true,
                             });
                             setModalTitle("edit feeds");
@@ -168,7 +168,7 @@ export default function Feeds() {
                         <Button
                           className="bg-red-light p-1 rounded"
                           onClick={() => {
-                            setFeed(bldg);
+                            setFeed(feed);
                             setModalTitle("confirmation");
                           }}
                           value={<AiFillDelete className="text-white" />}
