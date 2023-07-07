@@ -12,10 +12,12 @@ export default function Users() {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
   const [users, setUsers] = useState([]);
+  const [buildings, setBuildings] = useState([]);
   const [newUser, setNewUser] = useState({
     first_name: "",
     middle_name: "",
     last_name: "",
+    building_no: "",
     username: "",
     password: "",
   });
@@ -39,6 +41,7 @@ export default function Users() {
       selectedUser.user_id
     );
     setModalTitle(null);
+    console.log(response);
     if (response === 1) {
       toggleAlert({
         type: "success",
@@ -93,6 +96,7 @@ export default function Users() {
       first_name: "",
       middle_name: "",
       last_name: "",
+      building_no: "",
       username: "",
       password: "",
     });
@@ -128,6 +132,8 @@ export default function Users() {
       setUsers(response);
       const building_designations = await getBuilding("relation");
       setUserBuildings(building_designations);
+      const buildings = await getBuilding();
+      setBuildings(buildings);
     };
 
     setup();
@@ -211,6 +217,15 @@ export default function Users() {
                                   first_name: user.first_name,
                                   middle_name: user.middle_name,
                                   last_name: user.last_name,
+                                  building_no: [
+                                    ...userBuildings
+                                      .filter(
+                                        (ub) => ub.user_id === user.user_id
+                                      )
+                                      .map((bldg) => {
+                                        return bldg.number;
+                                      }),
+                                  ],
                                   username: user.username,
                                   update: true,
                                 });
@@ -254,9 +269,13 @@ export default function Users() {
                   }
                 >
                   {Object.keys(newUser)
-                    .filter((key) => key !== "update")
+                    .filter((key) =>
+                      activePanel !== "admin"
+                        ? key !== "update"
+                        : key !== "building_no" && key !== "update"
+                    )
                     .map((lbl, index) => {
-                      return (
+                      return lbl !== "building_no" ? (
                         <TextInput
                           type={lbl !== "password" ? "text" : "password"}
                           key={index}
@@ -276,6 +295,8 @@ export default function Users() {
                             }));
                           }}
                         />
+                      ) : (
+                        <select>{}</select>
                       );
                     })}
                   <div className="flex items-center justify-end gap-2">

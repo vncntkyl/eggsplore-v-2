@@ -8,7 +8,7 @@ export default function UserDropdown() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
   const handleLogout = () => {
-    sessionStorage.clear();
+    localStorage.clear();
     setCurrentUser([]);
     navigate("/login");
   };

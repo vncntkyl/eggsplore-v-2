@@ -36,10 +36,10 @@ export function FunctionProvider({ children }) {
   }
   //SESSION FUNCTIONS
   function saveItem(key, value) {
-    sessionStorage.setItem(key, value);
+    localStorage.setItem(key, value);
   }
   function getItem(key) {
-    return sessionStorage.getItem(key);
+    return localStorage.getItem(key);
   }
 
   const value = {

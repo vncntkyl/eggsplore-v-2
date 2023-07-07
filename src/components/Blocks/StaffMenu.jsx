@@ -3,10 +3,11 @@ import option_2 from "../../assets/chicken_mortality.png";
 import option_3 from "../../assets/medicine_remaining.png";
 import option_4 from "../../assets/feed_remaining.png";
 import option_5 from "../../assets/egg_segregation.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BuildingDropdown from "../Containers/BuildingDropdown";
 import classNames from "classnames";
 import { Button } from "../Forms";
+import StaffRoutes from "./StaffRoutes";
 export default function StaffMenu() {
   const [activeForm, setActiveForm] = useState(null);
   const [currentBldg, setCurrentBldg] = useState(null);
@@ -18,7 +19,7 @@ export default function StaffMenu() {
       img: option_1,
     },
     {
-      title: "Chicken Mortality",
+      title: "Chicken Management",
       helperText: "Update chicken conditions.",
       img: option_2,
     },
@@ -39,6 +40,11 @@ export default function StaffMenu() {
     },
   ];
 
+  useEffect(() => {
+    if (localStorage.getItem("activeForm")) {
+      setActiveForm(localStorage.getItem("activeForm"));
+    }
+  }, []);
   return (
     <div className="p-2 pt-4 body flex flex-col gap-4">
       <div className="flex flex-row items-center justify-between">
@@ -50,7 +56,10 @@ export default function StaffMenu() {
           return (
             <Button
               key={index}
-              onClick={() => setActiveForm(item.title)}
+              onClick={() => {
+                setActiveForm(item.title);
+                localStorage.setItem("activeForm", item.title);
+              }}
               important
               className={classNames(
                 "flex bg-white text-start shadow-md p-4 w-full border-main select-none cursor-pointer transition-all rounded",
@@ -88,11 +97,13 @@ export default function StaffMenu() {
       </div>
       <div
         className={classNames(
-          "flex items-center justify-center min-h-[55vh] rounded-md shadow-md",
-          !currentBldg || !activeForm ? "bg-default-dark" : "bg-white"
+          "flex min-h-[55vh] rounded-md shadow-md w-full",
+          !currentBldg || !activeForm
+            ? "bg-default-dark items-center justify-center"
+            : "bg-white"
         )}
       >
-        {(!currentBldg || !activeForm) && (
+        {!currentBldg || !activeForm ? (
           <span className="text-[1.1rem] text-gray-600 font-semibold">
             {!currentBldg && !activeForm
               ? "Please select from the menu and building"
@@ -100,10 +111,11 @@ export default function StaffMenu() {
               ? "Please select a building"
               : "Please select from the menu"}
           </span>
+        ) : (
+          <div className="w-full">
+            <StaffRoutes panel={activeForm} building={currentBldg} />
+          </div>
         )}
-        <div>
-          <form action=""></form>
-        </div>
       </div>
     </div>
   );

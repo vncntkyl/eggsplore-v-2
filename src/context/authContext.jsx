@@ -86,11 +86,11 @@ export function AuthProvider({ children }) {
     }
   };
   const getCurrentUser = () => {
-    return sessionStorage.getItem("currentUser");
+    return localStorage.getItem("currentUser");
   };
   const getUserType = () => {
-    if (sessionStorage.getItem("currentUser")) {
-      return JSON.parse(sessionStorage.getItem("currentUser")).user_type;
+    if (localStorage.getItem("currentUser")) {
+      return JSON.parse(localStorage.getItem("currentUser")).user_type;
     }
     return null;
   };
@@ -331,13 +331,47 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
+
+  //EGG MANAGEMENT
+  const insertEggProcurement = async (eggData, method) => {
+    try {
+      const eggFD = new FormData();
+      eggFD.append("method", method);
+      eggFD.append("egg_data", JSON.stringify(eggData));
+      const response = await axios.post(url.manageEggsURL, eggFD);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
+  const retrieveEggProcurement = async (
+    type = "admin",
+    selectionType = "all"
+  ) => {
+    try {
+      const response = await axios.get(url.manageEggsURL, {
+        params: {
+          retrieve: "procurement",
+          type: type,
+          selectionType: selectionType,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
   useEffect(() => {
-    if (sessionStorage.getItem("currentUser")) {
-      setCurrentUser(JSON.parse(sessionStorage.getItem("currentUser")));
+    if (localStorage.getItem("currentUser")) {
+      setCurrentUser(JSON.parse(localStorage.getItem("currentUser")));
     } else {
       navigate("/login");
     }
-  }, [sessionStorage]);
+  }, [localStorage]);
 
   const values = {
     currentUser,
@@ -366,6 +400,8 @@ export function AuthProvider({ children }) {
     deleteBuilding,
     getCurrentUser,
     setCurrentUser,
+    insertEggProcurement,
+    retrieveEggProcurement,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

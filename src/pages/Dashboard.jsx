@@ -31,14 +31,14 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (!sessionStorage.getItem("currentUser")) {
+    if (!localStorage.getItem("currentUser")) {
       navigate("/login");
       return;
     } else {
       setUser(JSON.parse(getCurrentUser()));
       setLoading(false);
     }
-  }, [sessionStorage]);
+  }, [localStorage]);
 
   return !loading ? (
     <div className="min-h-screen bg-default">
