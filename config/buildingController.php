@@ -3,12 +3,20 @@ require_once 'authController.php';
 class Building extends Controller
 {
 
-    function retrieve_buildings()
+    function retrieve_buildings($bldg_id = null)
     {
         try {
-            $this->setStatement("SELECT * FROM ep_building");
+            $sqlStatement = "SELECT * FROM ep_building";
+            if ($bldg_id) {
+                $sqlStatement .= " WHERE id = " . $bldg_id;
+            }
+            $this->setStatement($sqlStatement);
             $this->statement->execute();
-            return $this->statement->fetchAll();
+            if (!$bldg_id) {
+                return $this->statement->fetchAll();
+            } else {
+                return $this->statement->fetch();
+            }
         } catch (PDOException $e) {
             $this->getError($e);
         }
@@ -61,4 +69,3 @@ class Building extends Controller
         }
     }
 }
-?>

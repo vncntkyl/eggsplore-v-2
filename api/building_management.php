@@ -12,6 +12,9 @@ if (isset($_GET['getBuilding'])) {
     } else if ($param === "relation") {
         $result = $bldg->retrieve_all_user_buildings();
         echo json_encode($result);
+    } else{
+        $result = $bldg->retrieve_buildings($param);
+        echo json_encode($result);
     }
 }
 switch ($_SERVER['REQUEST_METHOD']) {
@@ -31,4 +34,3 @@ switch ($_SERVER['REQUEST_METHOD']) {
         echo $bldg->deleteBuilding($id) ? 1 : 0;
         break;
 }
-?>
