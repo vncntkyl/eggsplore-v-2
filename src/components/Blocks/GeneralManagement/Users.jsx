@@ -1,7 +1,12 @@
 import Toggle from "../../Fragments/Toggle";
 import { useEffect, useState } from "react";
 import { Button, TextInput } from "../../Forms";
-import { AiFillDelete, AiFillPlusCircle } from "react-icons/ai";
+import {
+  AiFillCaretDown,
+  AiFillCaretUp,
+  AiFillDelete,
+  AiFillPlusCircle,
+} from "react-icons/ai";
 import { HiPencilAlt } from "react-icons/hi";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";
@@ -11,13 +16,14 @@ export default function Users() {
   const [activePanel, setActivePanel] = useState("admin");
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
+  const [showBldgDropdown, toggleBldgDropdown] = useState(false);
   const [users, setUsers] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [newUser, setNewUser] = useState({
     first_name: "",
     middle_name: "",
     last_name: "",
-    building_no: "",
+    building_no: [],
     username: "",
     password: "",
   });
@@ -36,29 +42,30 @@ export default function Users() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const response = await updateUser(
-      JSON.stringify(newUser),
-      selectedUser.user_id
-    );
-    setModalTitle(null);
-    console.log(response);
-    if (response === 1) {
-      toggleAlert({
-        type: "success",
-        title: "Account Update Complete",
-        message: "User has been updated.",
-        show: true,
-      });
-    } else {
-      toggleAlert({
-        type: "warning",
-        title: "Update Error",
-        message:
-          "There has been an error on updating the account. Please try again.",
-        show: true,
-      });
-    }
-    doRefresh((count) => (count = count + 1));
+    console.log(newUser);
+    // const response = await updateUser(
+    //   JSON.stringify(newUser),
+    //   selectedUser.user_id
+    // );
+    // setModalTitle(null);
+    // console.log(response);
+    // if (response === 1) {
+    //   toggleAlert({
+    //     type: "success",
+    //     title: "Account Update Complete",
+    //     message: "User has been updated.",
+    //     show: true,
+    //   });
+    // } else {
+    //   toggleAlert({
+    //     type: "warning",
+    //     title: "Update Error",
+    //     message:
+    //       "There has been an error on updating the account. Please try again.",
+    //     show: true,
+    //   });
+    // }
+    // doRefresh((count) => (count = count + 1));
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -296,7 +303,67 @@ export default function Users() {
                           }}
                         />
                       ) : (
-                        <select>{}</select>
+                        <div className="flex flex-row gap-2 items-center justify-between relative max--h-[30px] p-1">
+                          <span>Buildings</span>
+                          <Button
+                            value={
+                              <>
+                                <p>Select Building/s</p>
+                                {showBldgDropdown ? (
+                                  <AiFillCaretDown />
+                                ) : (
+                                  <AiFillCaretUp />
+                                )}
+                              </>
+                            }
+                            className="bg-default p-1 px-2 w-full flex flex-row items-center justify-between rounded"
+                            onClick={() => {
+                              toggleBldgDropdown((prev) => !prev);
+                            }}
+                          />
+                          {showBldgDropdown && (
+                            <div className="flex flex-col gap-2 p-1 bg-default absolute right-0 top-full max-h-[50px] overflow-y-scroll">
+                              {buildings.map((bldg, index) => {
+                                return (
+                                  <div key={index}>
+                                    <input
+                                      type="checkbox"
+                                      id={bldg.id}
+                                      value={bldg.id}
+                                      checked={
+                                        bldg.id == newUser.building_no[index]
+                                      }
+                                      className="hidden peer/option"
+                                      onChange={(e) => {
+                                        const value = e.target.value;
+                                        const checked = e.target.checked;
+
+                                        if (checked) {
+                                          const tempUser = { ...newUser };
+                                          tempUser.building_no.push(value);
+                                          setNewUser(tempUser);
+                                        } else {
+                                          const tempUser = { ...newUser };
+                                          tempUser.building_no =
+                                            tempUser.building_no.filter(
+                                              (bldg) => bldg != value
+                                            );
+                                          setNewUser(tempUser);
+                                        }
+                                      }}
+                                    />
+                                    <label
+                                      htmlFor={bldg.id}
+                                      className="cursor-pointer peer-checked/option:bg-default-dark w-[90%] p-2 select-none"
+                                    >
+                                      Building {bldg.number}
+                                    </label>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
                       );
                     })}
                   <div className="flex items-center justify-end gap-2">
