@@ -35,37 +35,68 @@ export default function Users() {
   });
   const [userBuildings, setUserBuildings] = useState([]);
   const [selectedUser, setUser] = useState(null);
+  const [selectedBuildings, setSelectedBuildings] = useState([]);
 
   const { capitalize, getFullName, toTitle } = useFunction();
   const { getUser, getBuilding, registerUser, deleteUser, updateUser } =
     useAuth();
 
+  const compareBuildings = (user_buildings = [], selected = []) => {
+    const addedItems = selected.filter(
+      (selectedItem) =>
+        !user_buildings.some(
+          (userItem) =>
+            userItem.building_id === selectedItem.building_id &&
+            userItem.user_id === selectedItem.user_id
+        )
+    );
+    const removedItems = user_buildings
+      .filter((bldg) => bldg.user_id == selectedUser.user_id)
+      .filter(
+        (userItem) =>
+          !selected.some(
+            (selectedItem) =>
+              selectedItem.building_id === userItem.building_id &&
+              selectedItem.user_id === userItem.user_id
+          )
+      );
+
+    return { addedItems, removedItems };
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
-    console.log(newUser);
-    // const response = await updateUser(
-    //   JSON.stringify(newUser),
-    //   selectedUser.user_id
-    // );
-    // setModalTitle(null);
-    // console.log(response);
-    // if (response === 1) {
-    //   toggleAlert({
-    //     type: "success",
-    //     title: "Account Update Complete",
-    //     message: "User has been updated.",
-    //     show: true,
-    //   });
-    // } else {
-    //   toggleAlert({
-    //     type: "warning",
-    //     title: "Update Error",
-    //     message:
-    //       "There has been an error on updating the account. Please try again.",
-    //     show: true,
-    //   });
-    // }
-    // doRefresh((count) => (count = count + 1));
+    const tempUser = { ...newUser };
+    delete tempUser.building_no;
+    let buildings = { addedItems: [], removedItems: [] };
+    if (userBuildings.find((b) => b.user_id == selectedUser.user_id)) {
+      buildings = compareBuildings(userBuildings, selectedBuildings);
+    }
+
+    const response = await updateUser(
+      JSON.stringify(newUser),
+      JSON.stringify(buildings),
+      selectedUser.user_id
+    );
+    setModalTitle(null);
+    console.log(response);
+    if (response === 1) {
+      toggleAlert({
+        type: "success",
+        title: "Account Update Complete",
+        message: "User has been updated.",
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Update Error",
+        message:
+          "There has been an error on updating the account. Please try again.",
+        show: true,
+      });
+    }
+    doRefresh((count) => (count = count + 1));
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -107,6 +138,8 @@ export default function Users() {
       username: "",
       password: "",
     });
+    toggleBldgDropdown(false);
+    setSelectedBuildings([]);
   };
 
   const handleDelete = async () => {
@@ -133,6 +166,26 @@ export default function Users() {
     doRefresh((count) => (count = count + 1));
   };
 
+  const handleCheckboxChange = (e, item) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      setSelectedBuildings([
+        ...selectedBuildings,
+        {
+          user_id: selectedUser.user_id,
+          building_id: item.id,
+          number: item.number,
+          capacity: item.capacity,
+        },
+      ]);
+    } else {
+      setSelectedBuildings(
+        selectedBuildings.filter(
+          (selectedItem) => selectedItem.building_id !== item.id
+        )
+      );
+    }
+  };
   useEffect(() => {
     const setup = async () => {
       const response = await getUser();
@@ -220,18 +273,24 @@ export default function Users() {
                             <Button
                               onClick={() => {
                                 setUser(user);
+                                setSelectedBuildings(
+                                  userBuildings
+                                    .filter((ub) => ub.user_id === user.user_id)
+                                    .map((b) => ({
+                                      user_id: b.user_id,
+                                      building_id: b.building_id,
+                                      number: b.number,
+                                      capacity: b.capacity,
+                                    }))
+                                );
                                 setNewUser({
                                   first_name: user.first_name,
                                   middle_name: user.middle_name,
                                   last_name: user.last_name,
                                   building_no: [
-                                    ...userBuildings
-                                      .filter(
-                                        (ub) => ub.user_id === user.user_id
-                                      )
-                                      .map((bldg) => {
-                                        return bldg.number;
-                                      }),
+                                    ...userBuildings.filter(
+                                      (ub) => ub.user_id === user.user_id
+                                    ),
                                   ],
                                   username: user.username,
                                   update: true,
@@ -308,7 +367,15 @@ export default function Users() {
                           <Button
                             value={
                               <>
-                                <p>Select Building/s</p>
+                                <p>
+                                  {selectedBuildings.length > 0
+                                    ? selectedBuildings
+                                        .map((b) => {
+                                          return b.number;
+                                        })
+                                        .join(", ")
+                                    : "Select Building/s"}
+                                </p>
                                 {showBldgDropdown ? (
                                   <AiFillCaretDown />
                                 ) : (
@@ -322,7 +389,7 @@ export default function Users() {
                             }}
                           />
                           {showBldgDropdown && (
-                            <div className="flex flex-col gap-2 p-1 bg-default absolute right-0 top-full max-h-[50px] overflow-y-scroll">
+                            <div className="flex flex-col gap-2 p-1 bg-default absolute right-0 top-full max-h-[100px] overflow-y-scroll">
                               {buildings.map((bldg, index) => {
                                 return (
                                   <div key={index}>
@@ -330,27 +397,14 @@ export default function Users() {
                                       type="checkbox"
                                       id={bldg.id}
                                       value={bldg.id}
-                                      checked={
-                                        bldg.id == newUser.building_no[index]
-                                      }
+                                      checked={selectedBuildings.some(
+                                        (selectedItem) =>
+                                          selectedItem.building_id === bldg.id
+                                      )}
                                       className="hidden peer/option"
-                                      onChange={(e) => {
-                                        const value = e.target.value;
-                                        const checked = e.target.checked;
-
-                                        if (checked) {
-                                          const tempUser = { ...newUser };
-                                          tempUser.building_no.push(value);
-                                          setNewUser(tempUser);
-                                        } else {
-                                          const tempUser = { ...newUser };
-                                          tempUser.building_no =
-                                            tempUser.building_no.filter(
-                                              (bldg) => bldg != value
-                                            );
-                                          setNewUser(tempUser);
-                                        }
-                                      }}
+                                      onChange={(e) =>
+                                        handleCheckboxChange(e, bldg)
+                                      }
                                     />
                                     <label
                                       htmlFor={bldg.id}

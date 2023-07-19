@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, TextInput } from "../../Forms";
+import { Button, Dropdown, TextInput } from "../../Forms";
 import { useFunction } from "../../../context/FunctionContext";
 import { format } from "date-fns";
 import { useAuth } from "../../../context/authContext";
@@ -27,10 +27,13 @@ export default function EggProduction({ building }) {
 
   const handleSubmit = async () => {
     setModalTitle(null);
+    const building_id = document.querySelector("#building_id");
+    const id = parseInt(building_id.value);
+
     const data = {
       date: eggData.date,
       count: eggData.egg_tray_count,
-      building: eggData.building_number,
+      building: id,
       staff: JSON.parse(getCurrentUser()).user_id,
       log_date: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
     };
@@ -94,17 +97,32 @@ export default function EggProduction({ building }) {
             }}
           >
             {Object.keys(eggData).map((eggKey, index) => {
-              return (
+              return eggKey === "building_number" ? (
+                <>
+                  <TextInput
+                    type="hidden"
+                    value={currentBuilding.id}
+                    id="building_id"
+                  />
+                  <TextInput
+                    id={eggKey}
+                    key={index}
+                    withLabel={capitalize(toTitle(eggKey)) + ":"}
+                    value={currentBuilding.number}
+                    type="number"
+                    disabled={true}
+                    orientation="row"
+                    classes="p-1 items-center "
+                    labelClasses="whitespace-nowrap w-full text-start"
+                    inputClasses="w-full rounded px-2"
+                  />
+                </>
+              ) : (
                 <TextInput
                   id={eggKey}
                   key={index}
                   withLabel={capitalize(toTitle(eggKey)) + ":"}
-                  value={
-                    eggKey === "building_number"
-                      ? currentBuilding.number
-                      : eggData[eggKey]
-                  }
-                  disabled={eggKey === "building_number"}
+                  value={eggData[eggKey]}
                   type={eggKey === "date" ? "date" : "number"}
                   orientation="row"
                   classes="p-1 items-center "
@@ -115,7 +133,7 @@ export default function EggProduction({ building }) {
                       ...data,
                       [eggKey]:
                         eggKey === "egg_tray_count"
-                          ? e.target.valueAsNumber
+                          ? parseInt(e.target.value)
                           : e.target.value,
                     }))
                   }

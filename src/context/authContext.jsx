@@ -72,10 +72,11 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
-  const updateUser = async (user, id) => {
+  const updateUser = async (user,buildings, id) => {
     try {
       const fd = new FormData();
       fd.append("userdata", user);
+      fd.append("buildingdata", buildings);
       fd.append("user_id", id);
       const response = await axios.post(url.manageUserURL, fd);
       if (response.status === 200) {

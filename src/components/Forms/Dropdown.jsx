@@ -8,7 +8,7 @@ export default function Dropdown({
   labelClasses,
   inputClasses,
   classes,
-  type = "text",
+  options,
   withLabel = null,
   orientation = "row",
   inputRef,
@@ -22,13 +22,14 @@ export default function Dropdown({
           {withLabel}
         </label>
       )}
-      <select>
-        
+      <select id={id}>
+        <option value="" disabled>
+          Select {withLabel}
+        </option>
+
       </select>
       <input
         value={value}
-        type={type}
-        id={id}
         placeholder={textHint}
         disabled={disabled}
         ref={inputRef}
