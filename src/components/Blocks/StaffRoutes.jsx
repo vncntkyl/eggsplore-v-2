@@ -13,7 +13,7 @@ export default function StaffRoutes({ panel, building }) {
     case "Egg Production":
       return <EggProduction building={building} />;
     case "Chicken Management":
-      return <ChickenManagement />;
+      return <ChickenManagement building={building} />;
     case "Medicine Management":
       return <MedicineManagement />;
     case "Feeds Management":

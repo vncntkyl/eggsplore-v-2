@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 19, 2023 at 11:31 AM
+-- Generation Time: Jul 21, 2023 at 10:19 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -40,7 +40,55 @@ CREATE TABLE `ep_building` (
 INSERT INTO `ep_building` (`id`, `number`, `capacity`) VALUES
 (1, 1, 438),
 (2, 2, 1395),
-(4, 3, 147);
+(4, 3, 151);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ep_chicken`
+--
+
+CREATE TABLE `ep_chicken` (
+  `chicken_id` int(11) NOT NULL,
+  `chicken_count` int(11) NOT NULL COMMENT 'total count of chicken',
+  `mortality_count` int(11) NOT NULL,
+  `missing_count` int(11) NOT NULL,
+  `remaining` int(11) NOT NULL,
+  `remarks` text NOT NULL,
+  `date_procured` date NOT NULL,
+  `staff_id` int(11) NOT NULL,
+  `building_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ep_chicken`
+--
+
+INSERT INTO `ep_chicken` (`chicken_id`, `chicken_count`, `mortality_count`, `missing_count`, `remaining`, `remarks`, `date_procured`, `staff_id`, `building_id`) VALUES
+(1, 256, 6, 1, 249, 'Six chickens has been slained.', '2023-07-21', 2, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ep_chicks`
+--
+
+CREATE TABLE `ep_chicks` (
+  `chick_id` int(11) NOT NULL,
+  `batch_number` varchar(15) NOT NULL,
+  `chick_count` int(11) NOT NULL,
+  `supplier` varchar(50) NOT NULL,
+  `date_procured` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ep_chicks`
+--
+
+INSERT INTO `ep_chicks` (`chick_id`, `batch_number`, `chick_count`, `supplier`, `date_procured`) VALUES
+(1, '230721-001', 326, 'Hi-Chicks Farm', '2023-07-21'),
+(2, '230721-002', 255, 'Jethro Farm', '2023-07-21'),
+(3, '230721-003', 400, 'United Neon', '2023-07-21');
 
 -- --------------------------------------------------------
 
@@ -194,6 +242,20 @@ ALTER TABLE `ep_building`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `ep_chicken`
+--
+ALTER TABLE `ep_chicken`
+  ADD PRIMARY KEY (`chicken_id`),
+  ADD KEY `ep_chicken_ibfk_1` (`building_id`),
+  ADD KEY `ep_chicken_ibfk_2` (`staff_id`);
+
+--
+-- Indexes for table `ep_chicks`
+--
+ALTER TABLE `ep_chicks`
+  ADD PRIMARY KEY (`chick_id`);
+
+--
 -- Indexes for table `ep_egg_production`
 --
 ALTER TABLE `ep_egg_production`
@@ -244,6 +306,18 @@ ALTER TABLE `ep_building`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `ep_chicken`
+--
+ALTER TABLE `ep_chicken`
+  MODIFY `chicken_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `ep_chicks`
+--
+ALTER TABLE `ep_chicks`
+  MODIFY `chick_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `ep_egg_production`
 --
 ALTER TABLE `ep_egg_production`
@@ -282,6 +356,13 @@ ALTER TABLE `ep_user_building`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `ep_chicken`
+--
+ALTER TABLE `ep_chicken`
+  ADD CONSTRAINT `ep_chicken_ibfk_1` FOREIGN KEY (`building_id`) REFERENCES `ep_user_building` (`building_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `ep_chicken_ibfk_2` FOREIGN KEY (`staff_id`) REFERENCES `ep_user_building` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `ep_egg_production`

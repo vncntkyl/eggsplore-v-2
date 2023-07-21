@@ -3,6 +3,14 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { developmentURLs as url } from "./config";
+import {
+  insertEggProcurement,
+  retrieveEggProcurement,
+  retrieveProcurement,
+  addChickProcurement,
+  updateChickProcurement,
+  insertChickenMaintenance
+} from "./PoultryManagement";
 
 const AuthContext = React.createContext();
 
@@ -72,7 +80,7 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
-  const updateUser = async (user,buildings, id) => {
+  const updateUser = async (user, buildings, id) => {
     try {
       const fd = new FormData();
       fd.append("userdata", user);
@@ -333,39 +341,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  //EGG MANAGEMENT
-  const insertEggProcurement = async (eggData, method) => {
-    try {
-      const eggFD = new FormData();
-      eggFD.append("method", method);
-      eggFD.append("egg_data", JSON.stringify(eggData));
-      const response = await axios.post(url.manageEggsURL, eggFD);
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      return e.message;
-    }
-  };
-  const retrieveEggProcurement = async (
-    type = "admin",
-    selectionType = "all"
-  ) => {
-    try {
-      const response = await axios.get(url.manageEggsURL, {
-        params: {
-          retrieve: "procurement",
-          type: type,
-          selectionType: selectionType,
-        },
-      });
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      return e.message;
-    }
-  };
   useEffect(() => {
     if (localStorage.getItem("currentUser")) {
       setCurrentUser(JSON.parse(localStorage.getItem("currentUser")));
@@ -401,8 +376,12 @@ export function AuthProvider({ children }) {
     deleteBuilding,
     getCurrentUser,
     setCurrentUser,
+    retrieveProcurement,
+    addChickProcurement,
     insertEggProcurement,
     retrieveEggProcurement,
+    updateChickProcurement,
+    insertChickenMaintenance,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
