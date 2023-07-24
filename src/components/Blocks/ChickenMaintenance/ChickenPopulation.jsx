@@ -6,6 +6,7 @@ import { AiFillCalendar } from "react-icons/ai";
 import classNames from "classnames";
 import { Modal } from "../../Containers";
 import { format } from "date-fns";
+import ChickenMaintenanceTable from "../../ChickenMaintenanceTable";
 
 export default function ChickenPopulation() {
   const [refresh, doRefresh] = useState(0);
@@ -110,25 +111,15 @@ export default function ChickenPopulation() {
             }
           )}
         </div>
-        <div className="w-full">
-          <table className="w-full rounded-md shadow-md overflow-hidden">
-            <thead>
-              <tr className="bg-main text-white">
-                <th>Building No.</th>
-                <th>Population</th>
-                <th>Mortality</th>
-                <th>Missing</th>
-                <th>Remaining</th>
-                <th>Remarks</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-                {population.map(chicken => {
-                    
-                })}
-            </tbody>
-          </table>
+        <div className="w-full overflow-x-auto shadow-md">
+          <ChickenMaintenanceTable
+            refresh={refresh}
+            filter={
+              selectedFilter === "range" && dateRange.end_date != ""
+                ? dateRange
+                : selectedFilter
+            }
+          />
         </div>
       </div>
       {modalTitle && (

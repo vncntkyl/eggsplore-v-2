@@ -3,8 +3,8 @@ import { BigTextInput, Button, TextInput } from "../../Forms";
 import { useFunction } from "../../../context/FunctionContext";
 import { format } from "date-fns";
 import { useAuth } from "../../../context/authContext";
-import EggProcurementTable from "../../EggProcurementTable";
 import { Alert, Modal } from "../../Containers";
+import ChickenMaintenanceTable from "../../ChickenMaintenanceTable";
 // eslint-disable-next-line react/prop-types
 export default function EggProduction({ building }) {
   const [refresh, doRefresh] = useState(0);
@@ -107,7 +107,7 @@ export default function EggProduction({ building }) {
     <>
       <div className="p-2 flex flex-col gap-2 w-full animate-fade">
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">Egg Production</p>
+          <p className="text-[1.2rem] font-semibold">Chicken Management</p>
           <form
             className="flex flex-col gap-2 bg-default p-2 rounded-md"
             onSubmit={(e) => {
@@ -177,7 +177,7 @@ export default function EggProduction({ building }) {
                         orientation="row"
                         classes="p-1 items-start"
                         labelClasses="whitespace-nowrap w-full text-start"
-                        inputClasses="w-full rounded px-2 h-full resize-none"
+                        inputClasses="w-full rounded px-2 h-full resize-none min-h-[100px]"
                         onChange={(e) =>
                           setChickenData((data) => ({
                             ...data,
@@ -218,7 +218,7 @@ export default function EggProduction({ building }) {
           <p className="text-[1.2rem] font-semibold">
             Chicken Maintenance Logs
           </p>
-          <EggProcurementTable refresh={refresh} />
+          <ChickenMaintenanceTable refresh={refresh} />
         </div>
       </div>
       {modalTitle && (

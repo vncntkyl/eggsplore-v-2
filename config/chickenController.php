@@ -4,6 +4,7 @@ class Chicken extends Controller
 {
     function retrieve_procurement($table = 'ep_chicks', $filter)
     {
+
         try {
             $sqlStatement = "SELECT * FROM " . $table;
             if ($filter !== 'all') {
@@ -15,11 +16,12 @@ class Chicken extends Controller
                     $sqlStatement .= " WHERE WEEK(date_procured) = WEEK(NOW())";
                 } else if ($filter === 'this_month') {
                     $sqlStatement .= " WHERE MONTH(date_procured) = MONTH(NOW())";
-                }else{
-                    $sqlStatement .= "WHERE date_procured >= ".$filter->start_date." AND date_procured <= ".$filter->start_date;
+                } else {
+                    $filter = json_decode($filter);
+                    $sqlStatement .= " WHERE date_procured >= '" . $filter->start_date . "' AND date_procured <= '" . $filter->end_date . "'";
                 }
             }
-            $this->setStatement($sqlStatement);
+            $this->setStatement($sqlStatement . " ORDER BY log_date DESC");
             $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
@@ -55,6 +57,26 @@ class Chicken extends Controller
         try {
             $this->setStatement("UPDATE ep_chicks SET chick_count = ?, supplier = ?, date_procured = ? WHERE chick_id = ?");
             return $this->statement->execute([$procurement_data->chickCount, $procurement_data->supplier, $procurement_data->procurementDate, $procurement_data->procurement_id]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function insert_chicken_management($procurement_data)
+    {
+        try {
+            $this->setStatement("INSERT INTO ep_chicken (chicken_count,mortality_count, missing_count, remaining, remarks, date_procured, staff_id, building_id, log_date) 
+            VALUES (?,?,?,?,?,?,?,?,?)");
+            return $this->statement->execute([
+                $procurement_data->population,
+                $procurement_data->mortality,
+                $procurement_data->missing,
+                $procurement_data->remaining,
+                $procurement_data->remarks,
+                $procurement_data->date,
+                $procurement_data->staff,
+                $procurement_data->building,
+                $procurement_data->log_date
+            ]);
         } catch (PDOException $e) {
             $this->getError($e);
         }

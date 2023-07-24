@@ -22,7 +22,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             if ($_POST['method'] === "staff_add") {
                 $chicken_data = json_decode($_POST['chickenData']);
-                var_dump($chicken_data);
+                echo $chicken->insert_chicken_management($chicken_data) ? 1 : 0;
             }
         }
         break;
