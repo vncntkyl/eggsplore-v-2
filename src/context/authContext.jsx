@@ -9,7 +9,8 @@ import {
   retrieveProcurement,
   addChickProcurement,
   updateChickProcurement,
-  insertChickenMaintenance
+  insertChickenMaintenance,
+  retrieveChickenPopulation,
 } from "./PoultryManagement";
 
 const AuthContext = React.createContext();
@@ -237,6 +238,35 @@ export function AuthProvider({ children }) {
       console.log(e.message);
     }
   };
+  const getMedicationIntake = async (id = null) => {
+    try {
+      const response = await axios.get(url.manageMedicineURL, {
+        params: {
+          id: id ? id : "all",
+          medication_intake: true,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+  const getMedicineInventory = async () => {
+    try {
+      const response = await axios.get(url.manageMedicineURL, {
+        params: {
+          medicine_inventory: true,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
   const addMedicine = async (newMedicine) => {
     try {
       const fd = new FormData();
@@ -244,6 +274,20 @@ export function AuthProvider({ children }) {
       fd.append("medicine_name", newMedicine.medicine_name);
       fd.append("dosage_instructions", newMedicine.dosage_instructions);
       fd.append("usage_indication", newMedicine.usage_indication);
+
+      const response = await axios.post(url.manageMedicineURL, fd);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+  const addMedicationIntake = async (newMedicationIntake) => {
+    try {
+      const fd = new FormData();
+      fd.append("method", "add intake");
+      fd.append("data", JSON.stringify(newMedicationIntake));
 
       const response = await axios.post(url.manageMedicineURL, fd);
       if (response.status === 200) {
@@ -376,12 +420,16 @@ export function AuthProvider({ children }) {
     deleteBuilding,
     getCurrentUser,
     setCurrentUser,
+    getMedicationIntake,
+    addMedicationIntake,
     retrieveProcurement,
     addChickProcurement,
+    getMedicineInventory,
     insertEggProcurement,
     retrieveEggProcurement,
     updateChickProcurement,
     insertChickenMaintenance,
+    retrieveChickenPopulation,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

@@ -105,3 +105,15 @@ export const insertChickenMaintenance = async (chickenData, method) => {
     return e.message;
   }
 };
+export const retrieveChickenPopulation = async () => {
+  try {
+    const response = await axios.get(url.manageChickenURL, {
+      params: { retrievePopulation: true },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
