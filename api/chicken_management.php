@@ -10,6 +10,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $table_name = $_GET['retrieve'];
             $filter = isset($_GET['filter']) ? (gettype($_GET['filter']) == "object" ? json_decode($_GET['filter']) : $_GET['filter']) : "all";
             echo json_encode($chicken->retrieve_procurement($table_name, $filter));
+        } else if (isset($_GET['retrievePopulation'])) {
+            echo json_encode($chicken->get_chicken_population());
         }
         break;
     case "POST":

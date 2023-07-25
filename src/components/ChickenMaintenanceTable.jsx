@@ -6,7 +6,12 @@ import { format } from "date-fns";
 import { Button } from "./Forms";
 import { HiPencilAlt } from "react-icons/hi";
 
-export default function ChickenMaintenanceTable({ refresh, filter = "all" }) {
+export default function ChickenMaintenanceTable({
+  refresh,
+  filter = "all",
+  setModal = null,
+  setChicken = null,
+}) {
   const { getCurrentUser, retrieveProcurement, getBuilding } = useAuth();
   const { capitalize, toTitle } = useFunction();
   const [procurementData, setProcurementData] = useState([]);
@@ -69,7 +74,9 @@ export default function ChickenMaintenanceTable({ refresh, filter = "all" }) {
               return (
                 procurement !== "date_logged" && (
                   <th key={index} className="whitespace-nowrap p-2">
-                    {capitalize(toTitle(procurement))}
+                    {procurement === "building_id"
+                      ? "Building No."
+                      : capitalize(toTitle(procurement))}
                   </th>
                 )
               );
@@ -94,7 +101,7 @@ export default function ChickenMaintenanceTable({ refresh, filter = "all" }) {
               <td className="p-2">{procurement.mortality}</td>
               <td className="p-2">{procurement.missing}</td>
               <td className="p-2">{procurement.remaining}</td>
-              <td className="p-2">{procurement.remarks}</td>
+              <td className="p-2">{procurement.remarks || '--'}</td>
               <td className="p-2">
                 {format(new Date(procurement.date_procured), "MMM d, yyyy")}
               </td>
@@ -103,13 +110,8 @@ export default function ChickenMaintenanceTable({ refresh, filter = "all" }) {
                   <div className="flex items-center justify-center gap-1">
                     <Button
                       onClick={() => {
-                        // setBuilding(bldg);
-                        // setNewBuilding({
-                        //   number: bldg.number,
-                        //   capacity: bldg.capacity,
-                        //   update: true,
-                        // });
-                        // // setModalTitle("edit building");
+                        setModal("edit chicken information");
+                        setChicken(procurement);
                       }}
                       className="bg-yellow p-1 rounded"
                       value={<HiPencilAlt className="text-white" />}

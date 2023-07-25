@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";
-import { Button, TextInput } from "../../Forms";
+import { BigTextInput, Button, TextInput } from "../../Forms";
 import { AiFillCalendar } from "react-icons/ai";
 import classNames from "classnames";
 import { Modal } from "../../Containers";
@@ -10,23 +10,47 @@ import ChickenMaintenanceTable from "../../ChickenMaintenanceTable";
 
 export default function ChickenPopulation() {
   const [refresh, doRefresh] = useState(0);
-  const [population, populate] = useState([]);
+  const [selectedChicken, setChicken] = useState(null);
   const [alert, toggleAlert] = useState({
     type: "success",
     title: "",
     message: "",
     show: false,
   });
-  const [selectedFilter, selectDateFilter] = useState("today");
+  const [selectedFilter, selectDateFilter] = useState("all");
   const [modalTitle, setModalTitle] = useState(null);
   const [dateRange, setRange] = useState({ start_date: "", end_date: "" });
-  const { capitalize, getFullName, toTitle } = useFunction();
-  const { retrieveProcurement, updateUser } = useAuth();
+  const { capitalize, toTitle } = useFunction();
 
   const handleClose = () => {
     setModalTitle(null);
+    selectDateFilter("all");
+    setChicken(null);
   };
 
+  const handleUpdateChickenPopulation = async (e) => {
+    e.preventDefault();
+    console.log(selectedChicken);
+  };
+  const handleInputChange = (e, chickenKey, exception = null) => {
+    const population = parseInt(document.querySelector("#population").value);
+    const mortality_count = parseInt(
+      document.querySelector("#mortality").value
+    );
+    const missing_count = parseInt(document.querySelector("#missing").value);
+
+    setChicken((data) => ({
+      ...data,
+      [chickenKey]: exception
+        ? chickenKey === exception
+          ? e.target.value
+          : parseInt(e.target.value)
+        : parseInt(e.target.value),
+      remaining: e.target.value
+        ? population - (mortality_count + missing_count)
+        : population,
+    }));
+  };
   const handleDateChange = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -37,26 +61,8 @@ export default function ChickenPopulation() {
       start_date: startDate,
       end_date: endDate,
     });
-    handleClose();
+    setModalTitle(null);
   };
-
-  useEffect(() => {
-    const setup = async () => {
-      const filter =
-        selectedFilter === "range" && dateRange.end_date != ""
-          ? dateRange
-          : selectedFilter;
-      const response = await retrieveProcurement("ep_chicken", filter);
-      populate(response);
-    };
-
-    setup();
-    const realtimeData = setInterval(setup, 1000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
-  }, [refresh]);
   return (
     <>
       <div>
@@ -70,7 +76,11 @@ export default function ChickenPopulation() {
                   key={index}
                   onClick={() => {
                     if (date === "range") {
-                      setModalTitle("date range picker");
+                      if (
+                        !Object.values(dateRange).every((item) => item !== "")
+                      ) {
+                        setModalTitle("date range picker");
+                      }
                     }
                     selectDateFilter(date);
                   }}
@@ -110,10 +120,26 @@ export default function ChickenPopulation() {
               );
             }
           )}
+          {selectedFilter !== "all" && (
+            <Button
+              type="button"
+              value="Reset Filter"
+              onClick={() => {
+                setRange({
+                  start_date: "",
+                  end_date: "",
+                });
+                selectDateFilter("all");
+              }}
+              className="text-white p-1 px-2 rounded-sm text-[.9rem] transition-all bg-gray-400 hover:bg-tertiary hover:text-main"
+            />
+          )}
         </div>
         <div className="w-full overflow-x-auto shadow-md">
           <ChickenMaintenanceTable
             refresh={refresh}
+            setModal={setModalTitle}
+            setChicken={setChicken}
             filter={
               selectedFilter === "range" && dateRange.end_date != ""
                 ? dateRange
@@ -165,7 +191,68 @@ export default function ChickenPopulation() {
                 </form>
               </>
             ) : (
-              <>blabla</>
+              <>
+                <form onSubmit={handleUpdateChickenPopulation}>
+                  <div className="flex flex-col gap-2">
+                    {Object.keys(selectedChicken).map((label, index) => {
+                      return (
+                        ![
+                          "id",
+                          "user_id",
+                          "date_procured",
+                          "date_logged",
+                        ].includes(label) &&
+                        (label === "remarks" ? (
+                          <BigTextInput
+                            key={index}
+                            name={label}
+                            id={label}
+                            value={selectedChicken[label]}
+                            withLabel={capitalize(toTitle(label))}
+                            classes="p-1 items-center justify-between"
+                            labelClasses="whitespace-nowrap text-start"
+                            inputClasses="bg-default rounded px-2"
+                            onChange={(e) => {
+                              setChicken((current) => ({
+                                ...current,
+                                remarks: e.target.value,
+                              }));
+                            }}
+                          />
+                        ) : (
+                          <TextInput
+                            key={index}
+                            name={label}
+                            id={label}
+                            type="number"
+                            value={selectedChicken[label]}
+                            disabled={["building_id", "remaining"].includes(
+                              label
+                            )}
+                            withLabel={capitalize(toTitle(label))}
+                            classes="p-1 items-center justify-between"
+                            labelClasses="whitespace-nowrap text-start"
+                            inputClasses="bg-default rounded px-2 disabled:text-gray-500"
+                            onChange={(e) => handleInputChange(e, label)}
+                          />
+                        ))
+                      );
+                    })}
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        type="submit"
+                        value="Save Changes"
+                        className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                      />
+                      <Button
+                        value="Cancel"
+                        onClick={() => handleClose()}
+                        className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
+                      />
+                    </div>
+                  </div>
+                </form>
+              </>
             )
           }
         />

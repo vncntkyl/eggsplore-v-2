@@ -6,11 +6,10 @@ import { useAuth } from "../../../context/authContext";
 import { Alert, Modal } from "../../Containers";
 import ChickenMaintenanceTable from "../../ChickenMaintenanceTable";
 // eslint-disable-next-line react/prop-types
-export default function EggProduction({ building }) {
+export default function ChickenManagement({ building }) {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
   const [currentBuilding, setCurrentBuilding] = useState([]);
-
   const [chickenData, setChickenData] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
     building_number: 0,
@@ -28,7 +27,12 @@ export default function EggProduction({ building }) {
   });
 
   const { toTitle, capitalize } = useFunction();
-  const { insertChickenMaintenance, getCurrentUser, getBuilding } = useAuth();
+  const {
+    insertChickenMaintenance,
+    getCurrentUser,
+    getBuilding,
+    retrieveChickenPopulation,
+  } = useAuth();
 
   const handleSubmit = async () => {
     setModalTitle(null);
@@ -78,31 +82,57 @@ export default function EggProduction({ building }) {
     setChickenData({
       date: format(new Date(), "yyyy-MM-dd"),
       building_number: building,
-      population: 0,
+      population: chickenData.remaining,
       mortality: 0,
       missing: 0,
-      remaining: 0,
+      remaining: chickenData.remaining,
       remarks: "",
     });
   };
 
+  const handleInputChange = (e, chickenKey, exception = null) => {
+    const population = parseInt(document.querySelector("#population").value);
+    const mortality_count = parseInt(
+      document.querySelector("#mortality").value
+    );
+    const missing_count = parseInt(document.querySelector("#missing").value);
+
+    setChickenData((data) => ({
+      ...data,
+      [chickenKey]: exception
+        ? chickenKey === exception
+          ? e.target.value
+          : parseInt(e.target.value)
+        : parseInt(e.target.value),
+      remaining: e.target.value
+        ? population - (mortality_count + missing_count)
+        : population,
+    }));
+  };
   useEffect(() => {
     const setup = async () => {
       const response = await getBuilding(building);
       setCurrentBuilding(response);
-
+      const populationData = await retrieveChickenPopulation();
+      const chickenPopulationData = populationData.find(
+        (data) => data.building_id === building
+      );
       setChickenData({
         date: format(new Date(), "yyyy-MM-dd"),
         building_number: response.number,
-        population: 0,
+        population: chickenPopulationData
+          ? parseInt(chickenPopulationData.current_population)
+          : 0,
         mortality: 0,
         missing: 0,
-        remaining: 0,
+        remaining: chickenPopulationData
+          ? parseInt(chickenPopulationData.current_population)
+          : 0,
         remarks: "",
       });
     };
     setup();
-  }, [building]);
+  }, [building, refresh]);
   return (
     <>
       <div className="p-2 flex flex-col gap-2 w-full animate-fade">
@@ -152,13 +182,7 @@ export default function EggProduction({ building }) {
                         labelClasses="whitespace-nowrap w-full text-start"
                         inputClasses="w-full rounded px-2"
                         onChange={(e) =>
-                          setChickenData((data) => ({
-                            ...data,
-                            [chickenKey]:
-                              chickenKey === "remarks"
-                                ? e.target.value
-                                : parseInt(e.target.value),
-                          }))
+                          handleInputChange(e, chickenKey, "date")
                         }
                       />
                     );
@@ -196,12 +220,11 @@ export default function EggProduction({ building }) {
                         classes="p-1 items-center "
                         labelClasses="whitespace-nowrap w-full text-start"
                         inputClasses="w-full rounded px-2"
-                        onChange={(e) =>
-                          setChickenData((data) => ({
-                            ...data,
-                            [chickenKey]: parseInt(e.target.value),
-                          }))
-                        }
+                        disabled={chickenKey === "remaining"}
+                        onChange={(e) => {
+                          handleInputChange(e, chickenKey)
+
+                        }}
                       />
                     );
                   })}

@@ -6,22 +6,22 @@ class Chicken extends Controller
     {
 
         try {
-            $sqlStatement = "SELECT * FROM " . $table;
+            $sqlStatement = "SELECT * FROM " . $table . ($table === 'ep_chicks' ? " ORDER BY " : " ORDER BY log_date DESC,");
             if ($filter !== 'all') {
                 if ($filter === 'today') {
-                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(NOW())";
+                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(NOW()) ORDER BY log_date DESC,";
                 } else if ($filter === 'yesterday') {
-                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY))";
+                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY log_date DESC,";
                 } else if ($filter === 'this_week') {
-                    $sqlStatement .= " WHERE WEEK(date_procured) = WEEK(NOW())";
+                    $sqlStatement .= " WHERE WEEK(date_procured) = WEEK(NOW()) ORDER BY log_date DESC,";
                 } else if ($filter === 'this_month') {
-                    $sqlStatement .= " WHERE MONTH(date_procured) = MONTH(NOW())";
+                    $sqlStatement .= " WHERE MONTH(date_procured) = MONTH(NOW()) ORDER BY log_date DESC,";
                 } else {
                     $filter = json_decode($filter);
-                    $sqlStatement .= " WHERE date_procured >= '" . $filter->start_date . "' AND date_procured <= '" . $filter->end_date . "'";
+                    $sqlStatement .= " WHERE date_procured >= '" . $filter->start_date . "' AND date_procured <= '" . $filter->end_date . "' ORDER BY log_date DESC,";
                 }
             }
-            $this->setStatement($sqlStatement . " ORDER BY log_date DESC");
+            $this->setStatement($sqlStatement . " date_procured DESC");
             $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
@@ -77,6 +77,16 @@ class Chicken extends Controller
                 $procurement_data->building,
                 $procurement_data->log_date
             ]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function get_chicken_population()
+    {
+        try {
+            $this->setStatement("SELECT building_id, remaining as current_population FROM ep_chicken ORDER BY date_procured DESC LIMIT 1");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }
