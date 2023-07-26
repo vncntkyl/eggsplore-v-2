@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";
 import { BigTextInput, Button, TextInput } from "../../Forms";
 import { AiFillCalendar } from "react-icons/ai";
 import classNames from "classnames";
-import { Modal } from "../../Containers";
+import { Alert, Modal } from "../../Containers";
 import { format } from "date-fns";
 import ChickenMaintenanceTable from "../../ChickenMaintenanceTable";
 
@@ -21,16 +21,41 @@ export default function ChickenPopulation() {
   const [modalTitle, setModalTitle] = useState(null);
   const [dateRange, setRange] = useState({ start_date: "", end_date: "" });
   const { capitalize, toTitle } = useFunction();
+  const { updateChickenPopulation } = useAuth();
 
   const handleClose = () => {
     setModalTitle(null);
     selectDateFilter("all");
     setChicken(null);
+    toggleAlert({
+      type: "success",
+      title: "",
+      message: "",
+      show: false,
+    });
   };
 
   const handleUpdateChickenPopulation = async (e) => {
     e.preventDefault();
-    console.log(selectedChicken);
+    const response = await updateChickenPopulation(selectedChicken);
+    setModalTitle(null);
+    if (response === 1) {
+      toggleAlert({
+        type: "success",
+        title: "Chicken Population Update Success",
+        message: "Successfully updated the chicken population information.",
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Chicken Population Update Error",
+        message:
+          "There has been an error on updating chicken population information. Please try again.",
+        show: true,
+      });
+    }
+    doRefresh((count) => (count = count + 1));
   };
   const handleInputChange = (e, chickenKey, exception = null) => {
     const population = parseInt(document.querySelector("#population").value);
@@ -111,7 +136,7 @@ export default function ChickenPopulation() {
                     )
                   }
                   className={classNames(
-                    "text-white p-1 px-2 rounded-sm text-[.9rem] transition-all",
+                    "text-white p-1 px-2 rounded-sm text-[.9rem] transition-all whitespace-nowrap",
                     selectedFilter === date
                       ? "bg-main"
                       : "bg-gray-400 hover:bg-tertiary hover:text-main"
@@ -131,7 +156,7 @@ export default function ChickenPopulation() {
                 });
                 selectDateFilter("all");
               }}
-              className="text-white p-1 px-2 rounded-sm text-[.9rem] transition-all bg-gray-400 hover:bg-tertiary hover:text-main"
+              className="text-white p-1 px-2 rounded-sm text-[.9rem] transition-all bg-gray-400 hover:bg-tertiary hover:text-main whitespace-nowrap"
             />
           )}
         </div>
@@ -255,6 +280,14 @@ export default function ChickenPopulation() {
               </>
             )
           }
+        />
+      )}
+      {alert.show && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          title={alert.title}
+          onClose={() => handleClose()}
         />
       )}
     </>

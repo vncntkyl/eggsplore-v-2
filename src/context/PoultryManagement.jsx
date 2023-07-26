@@ -117,3 +117,15 @@ export const retrieveChickenPopulation = async () => {
     return e.message;
   }
 };
+export const updateChickenPopulation = async (chickendata) => {
+  try {
+    const response = await axios.put(url.manageChickenURL, {
+      chicken_data: JSON.stringify(chickendata),
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};

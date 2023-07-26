@@ -92,7 +92,7 @@ class Medicine extends Controller
     function retrieve_medicine_inventory()
     {
         try {
-            $this->setStatement("SELECT * FROM ep_medicine_inventory");
+            $this->setStatement("SELECT * FROM ep_medicine_inventory ORDER BY id DESC");
             $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
@@ -105,7 +105,7 @@ class Medicine extends Controller
             $this->setStatement("INSERT INTO ep_medicine_inventory (medicine_id, date_received, quantity, expiration_date, supplier, amount, log_date)
             VALUES (?,?,?,?,?,?,?)");
             return $this->statement->execute([
-                $medicine_data->medicine_id,
+                $medicine_data->medicine,
                 $medicine_data->date_received,
                 $medicine_data->quantity,
                 $medicine_data->expiration_date,
@@ -116,5 +116,22 @@ class Medicine extends Controller
         } catch (PDOException $e) {
             $this->getError($e);
         }
+    }
+
+    function update_medicine_inventory($med){
+        try {
+            $this->setStatement("UPDATE ep_medicine_inventory SET medicine_id = ?, date_received = ?, quantity = ?, expiration_date = ?, supplier = ?, amount = ?, log_date = ? WHERE id = ?");
+            return $this->statement->execute([
+                $med->medicine,
+                $med->date_received,
+                $med->quantity, 
+                $med->expiration_date,
+                $med->supplier,
+                $med->amount,
+                $med->log_date,
+                $med->id]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }  
     }
 }

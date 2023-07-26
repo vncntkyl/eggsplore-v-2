@@ -6,22 +6,26 @@ class Chicken extends Controller
     {
 
         try {
-            $sqlStatement = "SELECT * FROM " . $table . ($table === 'ep_chicks' ? " ORDER BY " : " ORDER BY log_date DESC,");
+            $sqlStatement = "SELECT * FROM " . $table . ($table === 'ep_chicks' ? " ORDER BY date_procured DESC" : "");
             if ($filter !== 'all') {
                 if ($filter === 'today') {
-                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(NOW()) ORDER BY log_date DESC,";
+                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(NOW()) ORDER BY log_date DESC, date_procured DESC";
                 } else if ($filter === 'yesterday') {
-                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY log_date DESC,";
+                    $sqlStatement .= " WHERE DATE(date_procured) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY log_date DESC, date_procured DESC";
                 } else if ($filter === 'this_week') {
-                    $sqlStatement .= " WHERE WEEK(date_procured) = WEEK(NOW()) ORDER BY log_date DESC,";
+                    $sqlStatement .= " WHERE WEEK(date_procured) = WEEK(NOW()) ORDER BY log_date DESC, date_procured DESC";
                 } else if ($filter === 'this_month') {
-                    $sqlStatement .= " WHERE MONTH(date_procured) = MONTH(NOW()) ORDER BY log_date DESC,";
+                    $sqlStatement .= " WHERE MONTH(date_procured) = MONTH(NOW()) ORDER BY log_date DESC,  date_procured DESC";
                 } else {
                     $filter = json_decode($filter);
-                    $sqlStatement .= " WHERE date_procured >= '" . $filter->start_date . "' AND date_procured <= '" . $filter->end_date . "' ORDER BY log_date DESC,";
+                    $sqlStatement .= " WHERE date_procured >= '" . $filter->start_date . "' AND date_procured <= '" . $filter->end_date . "' ORDER BY log_date DESC,  date_procured DESC" ;
+                }
+            }else{
+                if($table === "ep_chicken"){
+                    $sqlStatement .= " ORDER BY log_date DESC, date_procured DESC";
                 }
             }
-            $this->setStatement($sqlStatement . " date_procured DESC");
+            $this->setStatement($sqlStatement);
             $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
@@ -80,6 +84,20 @@ class Chicken extends Controller
         } catch (PDOException $e) {
             $this->getError($e);
         }
+    }
+    function update_chicken_maintenance($procurement_data){
+        try {
+            $this->setStatement("UPDATE ep_chicken SET chicken_count = ?, mortality_count = ?, missing_count = ?, remaining = ?, remarks = ? WHERE chicken_id = ?");
+            return $this->statement->execute([
+                $procurement_data->population,
+                $procurement_data->mortality, 
+                $procurement_data->missing, 
+                $procurement_data->remaining,
+                $procurement_data->remarks,
+                $procurement_data->id]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        } 
     }
     function get_chicken_population()
     {

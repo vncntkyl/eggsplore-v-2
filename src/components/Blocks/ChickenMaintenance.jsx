@@ -9,6 +9,7 @@ import Feeds from "./GeneralManagement/Feeds";
 import Medicine from "./GeneralManagement/Medicine";
 import Locations from "./GeneralManagement/Locations";
 import ChickenPopulation from "./ChickenMaintenance/ChickenPopulation";
+import MedicineInventory from "./ChickenMaintenance/MedicineInventory";
 
 export default function ChickenMaintenance() {
   const { toTitle, capitalize, getPath } = useFunction();
@@ -97,7 +98,7 @@ export default function ChickenMaintenance() {
           <Route path="/feeds_consumption/*" element={<></>} />
           <Route path="/feeds_inventory/*" element={<></>} />
           <Route path="/medication_intake/*" element={<></>} />
-          <Route path="/medication_inventory/*" element={<></>} />
+          <Route path="/medication_inventory/*" element={<MedicineInventory/>} />
         </Routes>
       </div>
     </div>

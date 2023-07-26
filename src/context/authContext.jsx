@@ -11,6 +11,7 @@ import {
   updateChickProcurement,
   insertChickenMaintenance,
   retrieveChickenPopulation,
+  updateChickenPopulation,
 } from "./PoultryManagement";
 
 const AuthContext = React.createContext();
@@ -267,6 +268,19 @@ export function AuthProvider({ children }) {
       console.log(e.message);
     }
   };
+  const addMedicineInventory = async (newInventory) => {
+    try {
+      const medicineData = new FormData();
+      medicineData.append("method", "add inventory");
+      medicineData.append("medicine_data", JSON.stringify(newInventory));
+      const response = await axios.post(url.manageMedicineURL, medicineData);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
   const addMedicine = async (newMedicine) => {
     try {
       const fd = new FormData();
@@ -306,6 +320,20 @@ export function AuthProvider({ children }) {
         usage_indication: medicine.usage_indication,
       };
       const response = await axios.put(url.manageMedicineURL, medicine_data);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+  const updateMedicineInventory = async (medicine_data) => {
+    const updatedMedicine = { ...medicine_data };
+    delete updatedMedicine.update;
+    updatedMedicine.updateInventory = true;
+    console.log(updatedMedicine);
+    try {
+      const response = await axios.put(url.manageMedicineURL, updatedMedicine);
       if (response.status === 200) {
         return response.data;
       }
@@ -425,9 +453,12 @@ export function AuthProvider({ children }) {
     retrieveProcurement,
     addChickProcurement,
     getMedicineInventory,
+    addMedicineInventory,
     insertEggProcurement,
     retrieveEggProcurement,
     updateChickProcurement,
+    updateChickenPopulation,
+    updateMedicineInventory,
     insertChickenMaintenance,
     retrieveChickenPopulation,
   };
