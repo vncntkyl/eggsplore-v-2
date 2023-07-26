@@ -1,6 +1,7 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: *");
 require "../config/userController.php";
 require "../config/buildingController.php";
 $user = new User();

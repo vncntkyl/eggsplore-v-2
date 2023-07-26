@@ -1,6 +1,7 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: *");
 require "../config/chickenController.php";
 $chicken = new Chicken();
 
@@ -30,7 +31,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
     case "PUT":
         $chick_procurement_data = json_decode(file_get_contents('php://input'));
-        echo $chicken->update_chick_procurement($chick_procurement_data) ? 1 : 0;
+        if (isset($chick_procurement_data->chicken_data)) {
+            echo $chicken->update_chicken_maintenance(json_decode($chick_procurement_data->chicken_data)) ? 1 : 0;
+        } else {
+            echo $chicken->update_chick_procurement($chick_procurement_data) ? 1 : 0;
+        }
         break;
     case "DELETE":
         break;
