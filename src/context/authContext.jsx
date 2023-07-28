@@ -254,6 +254,20 @@ export function AuthProvider({ children }) {
       console.log(e.message);
     }
   };
+  const getMedicineQuantity = async () => {
+    try {
+      const response = await axios.get(url.manageMedicineURL, {
+        params: {
+          medicineCurrentQuantity: true
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
   const getMedicineInventory = async () => {
     try {
       const response = await axios.get(url.manageMedicineURL, {
@@ -448,6 +462,7 @@ export function AuthProvider({ children }) {
     deleteBuilding,
     getCurrentUser,
     setCurrentUser,
+    getMedicineQuantity,
     getMedicationIntake,
     addMedicationIntake,
     retrieveProcurement,

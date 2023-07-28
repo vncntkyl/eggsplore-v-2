@@ -5,7 +5,8 @@ import { useFunction } from "../context/FunctionContext";
 import { format } from "date-fns";
 
 export default function MedicationIntakeTable({ refresh }) {
-  const { getMedicationIntake, getBuilding, getMedicine } = useAuth();
+  const { getMedicationIntake, getBuilding, getMedicine, currentUser } =
+    useAuth();
   const { capitalize, toTitle } = useFunction();
 
   const [medicationIntake, setIntakeData] = useState([]);
@@ -18,7 +19,31 @@ export default function MedicationIntakeTable({ refresh }) {
       setBuildings(buildingResponse);
 
       const response = await getMedicationIntake();
-      setIntakeData(response);
+      setIntakeData(
+        currentUser.user_type === "admin"
+          ? response.map((res) => ({
+              building_id: res.building_id,
+              medicine_id: res.medicine_id,
+              intake: res.intake,
+              disposed: res.disposed,
+              remaining: res.remaining,
+              remarks: res.remarks,
+              date_procured: res.date_procured,
+              date_logged: res.log_date,
+            }))
+          : response
+              .filter((res) => res.staff_id === currentUser.user_id)
+              .map((res) => ({
+                building_id: res.building_id,
+                medicine_id: res.medicine_id,
+                intake: res.intake,
+                disposed: res.disposed,
+                remaining: res.remaining,
+                remarks: res.remarks,
+                date_procured: res.date_procured,
+                date_logged: res.log_date,
+              }))
+      );
 
       const medicineResponse = await getMedicine();
       setMedicineList(medicineResponse);
@@ -39,8 +64,17 @@ export default function MedicationIntakeTable({ refresh }) {
           {Object.keys(medicationIntake[0])
             .filter((k) => k !== "id" && k !== "user_id")
             .map((intake, index) => {
-              return <th key={index}>{capitalize(toTitle(intake))}</th>;
+              return (
+                <th key={index} className="p-2">
+                  {intake === "medicine_id"
+                    ? "Medicine"
+                    : intake === "building_id"
+                    ? "Building"
+                    : capitalize(toTitle(intake))}
+                </th>
+              );
             })}
+          {currentUser.user_type === "admin" && <th className="p-2">Actions</th>}
         </tr>
       </thead>
       <tbody>
@@ -50,17 +84,28 @@ export default function MedicationIntakeTable({ refresh }) {
               <td className="p-2">
                 {
                   buildings.find(
-                    (building) => building.id == intake.building_id
+                    (building) => building.id === intake.building_id
                   ).number
                 }
               </td>
-              <td className="p-2">{medicineList.find(medicine => medicine.medicine_id === intake.medicine_id).medicine_name}</td>
+              <td className="p-2">
+                {
+                  medicineList.find(
+                    (medicine) => medicine.medicine_id === intake.medicine_id
+                  ).medicine_name
+                }
+              </td>
+              <td className="p-2">{intake.intake}</td>
+              <td className="p-2">{intake.disposed}</td>
+              <td className="p-2">{intake.remaining}</td>
+              <td className="p-2">{intake.remarks}</td>
               <td className="p-2">
                 {format(new Date(intake.date_procured), "MMM d, yyyy")}
               </td>
               <td className="p-2">
-                {format(new Date(intake.date_logged), "MMM d, yyyy hh:mmaaa")}
+                {format(new Date(intake.date_logged), "MMMM d, yyyy hh:mmaaa")}
               </td>
+              {currentUser.user_type === "admin" && <td className="p-2"></td>}
             </tr>
           );
         })}

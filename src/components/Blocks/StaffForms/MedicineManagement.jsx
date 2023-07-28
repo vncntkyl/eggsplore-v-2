@@ -11,6 +11,8 @@ export default function MedicineManagement({ building }) {
   const [modalTitle, setModalTitle] = useState(null);
   const [currentBuilding, setCurrentBuilding] = useState([]);
   const [medicineList, setMedicineList] = useState([]);
+  const [medicineQuantity, setMedicineQuantity] = useState([]);
+  const [selectedMedicine, setSelectedMedicine] = useState(null);
 
   const [medicineData, setMedicineData] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
@@ -29,7 +31,13 @@ export default function MedicineManagement({ building }) {
   });
 
   const { toTitle, capitalize } = useFunction();
-  const { getCurrentUser, getBuilding, getMedicine, addMedicationIntake } = useAuth();
+  const {
+    getCurrentUser,
+    getBuilding,
+    getMedicine,
+    addMedicationIntake,
+    getMedicineQuantity,
+  } = useAuth();
 
   const handleSubmit = async () => {
     setModalTitle(null);
@@ -76,6 +84,7 @@ export default function MedicineManagement({ building }) {
   const handleClose = () => {
     setModalTitle(null);
     toggleAlert({ type: "success", title: "", message: "", show: false });
+    setSelectedMedicine(null);
     setMedicineData({
       date: format(new Date(), "yyyy-MM-dd"),
       building_number: building,
@@ -87,12 +96,37 @@ export default function MedicineManagement({ building }) {
     });
   };
 
+  const handleInputChange = (e, key, exception = null) => {
+    const quantity = parseInt(
+      medicineQuantity.find((med) => med.medicine_id === medicineData.medicine)
+        .remaining_quantity
+    );
+    const intake = parseInt(document.querySelector("#intake").value);
+    const disposed = parseInt(document.querySelector("#disposed").value);
+
+    console.log(quantity - (intake + disposed));
+    setMedicineData((data) => ({
+      ...data,
+      [key]: exception
+        ? key === exception
+          ? e.target.value
+          : parseInt(e.target.value)
+        : parseInt(e.target.value),
+      remaining: parseInt(e.target.value)
+        ? quantity - (intake + disposed)
+        : quantity,
+    }));
+  };
+
   useEffect(() => {
     const setup = async () => {
       const response = await getBuilding(building);
       setCurrentBuilding(response);
       const meds = await getMedicine();
       setMedicineList(meds);
+      const medQuantity = await getMedicineQuantity();
+      console.log(medQuantity);
+      setMedicineQuantity(medQuantity);
       setMedicineData({
         date: format(new Date(), "yyyy-MM-dd"),
         building_number: response.number,
@@ -107,7 +141,7 @@ export default function MedicineManagement({ building }) {
   }, [building]);
   return (
     <>
-      <div className="p-2 flex flex-row gap-2 w-full animate-fade">
+      <div className="p-2 flex flex-col gap-2 w-full animate-fade">
         <div className="w-full">
           <p className="text-[1.2rem] font-semibold">Medicine Management</p>
           <form
@@ -118,105 +152,150 @@ export default function MedicineManagement({ building }) {
             }}
           >
             <div className="flex flex-row gap-2">
-              <div className="w-full flex flex-col gap-2 bg-default p-2 rounded-md">
-                {Object.keys(medicineData).map((medicineKey, index) => {
-                  return medicineKey === "building_number" ? (
-                    <>
-                      <TextInput
-                        type="hidden"
-                        value={currentBuilding.id}
-                        id="building_id"
-                      />
+              <div className="w-full flex flex-col gap-2 bg-default p-2 rounded-md disabled:bg-default-dark">
+                {Object.keys(medicineData)
+                  .splice(0, 4)
+                  .map((medicineKey, index) => {
+                    return medicineKey === "building_number" ? (
+                      <>
+                        <TextInput
+                          type="hidden"
+                          value={currentBuilding.id}
+                          id="building_id"
+                        />
+                        <TextInput
+                          id={medicineKey}
+                          key={index}
+                          withLabel={capitalize(toTitle(medicineKey)) + ":"}
+                          value={currentBuilding.number}
+                          type="number"
+                          disabled={true}
+                          orientation="row"
+                          classes="p-1 items-center"
+                          labelClasses="whitespace-nowrap w-full text-start"
+                          inputClasses="w-full rounded px-2 disabled:bg-default-dark"
+                        />
+                      </>
+                    ) : medicineKey === "medicine" ? (
+                      <div key={index} className="flex flex-col gap-2">
+                        <div className="flex gap-2 p-1 items-center">
+                          <label
+                            htmlFor={medicineKey}
+                            className="whitespace-nowrap w-full text-start"
+                          >
+                            Medicine
+                          </label>
+                          <select
+                            id={medicineKey}
+                            className="w-full rounded px-2 outline-none border-none p-1"
+                            onChange={(e) => {
+                              setSelectedMedicine(e.target.value);
+                              setMedicineData((current) => ({
+                                ...current,
+                                remaining: medicineQuantity.find(
+                                  (med) =>
+                                    med.medicine_id === parseInt(e.target.value)
+                                ).remaining_quantity,
+                                medicine: parseInt(e.target.value),
+                              }));
+                            }}
+                          >
+                            <option value="" selected={!selectedMedicine} disabled>
+                              Select Medicine
+                            </option>
+                            {medicineList.map((medicine, index) => {
+                              return (
+                                <option
+                                  key={index}
+                                  value={medicine.medicine_id}
+                                  selected={
+                                    medicine.medicine_id ===
+                                    medicineData[medicineKey]
+                                  }
+                                >
+                                  {medicine.medicine_name}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                        <div className="flex flex-row items-center justify-between">
+                          <span className="w-1/2 p-1">Current Quantity:</span>
+                          <span className="w-1/2 p-1 px-2">
+                            {medicineData.medicine
+                              ? medicineQuantity.find(
+                                  (med) =>
+                                    med.medicine_id === medicineData.medicine
+                                ).remaining_quantity
+                              : 0}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
                       <TextInput
                         id={medicineKey}
                         key={index}
                         withLabel={capitalize(toTitle(medicineKey)) + ":"}
-                        value={currentBuilding.number}
-                        type="number"
-                        disabled={true}
+                        value={medicineData[medicineKey]}
+                        type={medicineKey === "date" ? "date" : "number"}
                         orientation="row"
-                        classes="p-1 items-center "
+                        classes="p-1 items-center"
+                        disabled={!selectedMedicine}
                         labelClasses="whitespace-nowrap w-full text-start"
-                        inputClasses="w-full rounded px-2"
-                      />
-                    </>
-                  ) : medicineKey === "medicine" ? (
-                    <div key={index} className="flex gap-2 p-1 items-center">
-                      <label
-                        htmlFor={medicineKey}
-                        className="whitespace-nowrap w-full text-start"
-                      >
-                        Medicine
-                      </label>
-                      <select
-                        id={medicineKey}
-                        className="w-full rounded px-2 outline-none border-none p-1"
+                        inputClasses="w-full rounded px-2 disabled:bg-default-dark"
                         onChange={(e) =>
-                          setMedicineData((current) => ({
-                            ...current,
-                            medicine: parseInt(e.target.value),
+                          setMedicineData((data) => ({
+                            ...data,
+                            [medicineKey]:
+                              medicineKey === "date"
+                                ? e.target.value
+                                : parseInt(e.target.value),
                           }))
                         }
-                      >
-                        <option value="" selected disabled>
-                          Select Medicine
-                        </option>
-                        {medicineList.map((medicine, index) => {
-                          return (
-                            <option
-                              key={index}
-                              value={medicine.medicine_id}
-                              selected={
-                                medicine.medicine_id ===
-                                medicineData[medicineKey]
-                              }
-                            >
-                              {medicine.medicine_name}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-                  ) : medicineKey === "remarks" ? (
-                    <BigTextInput
-                      id={medicineKey}
-                      key={index}
-                      withLabel={capitalize(toTitle(medicineKey)) + ":"}
-                      value={setMedicineData[medicineKey]}
-                      orientation="row"
-                      classes="p-1 items-start"
-                      labelClasses="whitespace-nowrap w-full text-start"
-                      inputClasses="w-full rounded px-2 h-full resize-none min-h-[100px]"
-                      onChange={(e) =>
-                        setMedicineData((data) => ({
-                          ...data,
-                          [medicineKey]: e.target.value,
-                        }))
-                      }
-                    />
-                  ) : (
-                    <TextInput
-                      id={medicineKey}
-                      key={index}
-                      withLabel={capitalize(toTitle(medicineKey)) + ":"}
-                      value={medicineData[medicineKey]}
-                      type={medicineKey === "date" ? "date" : "number"}
-                      orientation="row"
-                      classes="p-1 items-center"
-                      labelClasses="whitespace-nowrap w-full text-start"
-                      inputClasses="w-full rounded px-2"
-                      onChange={(e) =>
-                        setMedicineData((data) => ({
-                          ...data,
-                          [medicineKey]:
-                            medicineKey === "date"
-                              ? e.target.value
-                              : parseInt(e.target.value),
-                        }))
-                      }
-                    />
-                  );
-                })}
+                      />
+                    );
+                  })}
+              </div>
+              <div className="w-full flex flex-col gap-2 bg-default p-2 rounded-md">
+                {Object.keys(medicineData)
+                  .splice(4, 8)
+                  .map((medicineKey, index) => {
+                    return medicineKey === "remarks" ? (
+                      <BigTextInput
+                        id={medicineKey}
+                        key={index}
+                        withLabel={capitalize(toTitle(medicineKey)) + ":"}
+                        value={medicineData[medicineKey]}
+                        disabled={!selectedMedicine}
+                        orientation="row"
+                        classes="p-1 items-start"
+                        labelClasses="whitespace-nowrap w-full text-start"
+                        inputClasses="w-full rounded px-2 h-full resize-none min-h-[100px] disabled:bg-default-dark"
+                        onChange={(e) =>
+                          setMedicineData((data) => ({
+                            ...data,
+                            [medicineKey]: e.target.value,
+                          }))
+                        }
+                      />
+                    ) : (
+                      <TextInput
+                        id={medicineKey}
+                        key={index}
+                        withLabel={capitalize(toTitle(medicineKey)) + ":"}
+                        value={medicineData[medicineKey]}
+                        type="number"
+                        disabled={
+                          medicineKey === "remaining" ? true : !selectedMedicine
+                        }
+                        orientation="row"
+                        classes="p-1 items-center"
+                        labelClasses="whitespace-nowrap w-full text-start"
+                        inputClasses="w-full rounded px-2 disabled:bg-default-dark"
+                        onChange={(e) => handleInputChange(e, medicineKey)}
+                      />
+                    );
+                  })}
               </div>
             </div>
             <Button

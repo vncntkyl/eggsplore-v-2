@@ -69,7 +69,7 @@ export default function EggProcurementTable({ refresh }) {
               <td className="p-2">
                 {format(
                   new Date(procurement.date_logged),
-                  "MMM d, yyyy hh:mmaaa"
+                  "MMMM d, yyyy hh:mmaaa"
                 )}
               </td>
             </tr>

@@ -6,6 +6,7 @@ export default function Modal({
   content,
   headerClassName,
   mainClassName,
+  className,
 }) {
   return (
     <>
@@ -13,7 +14,12 @@ export default function Modal({
         className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-[#00000010] z-[21]"
         onClick={onClose}
       ></div>
-      <div className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] bg-white rounded-md shadow-lg w-fit overflow-hidden z-[22] animate-modal-slide-down">
+      <div
+        className={classNames(
+          "absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] bg-white rounded-md shadow-lg w-fit overflow-hidden z-[22] animate-modal-slide-down",
+          className
+        )}
+      >
         <div
           className={classNames(
             "p-2 flex items-center gap-2 border-b-2",

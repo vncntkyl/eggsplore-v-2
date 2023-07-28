@@ -123,7 +123,7 @@ export default function ChickProcurement() {
         />
         {/* CHICK PROCUREMENT TABLE */}
         <div className="w-full">
-          <table className="w-full rounded-md shadow-md overflow-hidden">
+          <table className="w-full rounded-md shadow-md overflow-hidden bg-white">
             <thead>
               <tr className="bg-main text-white">
                 <th>Batch No.</th>

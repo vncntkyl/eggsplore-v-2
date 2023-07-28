@@ -56,7 +56,7 @@ class Medicine extends Controller
             if ($id !== "all") {
                 $statement .= "WHERE medicine_id = ?";
             }
-            $this->setStatement($statement);
+            $this->setStatement($statement . " ORDER BY id DESC");
             if ($id !== "all") {
                 $this->statement->execute([$id]);
                 return $this->statement->fetch();
@@ -79,9 +79,9 @@ class Medicine extends Controller
                 $intake_data->disposed,
                 $intake_data->remaining,
                 $intake_data->remarks,
-                $intake_data->date_procured,
-                $intake_data->staff_id,
-                $intake_data->building_id,
+                $intake_data->date,
+                $intake_data->staff,
+                $intake_data->building,
                 $intake_data->log_date,
             ]);
         } catch (PDOException $e) {
@@ -118,20 +118,44 @@ class Medicine extends Controller
         }
     }
 
-    function update_medicine_inventory($med){
+    function update_medicine_inventory($med)
+    {
         try {
             $this->setStatement("UPDATE ep_medicine_inventory SET medicine_id = ?, date_received = ?, quantity = ?, expiration_date = ?, supplier = ?, amount = ?, log_date = ? WHERE id = ?");
             return $this->statement->execute([
                 $med->medicine,
                 $med->date_received,
-                $med->quantity, 
+                $med->quantity,
                 $med->expiration_date,
                 $med->supplier,
                 $med->amount,
                 $med->log_date,
-                $med->id]);
+                $med->id
+            ]);
         } catch (PDOException $e) {
             $this->getError($e);
-        }  
+        }
+    }
+
+    function getMedicineQuantity()
+    {
+        try {
+            $this->setStatement("SELECT i.medicine_id,
+            COALESCE(i.total_received, 0) - COALESCE(m.total_taken, 0) AS remaining_quantity
+            FROM (
+                SELECT medicine_id, SUM(quantity) AS total_received
+                FROM ep_medicine_inventory
+                GROUP BY medicine_id
+            ) i
+            LEFT JOIN (
+                SELECT medicine_id, SUM(disposed + intake) AS total_taken
+                FROM ep_medication_intake
+                GROUP BY medicine_id
+            ) m ON i.medicine_id = m.medicine_id");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
     }
 }

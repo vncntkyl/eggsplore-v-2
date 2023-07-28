@@ -9,7 +9,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case "GET":
         if (isset($_GET['medication_intake'])) {
             echo json_encode($medicine->retrieve_medication_intake($_GET['id']));
-        } else if (isset($_GET['medicine_inventory'])) {
+        } else if(isset($_GET['medicineCurrentQuantity'])){
+            echo json_encode($medicine->getMedicineQuantity());
+        }else if (isset($_GET['medicine_inventory'])) {
             echo json_encode($medicine->retrieve_medicine_inventory());
         } else {
             echo json_encode($medicine->retrieve_medicine($_GET['id']));

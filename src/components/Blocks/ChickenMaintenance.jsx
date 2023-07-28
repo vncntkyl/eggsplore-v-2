@@ -3,13 +3,9 @@ import { useFunction } from "../../context/FunctionContext";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { GrNext } from "react-icons/gr";
-import Users from "./GeneralManagement/Users";
-import Buildings from "./GeneralManagement/Buildings";
-import Feeds from "./GeneralManagement/Feeds";
-import Medicine from "./GeneralManagement/Medicine";
-import Locations from "./GeneralManagement/Locations";
 import ChickenPopulation from "./ChickenMaintenance/ChickenPopulation";
 import MedicineInventory from "./ChickenMaintenance/MedicineInventory";
+import MedicationIntakeTable from "../MedicationIntakeTable";
 
 export default function ChickenMaintenance() {
   const { toTitle, capitalize, getPath } = useFunction();
@@ -97,7 +93,7 @@ export default function ChickenMaintenance() {
           <Route path="/chicken_population/*" element={<ChickenPopulation />} />
           <Route path="/feeds_consumption/*" element={<></>} />
           <Route path="/feeds_inventory/*" element={<></>} />
-          <Route path="/medication_intake/*" element={<></>} />
+          <Route path="/medication_intake/*" element={<MedicationIntakeTable />} />
           <Route path="/medication_inventory/*" element={<MedicineInventory/>} />
         </Routes>
       </div>

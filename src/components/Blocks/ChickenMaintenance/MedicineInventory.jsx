@@ -89,6 +89,25 @@ export default function MedicineInventory() {
     doRefresh((count) => (count = count + 1));
   };
 
+  const medicineInventory = () => {
+    if (!medicine) return;
+
+    const medicine_information = medicineList.find(
+      (med) => med.medicine_id === medicine.medicine
+    );
+    const inventory_details = { ...medicine };
+    const medicineInventory = {
+      medicine_name: medicine_information.medicine_name,
+      dosage_instructions: medicine_information.dosage_instructions,
+      indications_for_use: medicine_information.usage_indication,
+      quantity: inventory_details.quantity,
+      supplier: inventory_details.supplier,
+      amount: inventory_details.amount,
+      date_received: inventory_details.date_received,
+      expiration_date: inventory_details.expiration_date,
+    };
+    return medicineInventory;
+  };
   const handleUpdate = async (e) => {
     e.preventDefault();
     const updateMedicine = { ...medicine };
@@ -230,6 +249,9 @@ export default function MedicineInventory() {
       </div>
       {modalTitle && (
         <Modal
+          className={
+            modalTitle === "view medicine information" ? "max-w-lg" : ""
+          }
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
           content={
@@ -367,11 +389,46 @@ export default function MedicineInventory() {
               </>
             ) : (
               <>
-                {JSON.stringify(
-                  medicineList.find(
-                    (med) => med.medicine_id === medicine.medicine
-                  )
-                )}
+                <div className="text-left flex flex-col gap-2">
+                  {Object.keys(medicineInventory()).map((label, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="flex flex-row justify-between"
+                      >
+                        <span className="w-1/2 font-semibold text-gray-800">
+                          {capitalize(toTitle(label))}
+                        </span>
+                        <span className="w-1/2">
+                          {label === "amount"
+                            ? Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "PHP",
+                              }).format(medicineInventory()[label])
+                            : label.includes("date")
+                            ? format(
+                                new Date(medicineInventory()[label]),
+                                "MMMM d, yyyy"
+                              )
+                            : medicineInventory()[label]}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      type="button"
+                      value="Edit"
+                      onClick={() => setModalTitle("edit medicine information")}
+                      className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                    />
+                    <Button
+                      value="Cancel"
+                      onClick={() => handleClose()}
+                      className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
+                    />
+                  </div>
+                </div>
               </>
             )
           }

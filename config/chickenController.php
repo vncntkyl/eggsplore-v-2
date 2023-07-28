@@ -102,7 +102,15 @@ class Chicken extends Controller
     function get_chicken_population()
     {
         try {
-            $this->setStatement("SELECT building_id, remaining as current_population FROM ep_chicken ORDER BY date_procured DESC LIMIT 1");
+            $this->setStatement("SELECT ec.building_id, ec.remaining AS current_population, ec.log_date AS date_updated
+            FROM ep_chicken ec
+            JOIN (
+                SELECT building_id, MAX(log_date) AS max_log_date
+                FROM ep_chicken
+                GROUP BY building_id
+            ) subquery
+            ON ec.building_id = subquery.building_id AND ec.log_date = subquery.max_log_date
+            ORDER BY ec.building_id");
             $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
