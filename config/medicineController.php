@@ -88,6 +88,20 @@ class Medicine extends Controller
             $this->getError($e);
         }
     }
+    function update_medication_intake($intake_data){
+        try {
+            $this->setStatement("UPDATE ep_medication_intake SET intake = ?, disposed = ?, remaining = ?, remarks = ? WHERE id = ?");
+            return $this->statement->execute([
+                $intake_data->intake,
+                $intake_data->disposed,
+                $intake_data->remaining,
+                $intake_data->remarks,
+                $intake_data->id,
+            ]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
     //MEDICINE INVENTORY
     function retrieve_medicine_inventory()
     {
@@ -137,7 +151,7 @@ class Medicine extends Controller
         }
     }
 
-    function getMedicineQuantity()
+    function get_medicine_quantity()
     {
         try {
             $this->setStatement("SELECT i.medicine_id,
@@ -154,6 +168,15 @@ class Medicine extends Controller
             ) m ON i.medicine_id = m.medicine_id");
             $this->statement->execute();
             return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function get_latest_medication_intake($medicine_id){
+        try {
+            $this->setStatement("SELECT * FROM `ep_medication_intake` WHERE medicine_id = ? ORDER BY log_date DESC LIMIT 1;");
+            $this->statement->execute([$medicine_id]);
+            return $this->statement->fetch();
         } catch (PDOException $e) {
             $this->getError($e);
         }

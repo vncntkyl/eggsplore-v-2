@@ -3,25 +3,32 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/authContext";
 import { useFunction } from "../context/FunctionContext";
 import { format } from "date-fns";
+import { HiPencilAlt } from "react-icons/hi";
+import { Button } from "./Forms";
 
-export default function MedicationIntakeTable({ refresh }) {
-  const { getMedicationIntake, getBuilding, getMedicine, currentUser } =
-    useAuth();
+export default function MedicationIntakeTable({
+  refresh,
+  setIntake,
+  setModal,
+  setMedicineQuantity,
+}) {
+  const { getMedicationIntake, getBuilding, getMedicine } = useAuth();
   const { capitalize, toTitle } = useFunction();
 
   const [medicationIntake, setIntakeData] = useState([]);
+  const [user, setUser] = useState([]);
   const [medicineList, setMedicineList] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const setup = async () => {
-      const buildingResponse = await getBuilding();
-      setBuildings(buildingResponse);
-
-      const response = await getMedicationIntake();
+      const user = JSON.parse(localStorage.getItem("currentUser"));
+      setUser(user);
+      const response = await getMedicationIntake("all");
       setIntakeData(
-        currentUser.user_type === "admin"
+        user.user_type === "admin"
           ? response.map((res) => ({
+              id: res.id,
               building_id: res.building_id,
               medicine_id: res.medicine_id,
               intake: res.intake,
@@ -32,7 +39,7 @@ export default function MedicationIntakeTable({ refresh }) {
               date_logged: res.log_date,
             }))
           : response
-              .filter((res) => res.staff_id === currentUser.user_id)
+              .filter((res) => res.staff_id === user.user_id)
               .map((res) => ({
                 building_id: res.building_id,
                 medicine_id: res.medicine_id,
@@ -44,7 +51,8 @@ export default function MedicationIntakeTable({ refresh }) {
                 date_logged: res.log_date,
               }))
       );
-
+      const buildingResponse = await getBuilding();
+      setBuildings(buildingResponse);
       const medicineResponse = await getMedicine();
       setMedicineList(medicineResponse);
 
@@ -64,7 +72,17 @@ export default function MedicationIntakeTable({ refresh }) {
           {Object.keys(medicationIntake[0])
             .filter((k) => k !== "id" && k !== "user_id")
             .map((intake, index) => {
-              return (
+              return user.user_type === "admin" ? (
+                intake !== "date_logged" && (
+                  <th key={index} className="p-2">
+                    {intake === "medicine_id"
+                      ? "Medicine"
+                      : intake === "building_id"
+                      ? "Building"
+                      : capitalize(toTitle(intake))}
+                  </th>
+                )
+              ) : (
                 <th key={index} className="p-2">
                   {intake === "medicine_id"
                     ? "Medicine"
@@ -74,7 +92,7 @@ export default function MedicationIntakeTable({ refresh }) {
                 </th>
               );
             })}
-          {currentUser.user_type === "admin" && <th className="p-2">Actions</th>}
+          {user.user_type === "admin" && <th className="p-2">Actions</th>}
         </tr>
       </thead>
       <tbody>
@@ -102,10 +120,31 @@ export default function MedicationIntakeTable({ refresh }) {
               <td className="p-2">
                 {format(new Date(intake.date_procured), "MMM d, yyyy")}
               </td>
-              <td className="p-2">
-                {format(new Date(intake.date_logged), "MMMM d, yyyy hh:mmaaa")}
-              </td>
-              {currentUser.user_type === "admin" && <td className="p-2"></td>}
+              {user.user_type !== "admin" && (
+                <td className="p-2">
+                  {format(
+                    new Date(intake.date_logged),
+                    "MMMM d, yyyy hh:mmaaa"
+                  )}
+                </td>
+              )}
+              {user.user_type === "admin" && (
+                <td className="p-2">
+                  <Button
+                    onClick={() => {
+                      setIntake(intake);
+                      setMedicineQuantity(
+                        parseInt(intake.intake) +
+                          parseInt(intake.disposed) +
+                          parseInt(intake.remaining)
+                      );
+                      setModal("edit medication intake");
+                    }}
+                    className="bg-yellow p-1 rounded"
+                    value={<HiPencilAlt className="text-white" />}
+                  />
+                </td>
+              )}
             </tr>
           );
         })}

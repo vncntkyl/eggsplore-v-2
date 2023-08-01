@@ -258,7 +258,7 @@ export function AuthProvider({ children }) {
     try {
       const response = await axios.get(url.manageMedicineURL, {
         params: {
-          medicineCurrentQuantity: true
+          medicineCurrentQuantity: true,
         },
       });
       if (response.status === 200) {
@@ -267,7 +267,7 @@ export function AuthProvider({ children }) {
     } catch (e) {
       console.log(e.message);
     }
-  }
+  };
   const getMedicineInventory = async () => {
     try {
       const response = await axios.get(url.manageMedicineURL, {
@@ -318,6 +318,20 @@ export function AuthProvider({ children }) {
       fd.append("data", JSON.stringify(newMedicationIntake));
 
       const response = await axios.post(url.manageMedicineURL, fd);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+  const updateMedicationIntake = async (medicationIntake) => {
+    try {
+      const updateIntake = { ...medicationIntake };
+      updateIntake.updateIntake = true;
+      console.log(updateIntake);
+
+      const response = await axios.put(url.manageMedicineURL, updateIntake);
       if (response.status === 200) {
         return response.data;
       }
@@ -472,6 +486,7 @@ export function AuthProvider({ children }) {
     insertEggProcurement,
     retrieveEggProcurement,
     updateChickProcurement,
+    updateMedicationIntake,
     updateChickenPopulation,
     updateMedicineInventory,
     insertChickenMaintenance,

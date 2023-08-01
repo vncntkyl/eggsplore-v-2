@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { GrNext } from "react-icons/gr";
 import ChickenPopulation from "./ChickenMaintenance/ChickenPopulation";
 import MedicineInventory from "./ChickenMaintenance/MedicineInventory";
-import MedicationIntakeTable from "../MedicationIntakeTable";
+import MedicationIntake from "./ChickenMaintenance/MedicationIntake";
 
 export default function ChickenMaintenance() {
   const { toTitle, capitalize, getPath } = useFunction();
@@ -93,8 +93,11 @@ export default function ChickenMaintenance() {
           <Route path="/chicken_population/*" element={<ChickenPopulation />} />
           <Route path="/feeds_consumption/*" element={<></>} />
           <Route path="/feeds_inventory/*" element={<></>} />
-          <Route path="/medication_intake/*" element={<MedicationIntakeTable />} />
-          <Route path="/medication_inventory/*" element={<MedicineInventory/>} />
+          <Route path="/medication_intake/*" element={<MedicationIntake />} />
+          <Route
+            path="/medication_inventory/*"
+            element={<MedicineInventory />}
+          />
         </Routes>
       </div>
     </div>

@@ -125,7 +125,6 @@ export default function MedicineManagement({ building }) {
       const meds = await getMedicine();
       setMedicineList(meds);
       const medQuantity = await getMedicineQuantity();
-      console.log(medQuantity);
       setMedicineQuantity(medQuantity);
       setMedicineData({
         date: format(new Date(), "yyyy-MM-dd"),
@@ -138,7 +137,7 @@ export default function MedicineManagement({ building }) {
       });
     };
     setup();
-  }, [building]);
+  }, [building, refresh]);
   return (
     <>
       <div className="p-2 flex flex-col gap-2 w-full animate-fade">

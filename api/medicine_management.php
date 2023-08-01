@@ -10,7 +10,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         if (isset($_GET['medication_intake'])) {
             echo json_encode($medicine->retrieve_medication_intake($_GET['id']));
         } else if(isset($_GET['medicineCurrentQuantity'])){
-            echo json_encode($medicine->getMedicineQuantity());
+            echo json_encode($medicine->get_medicine_quantity());
         }else if (isset($_GET['medicine_inventory'])) {
             echo json_encode($medicine->retrieve_medicine_inventory());
         } else {
@@ -37,6 +37,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $medicine_data = json_decode(file_get_contents('php://input'));
         if (isset($medicine_data->updateInventory)) {
             echo $medicine->update_medicine_inventory($medicine_data) ? 1 : 0;
+        } else if(isset($medicine_data->updateIntake)){
+            echo $medicine->update_medication_intake($medicine_data) ? 1 : 0;
         } else {
             echo $medicine->update_medicine($medicine_data) ? 1 : 0;
         }
