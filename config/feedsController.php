@@ -45,5 +45,7 @@ class Feeds extends Controller
             $this->getError($e);
         }
     }
+    function retrieve_feeds_inventory(){
+        
+    }
 }
-?>

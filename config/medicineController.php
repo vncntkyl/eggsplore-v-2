@@ -88,7 +88,8 @@ class Medicine extends Controller
             $this->getError($e);
         }
     }
-    function update_medication_intake($intake_data){
+    function update_medication_intake($intake_data)
+    {
         try {
             $this->setStatement("UPDATE ep_medication_intake SET intake = ?, disposed = ?, remaining = ?, remarks = ? WHERE id = ?");
             return $this->statement->execute([
@@ -172,7 +173,8 @@ class Medicine extends Controller
             $this->getError($e);
         }
     }
-    function get_latest_medication_intake($medicine_id){
+    function get_latest_medication_intake($medicine_id)
+    {
         try {
             $this->setStatement("SELECT * FROM `ep_medication_intake` WHERE medicine_id = ? ORDER BY log_date DESC LIMIT 1;");
             $this->statement->execute([$medicine_id]);
