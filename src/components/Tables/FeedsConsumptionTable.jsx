@@ -1,60 +1,60 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/authContext";
-import { useFunction } from "../context/FunctionContext";
+import { useAuth } from "../../context/authContext";
+import { useFunction } from "../../context/FunctionContext";
 import { format } from "date-fns";
 import { HiPencilAlt } from "react-icons/hi";
-import { Button } from "./Forms";
+import { Button } from "../Forms";
 
-export default function MedicationIntakeTable({
+export default function FeedsConsumptionTable({
   refresh,
-  setIntake,
+  setConsumption,
   setModal,
-  setMedicineQuantity,
+  setFeedsQuantity,
 }) {
-  const { getMedicationIntake, getBuilding, getMedicine } = useAuth();
+  const { getFeedsConsumption, getBuilding, getFeeds } = useAuth();
   const { capitalize, toTitle } = useFunction();
 
-  const [medicationIntake, setIntakeData] = useState([]);
+  const [feedsConsumption, setConsumptionData] = useState([]);
   const [user, setUser] = useState([]);
-  const [medicineList, setMedicineList] = useState([]);
+  const [feedsList, setFeedsList] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const setup = async () => {
       const user = JSON.parse(localStorage.getItem("currentUser"));
       setUser(user);
-      const response = await getMedicationIntake("all");
-      setIntakeData(
-        user.user_type === "admin"
-          ? response.map((res) => ({
-              id: res.id,
-              building_id: res.building_id,
-              medicine_id: res.medicine_id,
-              intake: res.intake,
-              disposed: res.disposed,
-              remaining: res.remaining,
-              remarks: res.remarks,
-              date_procured: res.date_procured,
-              date_logged: res.log_date,
-            }))
-          : response
-              .filter((res) => res.staff_id === user.user_id)
-              .map((res) => ({
-                building_id: res.building_id,
-                medicine_id: res.medicine_id,
-                intake: res.intake,
-                disposed: res.disposed,
-                remaining: res.remaining,
-                remarks: res.remarks,
-                date_procured: res.date_procured,
-                date_logged: res.log_date,
-              }))
-      );
+      const response = await getFeedsConsumption("all");
+    //   setConsumptionData(
+    //     user.user_type === "admin"
+    //       ? response.map((res) => ({
+    //           id: res.id,
+    //           building_id: res.building_id,
+    //           medicine_id: res.medicine_id,
+    //           intake: res.intake,
+    //           disposed: res.disposed,
+    //           remaining: res.remaining,
+    //           remarks: res.remarks,
+    //           date_procured: res.date_procured,
+    //           date_logged: res.log_date,
+    //         }))
+    //       : response
+    //           .filter((res) => res.staff_id === user.user_id)
+    //           .map((res) => ({
+    //             building_id: res.building_id,
+    //             medicine_id: res.medicine_id,
+    //             intake: res.intake,
+    //             disposed: res.disposed,
+    //             remaining: res.remaining,
+    //             remarks: res.remarks,
+    //             date_procured: res.date_procured,
+    //             date_logged: res.log_date,
+    //           }))
+    //   );
       const buildingResponse = await getBuilding();
       setBuildings(buildingResponse);
-      const medicineResponse = await getMedicine();
-      setMedicineList(medicineResponse);
+      const medicineResponse = await getFeeds();
+      setFeedsList(medicineResponse);
 
       setLoading(false);
     };
@@ -65,11 +65,11 @@ export default function MedicationIntakeTable({
       clearInterval(realtimeData);
     };
   }, [refresh]);
-  return !loading && medicationIntake.length > 0 ? (
+  return !loading && feedsConsumption.length > 0 ? (
     <table className="w-full rounded-md shadow-md overflow-hidden">
       <thead>
         <tr className="bg-main text-white">
-          {Object.keys(medicationIntake[0])
+          {Object.keys(feedsConsumption[0])
             .filter((k) => k !== "id" && k !== "user_id")
             .map((intake, index) => {
               return user.user_type === "admin" ? (
@@ -96,7 +96,7 @@ export default function MedicationIntakeTable({
         </tr>
       </thead>
       <tbody>
-        {medicationIntake.map((intake, index) => {
+        {feedsConsumption.map((intake, index) => {
           return (
             <tr key={index} align="center">
               <td className="p-2">
@@ -108,7 +108,7 @@ export default function MedicationIntakeTable({
               </td>
               <td className="p-2">
                 {
-                  medicineList.find(
+                  feedsList.find(
                     (medicine) => medicine.medicine_id === intake.medicine_id
                   ).medicine_name
                 }
@@ -132,8 +132,8 @@ export default function MedicationIntakeTable({
                 <td className="p-2">
                   <Button
                     onClick={() => {
-                      setIntake(intake);
-                      setMedicineQuantity(
+                      setConsumption(intake);
+                      setFeedsQuantity(
                         parseInt(intake.intake) +
                           parseInt(intake.disposed) +
                           parseInt(intake.remaining)

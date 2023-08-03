@@ -4,7 +4,7 @@ import { useFunction } from "../../../context/FunctionContext";
 import { format } from "date-fns";
 import { useAuth } from "../../../context/authContext";
 import { Alert, Modal } from "../../Containers";
-import MedicationIntakeTable from "../../MedicationIntakeTable";
+import MedicationIntakeTable from "../../Tables/MedicationIntakeTable";
 // eslint-disable-next-line react/prop-types
 export default function MedicineManagement({ building }) {
   const [refresh, doRefresh] = useState(0);
@@ -46,7 +46,6 @@ export default function MedicineManagement({ building }) {
 
     const data = {
       date: medicineData.date,
-      count: medicineData.egg_tray_count,
       building: id,
       medicine_id: medicineData.medicine,
       intake: medicineData.intake,
@@ -199,7 +198,11 @@ export default function MedicineManagement({ building }) {
                               }));
                             }}
                           >
-                            <option value="" selected={!selectedMedicine} disabled>
+                            <option
+                              value=""
+                              selected={!selectedMedicine}
+                              disabled
+                            >
                               Select Medicine
                             </option>
                             {medicineList.map((medicine, index) => {
@@ -243,13 +246,7 @@ export default function MedicineManagement({ building }) {
                         labelClasses="whitespace-nowrap w-full text-start"
                         inputClasses="w-full rounded px-2 disabled:bg-default-dark"
                         onChange={(e) =>
-                          setMedicineData((data) => ({
-                            ...data,
-                            [medicineKey]:
-                              medicineKey === "date"
-                                ? e.target.value
-                                : parseInt(e.target.value),
-                          }))
+                          handleInputChange(e, medicineKey, "date")
                         }
                       />
                     );

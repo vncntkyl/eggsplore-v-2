@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MedicationIntakeTable from "../../MedicationIntakeTable";
+import MedicationIntakeTable from "../../Tables/MedicationIntakeTable";
 import { Alert, Modal } from "../../Containers";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";

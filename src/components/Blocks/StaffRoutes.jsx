@@ -17,7 +17,7 @@ export default function StaffRoutes({ panel, building }) {
     case "Medicine Management":
       return <MedicineManagement building={building} />;
     case "Feeds Management":
-      return <FeedsManagement />;
+      return <FeedsManagement building={building} />;
     case "Egg Segregation":
       return <EggSegregation />;
   }

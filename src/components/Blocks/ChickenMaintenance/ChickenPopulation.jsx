@@ -6,7 +6,7 @@ import { AiFillCalendar } from "react-icons/ai";
 import classNames from "classnames";
 import { Alert, Modal } from "../../Containers";
 import { format } from "date-fns";
-import ChickenMaintenanceTable from "../../ChickenMaintenanceTable";
+import ChickenMaintenanceTable from "../../Tables/ChickenMaintenanceTable";
 
 export default function ChickenPopulation() {
   const [refresh, doRefresh] = useState(0);

@@ -3,7 +3,7 @@ import { Button, TextInput } from "../../Forms";
 import { useFunction } from "../../../context/FunctionContext";
 import { format } from "date-fns";
 import { useAuth } from "../../../context/authContext";
-import EggProcurementTable from "../../EggProcurementTable";
+import EggProcurementTable from "../../Tables/EggProcurementTable";
 import { Alert, Modal } from "../../Containers";
 // eslint-disable-next-line react/prop-types
 export default function EggProduction({ building }) {

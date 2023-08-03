@@ -1,10 +1,17 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Breadcrumb from "../Fragments/Breadcrumb";
 import GeneralManagement from "./GeneralManagement";
 import ChickProcurement from "./ChickProcurement";
 import ChickenMaintenance from "./ChickenMaintenance";
+import { useEffect } from "react";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if(window.location.pathname === "/"){
+      navigate("/dashboard")
+    }
+  },[])
   return (
     <div className="p-4 body flex flex-col gap-2 mx-12">
       <Breadcrumb />

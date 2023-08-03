@@ -3,16 +3,9 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { developmentURLs as url } from "./config";
-import {
-  insertEggProcurement,
-  retrieveEggProcurement,
-  retrieveProcurement,
-  addChickProcurement,
-  updateChickProcurement,
-  insertChickenMaintenance,
-  retrieveChickenPopulation,
-  updateChickenPopulation,
-} from "./PoultryManagement";
+import { values as poultryManagement } from "./PoultryManagement";
+import { values as medicineManagement } from "./MedicineManagement";
+import { values as feedsManagement } from "./FeedsManagement";
 
 const AuthContext = React.createContext();
 
@@ -239,62 +232,6 @@ export function AuthProvider({ children }) {
       console.log(e.message);
     }
   };
-  const getMedicationIntake = async (id = null) => {
-    try {
-      const response = await axios.get(url.manageMedicineURL, {
-        params: {
-          id: id ? id : "all",
-          medication_intake: true,
-        },
-      });
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
-  const getMedicineQuantity = async () => {
-    try {
-      const response = await axios.get(url.manageMedicineURL, {
-        params: {
-          medicineCurrentQuantity: true,
-        },
-      });
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
-  const getMedicineInventory = async () => {
-    try {
-      const response = await axios.get(url.manageMedicineURL, {
-        params: {
-          medicine_inventory: true,
-        },
-      });
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
-  const addMedicineInventory = async (newInventory) => {
-    try {
-      const medicineData = new FormData();
-      medicineData.append("method", "add inventory");
-      medicineData.append("medicine_data", JSON.stringify(newInventory));
-      const response = await axios.post(url.manageMedicineURL, medicineData);
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
   const addMedicine = async (newMedicine) => {
     try {
       const fd = new FormData();
@@ -311,34 +248,6 @@ export function AuthProvider({ children }) {
       console.log(e.message);
     }
   };
-  const addMedicationIntake = async (newMedicationIntake) => {
-    try {
-      const fd = new FormData();
-      fd.append("method", "add intake");
-      fd.append("data", JSON.stringify(newMedicationIntake));
-
-      const response = await axios.post(url.manageMedicineURL, fd);
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
-  const updateMedicationIntake = async (medicationIntake) => {
-    try {
-      const updateIntake = { ...medicationIntake };
-      updateIntake.updateIntake = true;
-      console.log(updateIntake);
-
-      const response = await axios.put(url.manageMedicineURL, updateIntake);
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
   const updateMedicine = async (medicine, id) => {
     try {
       const medicine_data = {
@@ -348,20 +257,6 @@ export function AuthProvider({ children }) {
         usage_indication: medicine.usage_indication,
       };
       const response = await axios.put(url.manageMedicineURL, medicine_data);
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
-  const updateMedicineInventory = async (medicine_data) => {
-    const updatedMedicine = { ...medicine_data };
-    delete updatedMedicine.update;
-    updatedMedicine.updateInventory = true;
-    console.log(updatedMedicine);
-    try {
-      const response = await axios.put(url.manageMedicineURL, updatedMedicine);
       if (response.status === 200) {
         return response.data;
       }
@@ -476,21 +371,9 @@ export function AuthProvider({ children }) {
     deleteBuilding,
     getCurrentUser,
     setCurrentUser,
-    getMedicineQuantity,
-    getMedicationIntake,
-    addMedicationIntake,
-    retrieveProcurement,
-    addChickProcurement,
-    getMedicineInventory,
-    addMedicineInventory,
-    insertEggProcurement,
-    retrieveEggProcurement,
-    updateChickProcurement,
-    updateMedicationIntake,
-    updateChickenPopulation,
-    updateMedicineInventory,
-    insertChickenMaintenance,
-    retrieveChickenPopulation,
+    ...poultryManagement,
+    ...medicineManagement,
+    ...feedsManagement,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

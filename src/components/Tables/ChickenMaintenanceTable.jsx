@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/authContext";
-import { useFunction } from "../context/FunctionContext";
+import { useAuth } from "../../context/authContext";
+import { useFunction } from "../../context/FunctionContext";
 import { format } from "date-fns";
-import { Button } from "./Forms";
+import { Button } from "../Forms";
 import { HiPencilAlt } from "react-icons/hi";
 
 export default function ChickenMaintenanceTable({

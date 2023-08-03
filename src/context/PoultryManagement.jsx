@@ -2,7 +2,7 @@ import { developmentURLs as url } from "./config";
 import axios from "axios";
 
 //EGG MANAGEMENT
-export const insertEggProcurement = async (eggData, method) => {
+ const insertEggProcurement = async (eggData, method) => {
   try {
     const eggFD = new FormData();
     eggFD.append("method", method);
@@ -15,7 +15,7 @@ export const insertEggProcurement = async (eggData, method) => {
     return e.message;
   }
 };
-export const retrieveEggProcurement = async (
+ const retrieveEggProcurement = async (
   type = "admin",
   selectionType = "all"
 ) => {
@@ -37,7 +37,7 @@ export const retrieveEggProcurement = async (
 
 //CHICK MANAGEMENT
 
-export const retrieveProcurement = async (table, dateFilter) => {
+ const retrieveProcurement = async (table, dateFilter) => {
   try {
     const response = await axios.get(url.manageChickenURL, {
       params: {
@@ -56,7 +56,7 @@ export const retrieveProcurement = async (table, dateFilter) => {
   }
 };
 
-export const addChickProcurement = async (procurement) => {
+ const addChickProcurement = async (procurement) => {
   try {
     const procurementData = new FormData();
     procurementData.append("procurementDate", procurement.date_procured);
@@ -73,7 +73,7 @@ export const addChickProcurement = async (procurement) => {
   }
 };
 
-export const updateChickProcurement = async (procurement, id) => {
+ const updateChickProcurement = async (procurement, id) => {
   try {
     const procurementData = {
       procurement_id: id,
@@ -91,7 +91,7 @@ export const updateChickProcurement = async (procurement, id) => {
 };
 
 //CHICKEN MANAGEMENT
-export const insertChickenMaintenance = async (chickenData, method) => {
+ const insertChickenMaintenance = async (chickenData, method) => {
   try {
     const chickenForm = new FormData();
     chickenForm.append("method", method);
@@ -105,7 +105,7 @@ export const insertChickenMaintenance = async (chickenData, method) => {
     return e.message;
   }
 };
-export const retrieveChickenPopulation = async () => {
+ const retrieveChickenPopulation = async () => {
   try {
     const response = await axios.get(url.manageChickenURL, {
       params: { retrievePopulation: true },
@@ -117,7 +117,7 @@ export const retrieveChickenPopulation = async () => {
     return e.message;
   }
 };
-export const updateChickenPopulation = async (chickendata) => {
+ const updateChickenPopulation = async (chickendata) => {
   try {
     const response = await axios.put(url.manageChickenURL, {
       chicken_data: JSON.stringify(chickendata),
@@ -128,4 +128,15 @@ export const updateChickenPopulation = async (chickendata) => {
   } catch (e) {
     return e.message;
   }
+};
+
+export const values = {
+  insertEggProcurement,
+  retrieveEggProcurement,
+  retrieveProcurement,
+  addChickProcurement,
+  updateChickProcurement,
+  insertChickenMaintenance,
+  retrieveChickenPopulation,
+  updateChickenPopulation,
 };

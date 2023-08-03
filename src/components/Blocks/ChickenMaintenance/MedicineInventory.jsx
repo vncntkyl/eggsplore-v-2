@@ -4,7 +4,7 @@ import { Button, TextInput } from "../../Forms";
 import classNames from "classnames";
 import { format } from "date-fns";
 import { AiFillCalendar, AiFillPlusCircle } from "react-icons/ai";
-import MedicineInventoryTable from "../../MedicineInventoryTable";
+import MedicineInventoryTable from "../../Tables/MedicineInventoryTable";
 import { Alert, Modal } from "../../Containers";
 import { useAuth } from "../../../context/authContext";
 

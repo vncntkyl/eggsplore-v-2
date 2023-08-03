@@ -104,10 +104,25 @@ class Medicine extends Controller
         }
     }
     //MEDICINE INVENTORY
-    function retrieve_medicine_inventory()
+    function retrieve_medicine_inventory($filter)
     {
         try {
-            $this->setStatement("SELECT * FROM ep_medicine_inventory ORDER BY id DESC");
+            $sqlStatement = "SELECT * FROM ep_medicine_inventory ";
+            if ($filter !== 'all') {
+                if ($filter === 'today') {
+                    $sqlStatement .= " WHERE DATE(log_date) = DATE(NOW()) ORDER BY log_date DESC";
+                } else if ($filter === 'yesterday') {
+                    $sqlStatement .= " WHERE DATE(log_date) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY log_date DESC";
+                } else if ($filter === 'this_week') {
+                    $sqlStatement .= " WHERE WEEK(log_date) = WEEK(NOW()) ORDER BY log_date DESC";
+                } else if ($filter === 'this_month') {
+                    $sqlStatement .= " WHERE MONTH(log_date) = MONTH(NOW()) ORDER BY log_date DESC";
+                } else {
+                    $filter = json_decode($filter);
+                    $sqlStatement .= " WHERE log_date >= '" . $filter->start_date . "' AND log_date <= '" . $filter->end_date . "' ORDER BY log_date DESC" ;
+                }
+            }
+            $this->setStatement($sqlStatement);
             $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {

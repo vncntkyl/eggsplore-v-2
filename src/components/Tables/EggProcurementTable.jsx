@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/authContext";
-import { useFunction } from "../context/FunctionContext";
+import { useAuth } from "../../context/authContext";
+import { useFunction } from "../../context/FunctionContext";
 import { format } from "date-fns";
 
 export default function EggProcurementTable({ refresh }) {

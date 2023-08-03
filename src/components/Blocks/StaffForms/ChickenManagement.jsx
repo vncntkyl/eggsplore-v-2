@@ -4,7 +4,7 @@ import { useFunction } from "../../../context/FunctionContext";
 import { format } from "date-fns";
 import { useAuth } from "../../../context/authContext";
 import { Alert, Modal } from "../../Containers";
-import ChickenMaintenanceTable from "../../ChickenMaintenanceTable";
+import ChickenMaintenanceTable from "../../Tables/ChickenMaintenanceTable";
 // eslint-disable-next-line react/prop-types
 export default function ChickenManagement({ building }) {
   const [refresh, doRefresh] = useState(0);
