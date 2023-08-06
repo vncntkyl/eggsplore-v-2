@@ -12,11 +12,11 @@ STEPS FOR USAGE
 
 CREDENTIALS
 ADMIN
-username: linahernandex
-password: lina12345
+	username: linahernandex
+	password: lina12345
 STAFF: 
-username:jomaricruz
-password:jojoreyes
+	username:jomaricruz
+	password:jojoreyes
 
 STILL WORKING ON THE FOLLOWING
 1. DASHBOARD
