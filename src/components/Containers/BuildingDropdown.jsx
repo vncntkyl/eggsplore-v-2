@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { FaCaretDown } from "react-icons/fa";
 import { useAuth } from "../../context/authContext";
-import { Button } from "../Forms";
 
 export default function BuildingDropdown({ current, setCurrent }) {
   const { getBuilding, getCurrentUser } = useAuth();
   const [buildings, setBuildings] = useState([]);
-  const [dropdownShown, toggleDropdown] = useState(false);
   const userID = JSON.parse(getCurrentUser()).user_id;
 
   useEffect(() => {
@@ -22,41 +19,35 @@ export default function BuildingDropdown({ current, setCurrent }) {
     };
   }, []);
   return (
-    <div className="relative">
-      <Button
-        value={
-          <div className="flex items-center gap-1">
-            <p>
-              {current
-                ? "Selected: Building " +
-                  buildings.find((bldg) => bldg.building_id === current).number
-                : "Select Building"}
-            </p>
-            <FaCaretDown />
-          </div>
-        }
-        onClick={() => toggleDropdown((prev) => !prev)}
-        className="bg-main text-white p-1 px-2 rounded"
-      />
-      {dropdownShown && (
-        <div className="absolute top-full right-0 mt-1 min-w-full bg-white rounded shadow-md animate-slide-down">
-          <ul className=" flex flex-col p-2">
-            {buildings
-              .filter((bldg) => bldg.user_id === userID)
-              .map((bldg, index) => {
-                return (
-                  <li key={index}>
-                    <Button
-                      value={"Building " + bldg.number}
-                      onClick={() => setCurrent(bldg.building_id)}
-                      className="whitespace-nowrap p-1 hover:bg-default w-full rounded transition-all"
-                    />
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
-      )}
+    <div className="flex flex-row gap-2 items-center">
+      <label htmlFor="bldg">{current ? "Selected: " : "Select Building: "}</label>
+      <select
+      id="bldg"
+        onChange={(e) => setCurrent(parseInt(e.target.value))}
+        className="bg-main text-white p-1 rounded"
+      >
+        <option
+          value=""
+          selected
+          disabled
+          className="bg-white text-black whitespace-nowrap p-1 hover:bg-default w-full rounded transition-all"
+        >
+          --Select--
+        </option>
+        {buildings
+          .filter((bldg) => bldg.user_id === userID)
+          .map((bldg, index) => {
+            return (
+              <option
+                key={index}
+                value={bldg.building_id}
+                className="bg-white text-black whitespace-nowrap p-1 hover:bg-default w-full rounded transition-all"
+              >
+                {"Building " + bldg.number}
+              </option>
+            );
+          })}
+      </select>
     </div>
   );
 }

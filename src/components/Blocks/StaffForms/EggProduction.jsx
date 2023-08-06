@@ -3,7 +3,7 @@ import { Button, TextInput } from "../../Forms";
 import { useFunction } from "../../../context/FunctionContext";
 import { format } from "date-fns";
 import { useAuth } from "../../../context/authContext";
-import EggProcurementTable from "../../Tables/EggProcurementTable";
+import EggProductionTable from "../../Tables/EggProductionTable";
 import { Alert, Modal } from "../../Containers";
 // eslint-disable-next-line react/prop-types
 export default function EggProduction({ building }) {
@@ -15,6 +15,7 @@ export default function EggProduction({ building }) {
     date: format(new Date(), "yyyy-MM-dd"),
     building_number: 0,
     egg_tray_count: 0,
+    defect_egg_trays_count: 0,
   });
   const [alert, toggleAlert] = useState({
     type: "success",
@@ -24,7 +25,7 @@ export default function EggProduction({ building }) {
   });
 
   const { toTitle, capitalize } = useFunction();
-  const { insertEggProcurement, getCurrentUser, getBuilding } = useAuth();
+  const { insertEggProduction, getCurrentUser, getBuilding } = useAuth();
 
   const handleSubmit = async () => {
     setModalTitle(null);
@@ -34,12 +35,13 @@ export default function EggProduction({ building }) {
     const data = {
       date: eggData.date,
       count: eggData.egg_tray_count,
+      defect: eggData.defect_egg_trays_count,
       building: id,
       staff: JSON.parse(getCurrentUser()).user_id,
       log_date: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
     };
     try {
-      const response = await insertEggProcurement(data, "staff_add");
+      const response = await insertEggProduction(data, "staff_add");
       if (response === 1) {
         toggleAlert({
           type: "success",
@@ -69,6 +71,7 @@ export default function EggProduction({ building }) {
       date: format(new Date(), "yyyy-MM-dd"),
       building_number: building,
       egg_tray_count: 0,
+      defect_egg_trays_count: 0,
     });
   };
 
@@ -81,14 +84,15 @@ export default function EggProduction({ building }) {
         date: format(new Date(), "yyyy-MM-dd"),
         building_number: response.number,
         egg_tray_count: 0,
+        defect_egg_trays_count: 0,
       });
     };
     setup();
   }, [building]);
   return (
     <>
-      <div className="p-2 flex flex-row gap-2 w-full animate-fade">
-        <div className="w-1/2">
+      <div className="p-2 flex flex-col gap-2 w-full animate-fade">
+        <div className="w-full">
           <p className="text-[1.2rem] font-semibold">Egg Production</p>
           <form
             className="flex flex-col gap-2 bg-default p-2 rounded-md"
@@ -148,9 +152,11 @@ export default function EggProduction({ building }) {
             />
           </form>
         </div>
-        <div className="w-1/2">
+        <div className="w-full">
           <p className="text-[1.2rem] font-semibold">Egg Production Logs</p>
-          <EggProcurementTable refresh={refresh} />
+          <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+            <EggProductionTable refresh={refresh} />
+          </div>
         </div>
       </div>
       {modalTitle && (

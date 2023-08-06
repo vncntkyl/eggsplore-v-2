@@ -2,7 +2,7 @@ import { developmentURLs as url } from "./config";
 import axios from "axios";
 
 //EGG MANAGEMENT
- const insertEggProcurement = async (eggData, method) => {
+const insertEggProduction = async (eggData, method) => {
   try {
     const eggFD = new FormData();
     eggFD.append("method", method);
@@ -15,16 +15,45 @@ import axios from "axios";
     return e.message;
   }
 };
- const retrieveEggProcurement = async (
-  type = "admin",
-  selectionType = "all"
-) => {
+const retrieveEggProduction = async (dateFilter) => {
   try {
     const response = await axios.get(url.manageEggsURL, {
       params: {
-        retrieve: "procurement",
-        type: type,
-        selectionType: selectionType,
+        retrieve: "production",
+        filter:
+          typeof dateFilter === "object"
+            ? JSON.stringify(dateFilter)
+            : dateFilter,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+
+const updateEggProduction = async (eggData) => {
+  try {
+    const response = await axios.put(
+      url.manageEggsURL,
+      JSON.stringify(eggData)
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+
+const retrieveEggsForSegregation = async (user_id) => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "unsorted_egg_production",
+        user_id: user_id,
       },
     });
     if (response.status === 200) {
@@ -37,7 +66,7 @@ import axios from "axios";
 
 //CHICK MANAGEMENT
 
- const retrieveProcurement = async (table, dateFilter) => {
+const retrieveProduction = async (table, dateFilter) => {
   try {
     const response = await axios.get(url.manageChickenURL, {
       params: {
@@ -56,7 +85,7 @@ import axios from "axios";
   }
 };
 
- const addChickProcurement = async (procurement) => {
+const addChickProcurement = async (procurement) => {
   try {
     const procurementData = new FormData();
     procurementData.append("procurementDate", procurement.date_procured);
@@ -73,7 +102,7 @@ import axios from "axios";
   }
 };
 
- const updateChickProcurement = async (procurement, id) => {
+const updateChickProcurement = async (procurement, id) => {
   try {
     const procurementData = {
       procurement_id: id,
@@ -91,7 +120,7 @@ import axios from "axios";
 };
 
 //CHICKEN MANAGEMENT
- const insertChickenMaintenance = async (chickenData, method) => {
+const insertChickenMaintenance = async (chickenData, method) => {
   try {
     const chickenForm = new FormData();
     chickenForm.append("method", method);
@@ -105,7 +134,7 @@ import axios from "axios";
     return e.message;
   }
 };
- const retrieveChickenPopulation = async () => {
+const retrieveChickenPopulation = async () => {
   try {
     const response = await axios.get(url.manageChickenURL, {
       params: { retrievePopulation: true },
@@ -117,7 +146,7 @@ import axios from "axios";
     return e.message;
   }
 };
- const updateChickenPopulation = async (chickendata) => {
+const updateChickenPopulation = async (chickendata) => {
   try {
     const response = await axios.put(url.manageChickenURL, {
       chicken_data: JSON.stringify(chickendata),
@@ -131,9 +160,11 @@ import axios from "axios";
 };
 
 export const values = {
-  insertEggProcurement,
-  retrieveEggProcurement,
-  retrieveProcurement,
+  insertEggProduction,
+  retrieveEggProduction,
+  updateEggProduction,
+  retrieveProduction,
+  retrieveEggsForSegregation,
   addChickProcurement,
   updateChickProcurement,
   insertChickenMaintenance,

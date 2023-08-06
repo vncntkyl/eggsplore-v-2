@@ -78,7 +78,7 @@ const updateFeedsInventory = async (feeds_data) => {
 const addFeedsConsumption = async (newFeedsConsumption) => {
   try {
     const fd = new FormData();
-    fd.append("method", "add intake");
+    fd.append("method", "add consumption");
     fd.append("data", JSON.stringify(newFeedsConsumption));
 
     const response = await axios.post(url.manageFeedsURL, fd);
@@ -92,8 +92,7 @@ const addFeedsConsumption = async (newFeedsConsumption) => {
 const updateFeedsConsumption = async (feedsConsumption) => {
   try {
     const updateIntake = { ...feedsConsumption };
-    updateIntake.updateIntake = true;
-    console.log(updateIntake);
+    updateIntake.updateConsumption = true;
 
     const response = await axios.put(url.manageFeedsURL, updateIntake);
     if (response.status === 200) {

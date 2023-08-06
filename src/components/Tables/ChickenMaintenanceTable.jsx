@@ -12,7 +12,7 @@ export default function ChickenMaintenanceTable({
   setModal = null,
   setChicken = null,
 }) {
-  const { getCurrentUser, retrieveProcurement, getBuilding } = useAuth();
+  const { getCurrentUser, retrieveProduction, getBuilding } = useAuth();
   const { capitalize, toTitle } = useFunction();
   const [procurementData, setProcurementData] = useState([]);
   const [currentUser, setCurrentUser] = useState([]);
@@ -25,7 +25,7 @@ export default function ChickenMaintenanceTable({
       setBuildings(buildingResponse);
       setCurrentUser(user);
 
-      const response = await retrieveProcurement("ep_chicken", filter);
+      const response = await retrieveProduction("ep_chicken", filter);
       setProcurementData(
         user.user_type == "admin"
           ? response.map((res) => ({

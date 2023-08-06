@@ -79,7 +79,7 @@ class Feeds extends Controller
                 $consumption_data->date,
                 $consumption_data->staff,
                 $consumption_data->building,
-                $consumption_data->logdate,
+                $consumption_data->log_date,
             ]);
         } catch (PDOException $e) {
             $this->getError($e);
@@ -118,6 +118,8 @@ class Feeds extends Controller
                     $filter = json_decode($filter);
                     $sqlStatement .= " WHERE log_date >= '" . $filter->start_date . "' AND log_date <= '" . $filter->end_date . "' ORDER BY log_date DESC";
                 }
+            }else{
+                $sqlStatement .= " ORDER BY log_date DESC";
             }
             $this->setStatement($sqlStatement);
             $this->statement->execute();
