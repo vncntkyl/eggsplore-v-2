@@ -7,6 +7,7 @@ import classNames from "classnames";
 import { Alert, Modal } from "../../Containers";
 import { format } from "date-fns";
 import ChickenMaintenanceTable from "../../Tables/ChickenMaintenanceTable";
+import DatePicker from "../../Fragments/DatePicker";
 
 export default function ChickenPopulation() {
   const [refresh, doRefresh] = useState(0);
@@ -92,73 +93,14 @@ export default function ChickenPopulation() {
     <>
       <div>
         <div className="flex flex-row items-center justify-start p-2 gap-2">
-          <p>Date Filter: </p>
-          {["range", "today", "yesterday", "this_week", "this_month"].map(
-            (date, index) => {
-              return (
-                <Button
-                  type="button"
-                  key={index}
-                  onClick={() => {
-                    if (date === "range") {
-                      if (
-                        !Object.values(dateRange).every((item) => item !== "")
-                      ) {
-                        setModalTitle("date range picker");
-                      }
-                    }
-                    selectDateFilter(date);
-                  }}
-                  value={
-                    date === "range" ? (
-                      <div className="flex items-center gap-1">
-                        <AiFillCalendar />
-                        <span>
-                          {Object.values(dateRange).every(
-                            (value) => value != ""
-                          ) ? (
-                            <>
-                              {`${format(
-                                new Date(dateRange.start_date),
-                                "MMMM d, yyyy"
-                              )} - ${format(
-                                new Date(dateRange.end_date),
-                                "MMMM d, yyyy"
-                              )}`}
-                            </>
-                          ) : (
-                            "Select Date Range"
-                          )}
-                        </span>
-                      </div>
-                    ) : (
-                      capitalize(toTitle(date))
-                    )
-                  }
-                  className={classNames(
-                    "text-white p-1 px-2 rounded-sm text-[.9rem] transition-all whitespace-nowrap",
-                    selectedFilter === date
-                      ? "bg-main"
-                      : "bg-gray-400 hover:bg-tertiary hover:text-main"
-                  )}
-                />
-              );
-            }
-          )}
-          {selectedFilter !== "all" && (
-            <Button
-              type="button"
-              value="Reset Filter"
-              onClick={() => {
-                setRange({
-                  start_date: "",
-                  end_date: "",
-                });
-                selectDateFilter("all");
-              }}
-              className="text-white p-1 px-2 rounded-sm text-[.9rem] transition-all bg-gray-400 hover:bg-tertiary hover:text-main whitespace-nowrap"
-            />
-          )}
+          <p className="whitespace-nowrap">Date Filter: </p>
+          <DatePicker
+            dateRange={dateRange}
+            setModalTitle={setModalTitle}
+            selectDateFilter={selectDateFilter}
+            selectedFilter={selectedFilter}
+            setRange={setRange}
+          />
         </div>
         <div className="w-full overflow-x-auto shadow-md">
           <ChickenMaintenanceTable

@@ -81,6 +81,7 @@ export default function FeedsManagement({ building }) {
     const id = parseInt(building_id.value);
 
     const data = {
+      feed_id: feedsData.feed,
       date: feedsData.date,
       building: id,
       medicine_id: feedsData.medicine,
@@ -140,7 +141,7 @@ export default function FeedsManagement({ building }) {
     <>
       <div className="p-2 flex flex-col gap-2 w-full animate-fade">
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">Medicine Management</p>
+          <p className="text-[1.2rem] font-semibold">Feeds Management</p>
           <form
             className="flex flex-col gap-2 bg-default p-2 rounded-md"
             onSubmit={(e) => {

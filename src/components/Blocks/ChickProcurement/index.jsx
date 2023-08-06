@@ -24,7 +24,7 @@ export default function ChickProcurement() {
     show: false,
   });
 
-  const { retrieveProcurement, addChickProcurement, updateChickProcurement } =
+  const { retrieveProduction, addChickProcurement, updateChickProcurement } =
     useAuth();
   const { capitalize, toTitle } = useFunction();
 
@@ -94,7 +94,7 @@ export default function ChickProcurement() {
 
   useEffect(() => {
     const setup = async () => {
-      const response = await retrieveProcurement("ep_chicks");
+      const response = await retrieveProduction("ep_chicks");
       setChicks(response);
     };
 

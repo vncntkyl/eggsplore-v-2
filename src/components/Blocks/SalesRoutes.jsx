@@ -3,23 +3,18 @@ import { useFunction } from "../../context/FunctionContext";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { GrNext } from "react-icons/gr";
-import ChickenPopulation from "./ChickenMaintenance/ChickenPopulation";
-import MedicineInventory from "./ChickenMaintenance/MedicineInventory";
-import MedicationIntake from "./ChickenMaintenance/MedicationIntake";
-import FeedsInventory from "./ChickenMaintenance/FeedsInventory";
-import FeedsConsumption from "./ChickenMaintenance/FeedsConsumption";
 
-export default function ChickenMaintenance() {
+export default function Sales() {
   const { toTitle, capitalize, getPath } = useFunction();
   const [currentPanel, setCurrentPanel] = useState(null);
 
   useEffect(() => {
-    const panel = localStorage.getItem("chicken_maintenance_panel");
+    const panel = localStorage.getItem("sales_panel");
 
     if (panel) {
       setCurrentPanel(panel);
       if (panel !== getPath()) {
-        localStorage.removeItem("chicken_maintenance_panel");
+        localStorage.removeItem("sales_panel");
       }
     }
   }, [getPath]);
@@ -37,39 +32,34 @@ export default function ChickenMaintenance() {
           getPath() === currentPanel ? "w-1/4" : "w-full"
         )}
       >
-        {[
-          "chicken_population",
-          "feeds_consumption",
-          "feeds_inventory",
-          "medication_intake",
-          "medication_inventory",
-        ].map((link, index) => {
+        {["egg_sales", "sales_invoice"].map((link, index) => {
           return (
             <Link
               key={index}
-              to={`/chicken_maintenance/${link}`}
+              to={`/sales/${link}`}
               onClick={() =>
-                localStorage.setItem(
-                  "chicken_maintenance_panel",
-                  `/chicken_maintenance/${link}`
-                )
+                localStorage.setItem("sales_panel", `/sales/${link}`)
               }
               className="p-2 group/link"
             >
               <div
                 className={classNames(
                   " flex flex-row items-center justify-between rounded w-full transition-all duration-300 p-2",
-                  getPath() === "/chicken_maintenance" && "border-b-4",
-                  getPath() === `/chicken_maintenance/${link}`
+                  getPath() === "/sales" && "border-b-4",
+                  getPath() === `/sales/${link}`
                     ? "bg-tertiary"
                     : "group-hover/link:bg-default"
                 )}
               >
-                <span>{capitalize(toTitle(link))}</span>
+                <span>
+                  {link !== "buildings"
+                    ? capitalize(toTitle(link))
+                    : capitalize("buildings and Delivery Locations")}
+                </span>
                 <GrNext
                   className={classNames(
                     "transition-all ",
-                    getPath() === `/chicken_maintenance/${link}`
+                    getPath() === `/sales/${link}`
                       ? "block"
                       : "animate-slide-right hidden group-hover/link:block"
                   )}
@@ -92,14 +82,8 @@ export default function ChickenMaintenance() {
         )}
       >
         <Routes>
-          <Route path="/chicken_population/*" element={<ChickenPopulation />} />
-          <Route path="/feeds_consumption/*" element={<FeedsConsumption />} />
-          <Route path="/feeds_inventory/*" element={<FeedsInventory />} />
-          <Route path="/medication_intake/*" element={<MedicationIntake />} />
-          <Route
-            path="/medication_inventory/*"
-            element={<MedicineInventory />}
-          />
+          <Route path="/egg_sales/*" element={<></>} />
+          <Route path="/sales_invoice/*" element={<></>} />
         </Routes>
       </div>
     </div>

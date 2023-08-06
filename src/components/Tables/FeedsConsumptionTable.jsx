@@ -25,36 +25,38 @@ export default function FeedsConsumptionTable({
       const user = JSON.parse(localStorage.getItem("currentUser"));
       setUser(user);
       const response = await getFeedsConsumption("all");
-    //   setConsumptionData(
-    //     user.user_type === "admin"
-    //       ? response.map((res) => ({
-    //           id: res.id,
-    //           building_id: res.building_id,
-    //           medicine_id: res.medicine_id,
-    //           intake: res.intake,
-    //           disposed: res.disposed,
-    //           remaining: res.remaining,
-    //           remarks: res.remarks,
-    //           date_procured: res.date_procured,
-    //           date_logged: res.log_date,
-    //         }))
-    //       : response
-    //           .filter((res) => res.staff_id === user.user_id)
-    //           .map((res) => ({
-    //             building_id: res.building_id,
-    //             medicine_id: res.medicine_id,
-    //             intake: res.intake,
-    //             disposed: res.disposed,
-    //             remaining: res.remaining,
-    //             remarks: res.remarks,
-    //             date_procured: res.date_procured,
-    //             date_logged: res.log_date,
-    //           }))
-    //   );
+      setConsumptionData(
+        user.user_type === "admin"
+          ? response.map((res) => ({
+              id: res.id,
+              building_id: res.building_id,
+              feed_id: res.feed_id,
+              consumed: res.consumed,
+              disposed: res.disposed,
+              remaining: res.remaining,
+              remarks: res.remarks,
+              date_procured: res.date_procured,
+              date_logged: res.log_date,
+            }))
+          : response
+              .filter((res) => res.staff_id === user.user_id)
+              .map((res) => ({
+                id: res.id,
+                building_id: res.building_id,
+                feed_id: res.feed_id,
+                consumed: res.consumed,
+                disposed: res.disposed,
+                remaining: res.remaining,
+                remarks: res.remarks,
+                date_procured: res.date_procured,
+                date_logged: res.log_date,
+              }))
+      );
       const buildingResponse = await getBuilding();
       setBuildings(buildingResponse);
-      const medicineResponse = await getFeeds();
-      setFeedsList(medicineResponse);
+      const feedResponse = await getFeeds();
+      console.log(feedResponse);
+      setFeedsList(feedResponse);
 
       setLoading(false);
     };
@@ -71,24 +73,24 @@ export default function FeedsConsumptionTable({
         <tr className="bg-main text-white">
           {Object.keys(feedsConsumption[0])
             .filter((k) => k !== "id" && k !== "user_id")
-            .map((intake, index) => {
+            .map((consumed, index) => {
               return user.user_type === "admin" ? (
-                intake !== "date_logged" && (
+                consumed !== "date_logged" && (
                   <th key={index} className="p-2">
-                    {intake === "medicine_id"
-                      ? "Medicine"
-                      : intake === "building_id"
+                    {consumed === "feed_id"
+                      ? "Feeds"
+                      : consumed === "building_id"
                       ? "Building"
-                      : capitalize(toTitle(intake))}
+                      : capitalize(toTitle(consumed))}
                   </th>
                 )
               ) : (
                 <th key={index} className="p-2">
-                  {intake === "medicine_id"
-                    ? "Medicine"
-                    : intake === "building_id"
+                  {consumed === "feed_id"
+                    ? "Feeds"
+                    : consumed === "building_id"
                     ? "Building"
-                    : capitalize(toTitle(intake))}
+                    : capitalize(toTitle(consumed))}
                 </th>
               );
             })}
@@ -96,34 +98,30 @@ export default function FeedsConsumptionTable({
         </tr>
       </thead>
       <tbody>
-        {feedsConsumption.map((intake, index) => {
+        {feedsConsumption.map((consumed, index) => {
           return (
             <tr key={index} align="center">
               <td className="p-2">
                 {
                   buildings.find(
-                    (building) => building.id === intake.building_id
+                    (building) => building.id === consumed.building_id
                   ).number
                 }
               </td>
               <td className="p-2">
-                {
-                  feedsList.find(
-                    (medicine) => medicine.medicine_id === intake.medicine_id
-                  ).medicine_name
-                }
+                {capitalize(feedsList.find((feeds) => feeds.id === consumed.feed_id).name)}
               </td>
-              <td className="p-2">{intake.intake}</td>
-              <td className="p-2">{intake.disposed}</td>
-              <td className="p-2">{intake.remaining}</td>
-              <td className="p-2">{intake.remarks}</td>
+              <td className="p-2">{consumed.consumed}</td>
+              <td className="p-2">{consumed.disposed}</td>
+              <td className="p-2">{consumed.remaining}</td>
+              <td className="p-2">{consumed.remarks}</td>
               <td className="p-2">
-                {format(new Date(intake.date_procured), "MMM d, yyyy")}
+                {format(new Date(consumed.date_procured), "MMM d, yyyy")}
               </td>
               {user.user_type !== "admin" && (
                 <td className="p-2">
                   {format(
-                    new Date(intake.date_logged),
+                    new Date(consumed.date_logged),
                     "MMMM d, yyyy hh:mmaaa"
                   )}
                 </td>
@@ -132,13 +130,13 @@ export default function FeedsConsumptionTable({
                 <td className="p-2">
                   <Button
                     onClick={() => {
-                      setConsumption(intake);
+                      setConsumption(consumed);
                       setFeedsQuantity(
-                        parseInt(intake.intake) +
-                          parseInt(intake.disposed) +
-                          parseInt(intake.remaining)
+                        parseInt(consumed.consumed) +
+                          parseInt(consumed.disposed) +
+                          parseInt(consumed.remaining)
                       );
-                      setModal("edit medication intake");
+                      setModal("edit medication consumed");
                     }}
                     className="bg-yellow p-1 rounded"
                     value={<HiPencilAlt className="text-white" />}
@@ -151,6 +149,6 @@ export default function FeedsConsumptionTable({
       </tbody>
     </table>
   ) : (
-    <>No medication intake information found.</>
+    <>No feeds consumption information found.</>
   );
 }

@@ -8,8 +8,11 @@ $egg = new Egg();
 switch ($_SERVER['REQUEST_METHOD']) {
     case "GET":
         $retrieve_type = $_GET['retrieve'];
-        if ($retrieve_type === "procurement") {
-            echo json_encode($egg->retrieveEggProcurement($_GET['type'], $_GET['selectionType']));
+        if ($retrieve_type === "production") {
+            $filter = isset($_GET['filter']) ? (gettype($_GET['filter']) == "object" ? json_decode($_GET['filter']) : $_GET['filter']) : "all";
+            echo json_encode($egg->retrieveEggProduction($filter));
+        }else if($retrieve_type === "unsorted_egg_production"){
+            echo json_encode($egg->retrieveEggsForSegregation($_GET['user_id']));
         }
         break;
     case "POST":
@@ -27,8 +30,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         // }
         break;
     case "PUT":
-        // $feeds_data = json_decode(file_get_contents('php://input'));
-        // echo $feeds->updateFeeds($feeds_data) ? 1 : 0;
+        $egg_data = json_decode(file_get_contents('php://input'));
+        echo $egg->updateEggProduction($egg_data->egg_count, $egg_data->defect_count, $egg_data->id) ? 1 : 0;
         break;
     case "DELETE":
         // $id = $_GET['id'];

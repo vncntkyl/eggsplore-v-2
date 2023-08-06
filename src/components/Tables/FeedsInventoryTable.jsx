@@ -94,7 +94,7 @@ export default function FeedsInventoryTable({
                     onClick={() => {
                       setFeeds({
                         id: item.id,
-                        feed: item.feed_id,
+                        feeds: item.feed_id,
                         quantity: item.quantity,
                         amount: item.amount,
                         supplier: item.supplier,

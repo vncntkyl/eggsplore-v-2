@@ -7,6 +7,7 @@ import { AiFillCalendar, AiFillPlusCircle } from "react-icons/ai";
 import { Alert, Modal } from "../../Containers";
 import { useAuth } from "../../../context/authContext";
 import FeedsInventoryTable from "../../Tables/FeedsInventoryTable";
+import DatePicker from "../../Fragments/DatePicker";
 
 export default function FeedsInventory() {
   const [refresh, doRefresh] = useState(0);
@@ -160,76 +161,13 @@ export default function FeedsInventory() {
           />
           <div className="w-full overflow-x-auto flex flex-row items-center justify-start p-2 gap-2">
             <p className="whitespace-nowrap">Date Filter: </p>
-            <div className="w-full overflow-x-auto flex flex-row items-center justify-start gap-2">
-              {["range", "today", "yesterday", "this_week", "this_month"].map(
-                (date, index) => {
-                  return (
-                    <Button
-                      type="button"
-                      key={index}
-                      onClick={() => {
-                        if (date === "range") {
-                          if (
-                            !Object.values(dateRange).every(
-                              (item) => item !== ""
-                            )
-                          ) {
-                            setModalTitle("date range picker");
-                          }
-                        }
-                        selectDateFilter(date);
-                      }}
-                      value={
-                        date === "range" ? (
-                          <div className="flex items-center gap-1">
-                            <AiFillCalendar />
-                            <span>
-                              {Object.values(dateRange).every(
-                                (value) => value != ""
-                              ) ? (
-                                <>
-                                  {`${format(
-                                    new Date(dateRange.start_date),
-                                    "MMMM d, yyyy"
-                                  )} - ${format(
-                                    new Date(dateRange.end_date),
-                                    "MMMM d, yyyy"
-                                  )}`}
-                                </>
-                              ) : (
-                                "Select Date Range"
-                              )}
-                            </span>
-                          </div>
-                        ) : (
-                          capitalize(toTitle(date))
-                        )
-                      }
-                      className={classNames(
-                        "text-white p-1 px-2 rounded-sm text-[.9rem] transition-all whitespace-nowrap",
-                        selectedFilter === date
-                          ? "bg-main"
-                          : "bg-gray-400 hover:bg-tertiary hover:text-main"
-                      )}
-                    />
-                  );
-                }
-              )}
-              {selectedFilter !== "all" && (
-                <Button
-                  type="button"
-                  value="Reset Filter"
-                  onClick={() => {
-                    setRange({
-                      start_date: "",
-                      end_date: "",
-                    });
-                    selectDateFilter("all");
-                  }}
-                  className="text-white p-1 px-2 rounded-sm text-[.9rem] transition-all bg-gray-400 hover:bg-tertiary hover:text-main whitespace-nowrap"
-                />
-              )}
-            </div>
+            <DatePicker
+              dateRange={dateRange}
+              setModalTitle={setModalTitle}
+              selectDateFilter={selectDateFilter}
+              selectedFilter={selectedFilter}
+              setRange={setRange}
+            />
           </div>
         </div>
         <div className="w-full overflow-x-auto shadow-md">
@@ -247,9 +185,7 @@ export default function FeedsInventory() {
       </div>
       {modalTitle && (
         <Modal
-          className={
-            modalTitle === "view feeds information" ? "max-w-lg" : ""
-          }
+          className={modalTitle === "view feeds information" ? "max-w-lg" : ""}
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
           content={
@@ -290,9 +226,7 @@ export default function FeedsInventory() {
                   </div>
                 </form>
               </>
-            ) : ["add feeds", "edit feeds information"].includes(
-                modalTitle
-              ) ? (
+            ) : ["add feeds", "edit feeds information"].includes(modalTitle) ? (
               <>
                 <form
                   className="flex flex-col gap-2"
@@ -303,7 +237,7 @@ export default function FeedsInventory() {
                   {Object.keys(feeds)
                     .filter((key) => key !== "update" && key !== "id")
                     .map((label, index) => {
-                      return label === "feed" ? (
+                      return label === "feeds" ? (
                         <div
                           key={index}
                           className="flex gap-2 p-1 items-center"
