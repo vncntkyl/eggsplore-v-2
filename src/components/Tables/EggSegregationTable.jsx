@@ -3,12 +3,11 @@ import { useAuth } from "../../context/authContext";
 import { useFunction } from "../../context/FunctionContext";
 import { format } from "date-fns";
 
-export default function EggSegregationTable({ refresh }) {
+export default function EggSegregationTable() {
   const [segregationLogs, setSegregationLogs] = useState([]);
-  const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { retrieveSegregationLogs, getCurrentUser, getBuilding } = useAuth();
+  const { retrieveSegregationLogs, getCurrentUser,  } = useAuth();
   const { capitalize, toTitle } = useFunction();
   useEffect(() => {
     const setup = async () => {
@@ -17,8 +16,6 @@ export default function EggSegregationTable({ refresh }) {
       );
       console.log(logsResponse);
       setSegregationLogs(logsResponse);
-      const buildingsResponse = await getBuilding();
-      setBuildings(buildingsResponse);
       setLoading(false);
     };
     setup();
