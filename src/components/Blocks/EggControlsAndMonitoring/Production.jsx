@@ -120,7 +120,6 @@ export default function Production() {
                     ? dateRange
                     : selectedFilter
                 }
-                l
               />
             </div>
           </div>
