@@ -63,7 +63,19 @@ const retrieveEggsForSegregation = async (user_id) => {
     return e.message;
   }
 };
-
+const insertEggSegregation = async (data) => {
+  try {
+    const eggFD = new FormData();
+    eggFD.append("method", "add_segregation");
+    eggFD.append("segregation_data", JSON.stringify(data));
+    const response = await axios.post(url.manageEggsURL, eggFD);
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 //CHICK MANAGEMENT
 
 const retrieveProduction = async (table, dateFilter) => {
@@ -163,6 +175,7 @@ export const values = {
   insertEggProduction,
   retrieveEggProduction,
   updateEggProduction,
+  insertEggSegregation,
   retrieveProduction,
   retrieveEggsForSegregation,
   addChickProcurement,

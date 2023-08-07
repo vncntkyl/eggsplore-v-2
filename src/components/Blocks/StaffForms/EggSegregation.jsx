@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, TextInput } from "../../Forms";
 import { useFunction } from "../../../context/FunctionContext";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { useAuth } from "../../../context/authContext";
 import EggProductionTable from "../../Tables/EggProductionTable";
 import { Alert, Modal } from "../../Containers";
@@ -28,88 +28,89 @@ export default function EggSegregation({ building }) {
     crack: 0,
     soft_shell: 0,
   });
-  const [currentTotal, setCurrentTotal] = useState(0);
   const [alert, toggleAlert] = useState({
     type: "success",
     title: "",
     message: "",
     show: false,
   });
+  const { toTitle, capitalize } = useFunction();
+  const {
+    getCurrentUser,
+    getBuilding,
+    retrieveEggsForSegregation,
+    insertEggSegregation,
+  } = useAuth();
 
   const handleInputChange = (label, value) => {
-    const keysToExclude = [
-      "unsorted_egg_production",
-      "building_number",
-      "date",
-    ];
-    const total = Object.keys(eggData)
-      .filter((key) => !keysToExclude.includes(key))
-      .reduce((acc, key) => acc + eggData[key], 0);
     if (label.includes("date")) {
       setEggData((data) => ({
         ...data,
         [label]: value,
       }));
-    } else if (label === "unsorted_egg_production") {
-      setEggData((data) => ({
-        ...data,
-        [label]: parseInt(value),
-      }));
-    } else if (
-      parseInt(value) >= 0 &&
-      total <
-        parseInt(eggData.unsorted_egg_production)
-    ) {
+    }
+    if (label === "unsorted_egg_production") {
       setEggData((data) => ({
         ...data,
         [label]: parseInt(value),
       }));
     }
+
+    const updatedEggData = { ...eggData, [label]: parseInt(value) };
+
+    let total = 0;
+    Object.keys(updatedEggData)
+      .filter(
+        (key) =>
+          !["unsorted_egg_production", "building_number", "date"].includes(key)
+      )
+      .forEach((type) => {
+        total += updatedEggData[type];
+      });
+
+    if (total <= updatedEggData.unsorted_egg_production) {
+      setEggData(updatedEggData);
+    } else {
+      console.log("STAHPPPP");
+    }
   };
-  const { toTitle, capitalize } = useFunction();
-  const { getCurrentUser, getBuilding, retrieveEggsForSegregation } = useAuth();
 
   const handleSubmit = async () => {
-    console.log(eggData, currentTotal);
-    // setModalTitle(null);
-    // const building_id = document.querySelector("#building_id");
-    // const id = parseInt(building_id.value);
-
-    // const data = {
-    //   date: eggData.date,
-    //   count: eggData.egg_tray_count,
-    //   defect: eggData.defect_egg_trays_count,
-    //   building: id,
-    //   staff: JSON.parse(getCurrentUser()).user_id,
-    //   log_date: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
-    // };
-    // try {
-    //   const response = await insertEggProduction(data, "staff_add");
-    //   if (response === 1) {
-    //     toggleAlert({
-    //       type: "success",
-    //       title: "Procurement Success",
-    //       message: "You have successfully submitted!",
-    //       show: true,
-    //     });
-    //   } else {
-    //     toggleAlert({
-    //       type: "warning",
-    //       title: "Procurement Error",
-    //       message:
-    //         "There has been an error on submitting your procurement. Please try again.",
-    //       show: true,
-    //     });
-    //   }
-    //   doRefresh((count) => (count = count + 1));
-    // } catch (e) {
-    //   console.log(e.message);
-    // }
+    setModalTitle(null);
+    const building_id = document.querySelector("#building_id");
+    const data = { ...eggData };
+    data.building_number = parseInt(building_id.value);
+    data.production_id = parseInt(selectedProduction);
+    data.user_id = parseInt(JSON.parse(getCurrentUser()).user_id);
+    data.log_date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    try {
+      const response = await insertEggSegregation(data);
+      if (response === 1) {
+        toggleAlert({
+          type: "success",
+          title: "Segregation Success",
+          message: "You have successfully submitted!",
+          show: true,
+        });
+      } else {
+        toggleAlert({
+          type: "warning",
+          title: "Segregation Error",
+          message:
+            "There has been an error on submitting your segregation. Please try again.",
+          show: true,
+        });
+      }
+      doRefresh((count) => (count = count + 1));
+    } catch (e) {
+      console.log(e.message);
+    }
   };
 
   const handleClose = () => {
     setModalTitle(null);
     toggleAlert({ type: "success", title: "", message: "", show: false });
+    setSelectedProduction(null);
     setEggData({
       date: format(new Date(), "yyyy-MM-dd"),
       building_number: 0,
@@ -190,6 +191,7 @@ export default function EggSegregation({ building }) {
                             className="w-full rounded px-2 outline-none border-none p-1"
                             onChange={(e) => {
                               setSelectedProduction(e.target.value);
+
                               setEggData((current) => ({
                                 ...current,
                                 unsorted_egg_production: eggProductionList.find(
@@ -248,6 +250,7 @@ export default function EggSegregation({ building }) {
                         value={eggData[eggKey]}
                         type={eggKey.includes("date") ? "date" : "number"}
                         orientation="row"
+                        disabled={!selectedProduction}
                         classes="p-1 items-center "
                         labelClasses="whitespace-nowrap w-full text-start"
                         inputClasses="w-full rounded px-2"
@@ -269,15 +272,13 @@ export default function EggSegregation({ building }) {
                         withLabel={capitalize(toTitle(eggKey)) + ":"}
                         value={eggData[eggKey]}
                         type={eggKey.includes("date") ? "date" : "number"}
+                        disabled={!selectedProduction}
                         orientation="row"
                         classes="p-1 items-center "
                         labelClasses="whitespace-nowrap w-full text-start"
                         inputClasses="w-full rounded px-2"
                         onChange={(e) =>
-                          setEggData((data) => ({
-                            ...data,
-                            [eggKey]: parseInt(e.target.value),
-                          }))
+                          handleInputChange(eggKey, e.target.value)
                         }
                       />
                     );

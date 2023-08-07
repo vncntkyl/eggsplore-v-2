@@ -22,7 +22,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $egg_data = json_decode($_POST['egg_data']);
                 echo $egg->procureEgg($egg_data) ? 1 : 0;
                 break;
-        }
+                case "add_segregation":
+                    $segregated_eggs = json_decode($_POST['segregation_data']);
+                    echo $egg->segregateEggProduction($segregated_eggs) ? 1 : 0;
+                    break;
+        }   
         // if ($method === "add") {
         //     $name = $_POST['feeds_name'];
         //     $description = $_POST['feeds_description'];
