@@ -105,8 +105,14 @@ class Egg extends Controller
     function updateEggClassifications($count, $classification)
     {
         try {
-            $this->setStatement("UPDATE ep_egg_segregation SET egg_type_total_count = ? WHERE egg_type_name = ?");
-            return $this->statement->execute([ $count, $classification ]);
+            $this->setStatement("BEGIN;
+
+            SET @egg_count = (SELECT et.egg_type_total_count as count FROM ep_egg_types as et WHERE et.egg_type_name = :name);
+            
+            UPDATE ep_egg_types SET egg_type_total_count = @egg_count + :count WHERE egg_type_name = :name;
+            
+            COMMIT;");
+            return $this->statement->execute([ ":count" => $count, ":name" => $classification ]);
         } catch (PDOException $e) {
             return $e->getMessage();
         }
