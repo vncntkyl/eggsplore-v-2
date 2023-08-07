@@ -82,7 +82,7 @@ class Egg extends Controller
         try {
             $this->setStatement("INSERT INTO ep_egg_segregation (production_id, no_weight, pewee, pullet, brown, small, medium, large, extra_large, jumbo, crack, soft_shell, user_id, log_date)
              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            return $this->statement->execute([
+            if ($this->statement->execute([
                 $data->production_id,
                 $data->no_weight,
                 $data->pewee,
@@ -97,7 +97,23 @@ class Egg extends Controller
                 $data->soft_shell,
                 $data->user_id,
                 $data->log_date,
-            ]);
+            ])) {
+                $status = array();
+                unset($data->production_id);
+                unset($data->user_id);
+                unset($data->log_date);
+
+                $objectVars = get_object_vars($data);
+                foreach ($objectVars as $key => $value) {
+                    $this->updateEggClassifications($value, str_replace('_', ' ', $key)) ? array_push($status, 1) : array_push($status, 0);
+                }
+
+                if (in_array(0, $status)) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
         } catch (PDOException $e) {
             return $e->getMessage();
         }
@@ -112,7 +128,7 @@ class Egg extends Controller
             UPDATE ep_egg_types SET egg_type_total_count = @egg_count + :count WHERE egg_type_name = :name;
             
             COMMIT;");
-            return $this->statement->execute([ ":count" => $count, ":name" => $classification ]);
+            return $this->statement->execute([":count" => $count, ":name" => $classification]);
         } catch (PDOException $e) {
             return $e->getMessage();
         }
