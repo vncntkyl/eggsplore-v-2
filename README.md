@@ -11,12 +11,12 @@ STEPS FOR USAGE
 6. Enjoy.
 
 CREDENTIALS
-ADMIN
-	username: linahernandez
-	password: lina12345
-STAFF: 
-	username:jomaricruz
-	password:jojoreyes
+ADMIN  
+	username: linahernandez  
+	password: lina12345  
+STAFF:   
+	username:jomaricruz  
+	password:jojoreyes  
 
 STILL WORKING ON THE FOLLOWING
 1. DASHBOARD
