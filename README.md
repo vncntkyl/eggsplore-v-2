@@ -12,7 +12,7 @@ STEPS FOR USAGE
 
 CREDENTIALS
 ADMIN
-	username: linahernandex
+	username: linahernandez\n
 	password: lina12345
 STAFF: 
 	username:jomaricruz
