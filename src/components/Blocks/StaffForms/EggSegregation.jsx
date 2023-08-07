@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button, TextInput } from "../../Forms";
 import { useFunction } from "../../../context/FunctionContext";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { useAuth } from "../../../context/authContext";
-import EggProductionTable from "../../Tables/EggProductionTable";
 import { Alert, Modal } from "../../Containers";
+import EggSegregationTable from "../../Tables/EggSegregationTable";
 // eslint-disable-next-line react/prop-types
 export default function EggSegregation({ building }) {
   const [refresh, doRefresh] = useState(0);
@@ -293,9 +293,9 @@ export default function EggSegregation({ building }) {
           </form>
         </div>
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">Egg Production Logs</p>
+          <p className="text-[1.2rem] font-semibold">Egg Segregation Logs</p>
           <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
-            <EggProductionTable refresh={refresh} />
+            <EggSegregationTable refresh={refresh} />
           </div>
         </div>
       </div>

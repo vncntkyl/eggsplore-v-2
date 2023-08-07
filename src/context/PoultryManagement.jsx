@@ -76,6 +76,22 @@ const insertEggSegregation = async (data) => {
     return e.message;
   }
 };
+
+const retrieveSegregationLogs = async (user) => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "segregation_logs",
+        user_id: user,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 //CHICK MANAGEMENT
 
 const retrieveProduction = async (table, dateFilter) => {
@@ -178,6 +194,7 @@ export const values = {
   insertEggSegregation,
   retrieveProduction,
   retrieveEggsForSegregation,
+  retrieveSegregationLogs,
   addChickProcurement,
   updateChickProcurement,
   insertChickenMaintenance,

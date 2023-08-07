@@ -13,6 +13,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
             echo json_encode($egg->retrieveEggProduction($filter));
         }else if($retrieve_type === "unsorted_egg_production"){
             echo json_encode($egg->retrieveEggsForSegregation($_GET['user_id']));
+        }else if($retrieve_type === "segregation_logs"){
+            echo json_encode($egg->retrieveEggSegregationLogs($_GET['user_id']));
         }
         break;
     case "POST":

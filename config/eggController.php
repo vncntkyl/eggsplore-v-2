@@ -9,7 +9,7 @@ class Egg extends Controller
             $this->setStatement("INSERT INTO ep_egg_production (date_produced, egg_count, defect_count, building_id, user_id, log_date) VALUES (?,?,?,?,?,?)");
             return $this->statement->execute([$egg_data->date, $egg_data->count, $egg_data->defect, $egg_data->building, $egg_data->staff, $egg_data->log_date]);
         } catch (PDOException $e) {
-            return $e->getMessage();
+            $this->getError($e);
         }
     }
     function retrieveEggProduction($filter = "all")
@@ -71,8 +71,15 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
-    function retrieveEggSegregationLogs()
+    function retrieveEggSegregationLogs($staff_id)
     {
+        try {
+            $this->setStatement("SELECT * FROM ep_egg_segregation WHERE user_id = ? ORDER BY log_date DESC");
+            $this->statement->execute([$staff_id]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
     }
     function retrieveEggClasifications()
     {
@@ -115,7 +122,7 @@ class Egg extends Controller
                 }
             }
         } catch (PDOException $e) {
-            return $e->getMessage();
+            $this->getError($e);
         }
     }
     function updateEggClassifications($count, $classification)
@@ -130,7 +137,7 @@ class Egg extends Controller
             COMMIT;");
             return $this->statement->execute([":count" => $count, ":name" => $classification]);
         } catch (PDOException $e) {
-            return $e->getMessage();
+            $this->getError($e);
         }
     }
     function procureBrownEgg()
