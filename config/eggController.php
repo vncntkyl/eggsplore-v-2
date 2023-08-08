@@ -83,6 +83,13 @@ class Egg extends Controller
     }
     function retrieveEggClasifications()
     {
+        try {
+            $this->setStatement("SELECT * FROM ep_egg_types");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
     }
     function segregateEggProduction($data)
     {
@@ -140,8 +147,66 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
-    function procureBrownEgg()
+    function procureBrownEgg($data)
     {
-        //add into egg production and then add to segregation and classification
+        try {
+            $this->setStatement("INSERT INTO ep_egg_procurement (egg_type,quantity,supplier,amount,date_procured,log_date) 
+            VALUES (?,?,?,?,?,?)");
+            if ($this->statement->execute([
+                $data->egg_type,
+                $data->quantity,
+                $data->supplier,
+                $data->amount,
+                $data->date_procured,
+                $data->log_date,
+            ])) {
+                return $this->updateEggClassifications($data->quantity, str_replace('_', ' ', $data->egg_type));
+            }
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function updateProcurement($data)
+    {
+        try {
+            $this->setStatement("BEGIN;
+            SET @qty = (SELECT quantity as qty FROM ep_egg_procurement WHERE egg_procurement_id = :proc_id);
+            SET @eggQty = (SELECT egg_type_total_count as eggQty FROM ep_egg_types WHERE egg_type_name = :egg_type);
+            
+            UPDATE `ep_egg_procurement` SET `egg_type`= :egg_type,`quantity`= :qty,`supplier`= :supplier,`amount`= :amt WHERE `egg_procurement_id` = :proc_id;
+            UPDATE ep_egg_types SET egg_type_total_count = (@eggQty - @qty) + :qty WHERE egg_type_name = :egg_type;
+            COMMIT;
+            ");
+            return $this->statement->execute([
+                ":egg_type" => $data->egg_type,
+                ":qty" => $data->quantity,
+                ":supplier" => $data->supplier,
+                ":amt" => $data->amount,
+                ":proc_id" => $data->egg_procurement_id,
+            ]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveProcurement($filter)
+    {
+        try {
+            $sqlStatement = "SELECT * FROM ep_egg_procurement ";
+            if ($filter !== 'all') {
+                if ($filter === 'this_month') {
+                    $sqlStatement .= " WHERE MONTH(log_date) = MONTH(NOW()) ORDER BY log_date DESC";
+                } else {
+                    $filter = json_decode($filter);
+                    $sqlStatement .= " WHERE log_date >= '" . $filter->start_date . "' AND log_date <= '" . $filter->end_date . "' ORDER BY log_date DESC";
+                }
+            } else {
+                $sqlStatement .= " ORDER BY log_date DESC";
+            }
+            $this->setStatement($sqlStatement);
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
     }
 }

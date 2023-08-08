@@ -253,7 +253,7 @@ export default function EggSegregation({ building }) {
                         disabled={!selectedProduction}
                         classes="p-1 items-center "
                         labelClasses="whitespace-nowrap w-full text-start"
-                        inputClasses="w-full rounded px-2"
+                        inputClasses="w-full rounded px-2 disabled:bg-default-dark"
                         onChange={(e) =>
                           handleInputChange(eggKey, e.target.value)
                         }
@@ -276,7 +276,7 @@ export default function EggSegregation({ building }) {
                         orientation="row"
                         classes="p-1 items-center "
                         labelClasses="whitespace-nowrap w-full text-start"
-                        inputClasses="w-full rounded px-2"
+                        inputClasses="w-full rounded px-2 disabled:bg-default-dark"
                         onChange={(e) =>
                           handleInputChange(eggKey, e.target.value)
                         }

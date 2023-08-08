@@ -92,6 +92,68 @@ const retrieveSegregationLogs = async (user) => {
     return e.message;
   }
 };
+
+const retrieveEggClasifications = async () => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "egg_classifications",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+
+const retrieveEggProcurement = async (dateFilter) => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "egg_procurement",
+        filter:
+          typeof dateFilter === "object"
+            ? JSON.stringify(dateFilter)
+            : dateFilter,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+
+const insertEggProcurement = async (data) => {
+  try {
+    const eggFD = new FormData();
+    eggFD.append("method", "procure_egg");
+    eggFD.append("procurement_data", JSON.stringify(data));
+    const response = await axios.post(url.manageEggsURL, eggFD);
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+const updateEggProcurement = async (eggData) => {
+  eggData.adminUpdate = true;
+  try {
+    const response = await axios.put(
+      url.manageEggsURL,
+      JSON.stringify(eggData)
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 //CHICK MANAGEMENT
 
 const retrieveProduction = async (table, dateFilter) => {
@@ -188,16 +250,20 @@ const updateChickenPopulation = async (chickendata) => {
 };
 
 export const values = {
+  retrieveProduction,
+  addChickProcurement,
   insertEggProduction,
-  retrieveEggProduction,
   updateEggProduction,
   insertEggSegregation,
-  retrieveProduction,
-  retrieveEggsForSegregation,
-  retrieveSegregationLogs,
-  addChickProcurement,
+  insertEggProcurement,
+  updateEggProcurement,
+  retrieveEggProduction,
+  retrieveEggProcurement,
   updateChickProcurement,
+  retrieveSegregationLogs,
+  updateChickenPopulation,
   insertChickenMaintenance,
   retrieveChickenPopulation,
-  updateChickenPopulation,
+  retrieveEggClasifications,
+  retrieveEggsForSegregation,
 };
