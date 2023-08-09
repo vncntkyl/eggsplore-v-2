@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import { useFunction } from "../../context/FunctionContext";
 import { useAuth } from "../../context/authContext";
@@ -19,7 +20,8 @@ export default function SalesInvoiceTable({
   const { retrieveSalesInvoice } = useAuth();
   useEffect(() => {
     const setup = async () => {
-      const response = await retrieveSalesInvoice();
+      console.log(filter);
+      const response = await retrieveSalesInvoice(filter);
       setSalesInvoiceLogs(response);
       setLoading(false);
     };
@@ -29,7 +31,7 @@ export default function SalesInvoiceTable({
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh]);
+  }, [refresh, filter]);
 
   return !loading && salesInvoiceLogs ? (
     <table className="w-full rounded-md">
@@ -55,7 +57,7 @@ export default function SalesInvoiceTable({
           return (
             <tr key={index}>
               <td className="p-2" align="center">
-                {format(new Date(logs.date),"MMM dd, yyyy")}
+                {format(new Date(logs.date), "MMM dd, yyyy")}
               </td>
               <td className="p-2" align="center">
                 {logs.invoice_no}

@@ -191,8 +191,20 @@ export default function SalesInvoice() {
           />
         </div>
         <div className="w-full px-2">
+          {dateRange.end_date}
           <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
-            <SalesInvoiceTable invoiceHeaders={salesInvoice} />
+            <SalesInvoiceTable
+              invoiceHeaders={salesInvoice}
+              setModal={setModalTitle}
+              refresh={refresh}
+              filter={
+                selectedFilter == "range"
+                  ? dateRange.end_date.length > 0
+                    ? dateRange
+                    : selectedFilter
+                  : selectedFilter
+              }
+            />
           </div>
         </div>
       </div>

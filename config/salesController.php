@@ -2,7 +2,7 @@
 require_once 'authController.php';
 class Sales extends Controller
 {
-    function retrieveSalesInvoice($filter)
+    function retrieveSalesInvoice($filter = "all")
     {
         try {
             $sqlStatement = "SELECT * FROM ep_sales_invoice ";
