@@ -3,6 +3,7 @@ import { useFunction } from "../../context/FunctionContext";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { GrNext } from "react-icons/gr";
+import SalesInvoice from "./Sales/SalesInvoice";
 
 export default function Sales() {
   const { toTitle, capitalize, getPath } = useFunction();
@@ -83,7 +84,7 @@ export default function Sales() {
       >
         <Routes>
           <Route path="/egg_sales/*" element={<></>} />
-          <Route path="/sales_invoice/*" element={<></>} />
+          <Route path="/sales_invoice/*" element={<SalesInvoice />} />
         </Routes>
       </div>
     </div>

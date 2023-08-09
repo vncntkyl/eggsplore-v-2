@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "../../Fragments/DatePicker";
 import { Alert, Modal } from "../../Containers";
 import { AiFillPlusCircle } from "react-icons/ai";
@@ -7,8 +7,6 @@ import { format } from "date-fns";
 import EggProcurementTable from "../../Tables/EggProcurementTable";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";
-import axios from "axios";
-
 export default function Procurement() {
   const [refresh, doRefresh] = useState(0);
   const [selectedFilter, selectDateFilter] = useState("all");
@@ -51,7 +49,6 @@ export default function Procurement() {
       quantity: 0,
       supplier: "",
       amount: 0,
-      log_date: format(new Date(), "MMMM d, yyyy hh:mmaaa"),
     });
   };
   const handleDateChange = (e) => {

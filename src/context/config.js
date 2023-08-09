@@ -8,6 +8,7 @@ export const developmentURLs = {
   manageMedicineURL: "http://localhost/eggsplore-v-2/api/medicine_management.php",
   manageBuildingURL: "http://localhost/eggsplore-v-2/api/building_management.php",
   manageLocationsURL: "http://localhost/eggsplore-v-2/api/locations_management.php",
+  manageSalesURL: "http://localhost/eggsplore-v-2/api/sales_management.php",
 };
 export const buildURLs = {
   manageLocationsURL: "../api/locations_management.php",
@@ -15,6 +16,7 @@ export const buildURLs = {
   manageMedicineURL: "../api/medicine_management.php",
   manageChickenURL: "../api/chicken_management.php",
   manageFeedsURL: "../api/feeds_management.php",
+  manageSalesURL: "../api/sales_management.php",
   manageUserURL: "../api/user_management.php",
   manageEggsURL: "../api/egg_management.php",
   registerUserURL: "../api/register.php",

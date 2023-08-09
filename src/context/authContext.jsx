@@ -6,6 +6,7 @@ import { developmentURLs as url } from "./config";
 import { values as poultryManagement } from "./PoultryManagement";
 import { values as medicineManagement } from "./MedicineManagement";
 import { values as feedsManagement } from "./FeedsManagement";
+import { values as salesManagement } from "./SalesManagement";
 
 const AuthContext = React.createContext();
 
@@ -374,6 +375,7 @@ export function AuthProvider({ children }) {
     ...poultryManagement,
     ...medicineManagement,
     ...feedsManagement,
+    ...salesManagement,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
