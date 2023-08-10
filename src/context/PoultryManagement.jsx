@@ -154,6 +154,25 @@ const updateEggProcurement = async (eggData) => {
     return e.message;
   }
 };
+
+const retrieveEggInventory = async (dateFilter) => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "egg_inventory",
+        filter:
+          typeof dateFilter === "object"
+            ? JSON.stringify(dateFilter)
+            : dateFilter,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 //CHICK MANAGEMENT
 
 const retrieveProduction = async (table, dateFilter) => {
@@ -256,6 +275,7 @@ export const values = {
   updateEggProduction,
   insertEggSegregation,
   insertEggProcurement,
+  retrieveEggInventory, 
   updateEggProcurement,
   retrieveEggProduction,
   retrieveEggProcurement,

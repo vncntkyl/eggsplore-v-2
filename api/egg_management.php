@@ -20,6 +20,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else if ($retrieve_type === "egg_procurement") {
             $filter = isset($_GET['filter']) ? (gettype($_GET['filter']) == "object" ? json_decode($_GET['filter']) : $_GET['filter']) : "all";
             echo json_encode($egg->retrieveProcurement($filter));
+        }else if($retrieve_type === "egg_inventory"){
+            echo json_encode($egg->retrieveEggsInventory());
         }
         break;
     case "POST":

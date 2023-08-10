@@ -209,4 +209,27 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
+
+    function retrieveEggsInventory()
+    {
+        try {
+            $this->setStatement("SELECT
+            production_eggs.week,
+             COALESCE(production_eggs.total_eggs, 0) + COALESCE(procurement_eggs.total_eggs, 0) AS total_combined_eggs
+        FROM (
+            SELECT WEEK(log_date) AS week, (SUM(egg_count) + SUM(defect_count)) AS total_eggs
+            FROM ep_egg_production
+            GROUP BY WEEK(log_date)
+        ) AS production_eggs
+        LEFT JOIN (
+            SELECT WEEK(log_date) AS week, SUM(quantity) AS total_eggs
+            FROM ep_egg_procurement
+            GROUP BY WEEK(log_date)
+        ) AS procurement_eggs ON production_eggs.week = procurement_eggs.week;");
+        $this->statement->execute();
+        $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
 }
