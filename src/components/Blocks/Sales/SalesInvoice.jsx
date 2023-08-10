@@ -28,20 +28,28 @@ export default function SalesInvoice() {
     location: "",
     amount: 0,
   });
+  const [salesId, setSalesId] = useState(null);
   const [items, setItems] = useState([
     { item: "", quantity: 1, price: 0, total: 0 },
   ]);
   const [eggs, setEggs] = useState([]);
   const [selectedEggs, setSelectedEggs] = useState([]);
+  const [selectedInvoice, setInvoice] = useState(null);
+  const [salesItems, setSalesItems] = useState(null);
+  const [locations, setLocations] = useState([]);
   const { capitalize, toTitle } = useFunction();
   const {
     retrieveLatestInvoice,
     retrieveEggClasifications,
     insertSalesInvoice,
+    retrieveItems,
+    getLocation,
   } = useAuth();
 
   const handleClose = () => {
     setModalTitle(null);
+    setInvoice(null);
+    setSalesItems(null);
     selectDateFilter("all");
     toggleAlert({
       type: "success",
@@ -74,6 +82,7 @@ export default function SalesInvoice() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = { ...salesInvoice, items: items };
+    data.date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     const response = await insertSalesInvoice(data);
     setModalTitle(null);
     if (response === 1) {
@@ -115,6 +124,8 @@ export default function SalesInvoice() {
         break;
     }
     if (id === "price" || id === "quantity") {
+      if (isNaN(updatedItems[key].price) || isNaN(updatedItems[key].quantity))
+        return;
       const product = parseFloat(
         updatedItems[key].price * updatedItems[key].quantity
       );
@@ -142,16 +153,26 @@ export default function SalesInvoice() {
     const setup = async () => {
       const eggtypes = await retrieveEggClasifications();
       setEggs(eggtypes);
+      const locations = await getLocation();
+      setLocations(locations);
+      const itemsData = await retrieveItems(salesId);
+      setSalesItems(itemsData);
       const response = await retrieveLatestInvoice();
       let newInvoice = "";
       const currentInvoice = response.invoice_no;
       if (currentInvoice) {
         const invoice = currentInvoice.split("-");
-        let invoice_count = parseInt(invoice[1]);
-        invoice_count += 1;
-        newInvoice = [invoice[0], invoice_count.toString().padStart(2, 0)].join(
-          "-"
-        );
+        if (format(new Date(), "yyMMdd") !== invoice[0].substring(3)) {
+          console.log("creating new id...");
+          newInvoice = "INV" + format(new Date(), "yyMMdd") + "-01";
+        } else {
+          let invoice_count = parseInt(invoice[1]);
+          invoice_count += 1;
+          newInvoice = [
+            invoice[0],
+            invoice_count.toString().padStart(2, 0),
+          ].join("-");
+        }
       } else {
         newInvoice = "INV" + format(new Date(), "yyMMdd") + "-01";
       }
@@ -163,7 +184,7 @@ export default function SalesInvoice() {
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh]);
+  }, [refresh, salesId]);
   return (
     <>
       <div>
@@ -194,14 +215,13 @@ export default function SalesInvoice() {
           {dateRange.end_date}
           <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
             <SalesInvoiceTable
-              invoiceHeaders={salesInvoice}
               setModal={setModalTitle}
               refresh={refresh}
+              setSalesInvoice={setInvoice}
+              setSalesId={setSalesId}
               filter={
-                selectedFilter == "range"
-                  ? dateRange.end_date.length > 0
-                    ? dateRange
-                    : selectedFilter
+                selectedFilter === "range" && dateRange.end_date !== ""
+                  ? dateRange
                   : selectedFilter
               }
             />
@@ -250,6 +270,62 @@ export default function SalesInvoice() {
                   </div>
                 </form>
               </>
+            ) : modalTitle === "view sales invoice" ? (
+              <div>
+                <div>
+                  <div className="grid grid-cols-2 gap-2 pb-2">
+                    <p className="font-semibold text-start whitespace-nowrap flex gap-2">
+                      Invoice Date:
+                      <span className="font-normal">
+                        {format(
+                          new Date(selectedInvoice.date),
+                          "MMMM dd, yyyy"
+                        )}
+                      </span>
+                    </p>
+                    <p className="font-semibold text-start whitespace-nowrap flex gap-2">
+                      Invoice No.:
+                      <span className="font-normal">
+                        {selectedInvoice.invoice_no}
+                      </span>
+                    </p>
+                    <p className="font-semibold text-start whitespace-nowrap flex gap-2">
+                      Customer Name:
+                      <span className="font-normal">
+                        {selectedInvoice.customer}
+                      </span>
+                    </p>
+                    <p className="font-semibold text-start whitespace-nowrap flex gap-2">
+                      Location:
+                      <span className="font-normal">
+                        {selectedInvoice.location}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <hr />
+                <div className="pt-2">
+                  {salesItems && (
+                    <SalesItemsTable
+                      items={salesItems}
+                      eggList={eggs}
+                      itemLength={salesItems.length}
+                      selectedEggs={selectedEggs}
+                      viewOnly
+                    />
+                  )}
+                </div>
+                <hr />
+                <div className="flex gap-2 justify-end pr-11 pt-2">
+                  <p className="font-semibold">Total Amount:</p>
+                  <span>
+                    {Intl.NumberFormat("en-PH", {
+                      style: "currency",
+                      currency: "PHP",
+                    }).format(selectedInvoice.amount)}
+                  </span>
+                </div>
+              </div>
             ) : (
               <>
                 <form
@@ -264,7 +340,44 @@ export default function SalesInvoice() {
                     {Object.keys(salesInvoice)
                       .filter((key) => key !== "amount")
                       .map((label, index) => {
-                        return (
+                        return label === "location" ? (
+                          <div
+                            key={index}
+                            className="p-1 flex gap-2 items-center justify-between"
+                          >
+                            <label
+                              htmlFor={label}
+                              className="whitespace-nowrap text-start w-1/2"
+                            >
+                              Location
+                            </label>
+                            <input
+                              type="text"
+                              list="locations"
+                              id={label}
+                              value={salesInvoice[label]}
+                              onChange={(e) => {
+                                setSalesInvoice((current) => {
+                                  return {
+                                    ...current,
+                                    [label]: e.target.value,
+                                  };
+                                });
+                              }}
+                              className="outline-none border-none p-1 bg-default rounded px-2 w-full disabled:text-gray-500"
+                            />
+                            <datalist id="locations">
+                              {locations.map((location, index) => {
+                                return (
+                                  <option
+                                    value={location.location_name}
+                                    key={index}
+                                  />
+                                );
+                              })}
+                            </datalist>
+                          </div>
+                        ) : (
                           <TextInput
                             key={index}
                             name={label}

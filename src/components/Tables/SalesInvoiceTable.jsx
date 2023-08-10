@@ -8,10 +8,11 @@ import { HiPencilAlt } from "react-icons/hi";
 import { format } from "date-fns";
 
 export default function SalesInvoiceTable({
-  invoiceHeaders = [],
   setModal,
   refresh,
   filter = "all",
+  setSalesInvoice,
+  setSalesId,
 }) {
   const [salesInvoiceLogs, setSalesInvoiceLogs] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ export default function SalesInvoiceTable({
   const { retrieveSalesInvoice } = useAuth();
   useEffect(() => {
     const setup = async () => {
-      console.log(filter);
+      if (filter === "range") return;
       const response = await retrieveSalesInvoice(filter);
       setSalesInvoiceLogs(response);
       setLoading(false);
@@ -33,14 +34,19 @@ export default function SalesInvoiceTable({
     };
   }, [refresh, filter]);
 
-  return !loading && salesInvoiceLogs ? (
+  return !loading && salesInvoiceLogs.length > 0 ? (
     <table className="w-full rounded-md">
       <thead>
         <tr>
-          {Object.keys(invoiceHeaders)
+          {Object.keys(salesInvoiceLogs[0])
             .filter(
               (key) =>
-                !["log_date", "update", "egg_procurement_id"].includes(key)
+                ![
+                  "sales_id",
+                  "log_date",
+                  "update",
+                  "egg_procurement_id",
+                ].includes(key)
             )
             .map((header, key) => {
               return (
@@ -78,21 +84,25 @@ export default function SalesInvoiceTable({
                 <div className="flex items-center justify-center gap-1">
                   <Button
                     onClick={() => {
-                      setModal("view medicine information");
+                      setSalesInvoice(logs);
+                      setSalesId(logs.sales_id);
+                      setModal("view sales invoice");
                     }}
                     className="bg-yellow p-1 rounded"
                     value={<AiOutlineEye className="text-white" />}
                   />
                   <Button
                     onClick={() => {
-                      setModal("edit medicine information");
+                      setSalesInvoice(logs);
+                      setSalesId(logs.sales_id);
+                      setModal("edit sales invoice");
                     }}
                     className="bg-yellow p-1 rounded"
                     value={<HiPencilAlt className="text-white" />}
                   />
                   <Button
                     onClick={() => {
-                      setModal("edit medicine information");
+                      setModal("print sales invoice");
                     }}
                     className="bg-yellow p-1 rounded"
                     value={<AiFillPrinter className="text-white" />}

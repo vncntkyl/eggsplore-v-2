@@ -36,23 +36,11 @@ class Sales extends Controller
     function createSalesInvoice($data)
     {
         try {
-            $this->setStatement("BEGIN;
-            SET @current_date = DATE_FORMAT(NOW(), '%y%m%d');
-            SET @min_invoice_no = CONVERT(CONCAT(@current_date, '-000') USING utf8mb4);
-            SET @max_invoice_no = CONVERT(CONCAT(@current_date, '-999') USING utf8mb4);
-
-            SELECT MAX(invoice_no) AS latest INTO @latest_invoice_no
-            FROM ep_sales_invoice
-            WHERE invoice_no >= @min_invoice_no AND invoice_no <= @max_invoice_no;
-
-            SET @latest_invoice_no = IFNULL(@latest_invoice_no, CONCAT(@current_date, '-000'));
-            SET @next_invoice_no = CONCAT('INV', @current_date, '-', LPAD(SUBSTRING(@latest_invoice_no, 8) + 1, 2, '0'));
-
-            INSERT INTO ep_sales_invoice (date, invoice_no, customer, location, amount)
-            VALUES (?, @next_invoice_no, ?, ?, ?);
-            COMMIT;");
+            $this->setStatement("INSERT INTO ep_sales_invoice (date, invoice_no, customer, location, amount)
+            VALUES (?, ?, ?, ?, ?);");
             if ($this->statement->execute([
                 $data->date,
+                $data->invoice_no,
                 $data->customer,
                 $data->location,
                 $data->amount
@@ -97,12 +85,14 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
-    function retrieveInvoiceItems($sales_id)
+    function retrieveInvoiceItems($sales_id = null)
     {
         try {
-            $this->setStatement("SELECT * FROM ep_sales_items WHERE sales_id = ?");
-            $this->statement->execute([$sales_id]);
-            return $this->statement->fetchAll();
+            if ($sales_id) {
+                $this->setStatement("SELECT * FROM ep_sales_items WHERE sales_id = ?");
+                $this->statement->execute([$sales_id]);
+                return $this->statement->fetchAll();
+            }
         } catch (PDOException $e) {
             $this->getError($e);
         }

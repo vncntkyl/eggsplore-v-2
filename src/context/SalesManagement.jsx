@@ -46,8 +46,24 @@ const insertSalesInvoice = async (data) => {
     return e.message;
   }
 };
+const retrieveItems = async (sales_id = null) => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "invoice_items",
+        sales_id: sales_id ? sales_id : 0,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 export const values = {
   insertSalesInvoice,
   retrieveSalesInvoice,
   retrieveLatestInvoice,
+  retrieveItems,
 };

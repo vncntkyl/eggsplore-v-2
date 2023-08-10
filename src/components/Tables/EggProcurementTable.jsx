@@ -19,7 +19,7 @@ export default function EggProcurementTable({
   const { retrieveEggProcurement } = useAuth();
   useEffect(() => {
     const setup = async () => {
-      const response = await retrieveEggProcurement();
+      const response = await retrieveEggProcurement(filter);
       setProcurementLogs(response);
       setLoading(false);
     };
@@ -29,7 +29,7 @@ export default function EggProcurementTable({
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh]);
+  }, [refresh, filter]);
 
   return !loading && procurementLogs ? (
     <table className="w-full rounded-md">
