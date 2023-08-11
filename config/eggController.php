@@ -225,9 +225,9 @@ class Egg extends Controller
             SELECT WEEK(log_date) AS week, SUM(quantity) AS total_eggs
             FROM ep_egg_procurement
             GROUP BY WEEK(log_date)
-        ) AS procurement_eggs ON production_eggs.week = procurement_eggs.week;");
+        ) AS procurement_eggs ON production_eggs.week = procurement_eggs.week ORDER BY production_eggs.week DESC;");
         $this->statement->execute();
-        $this->statement->fetchAll();
+        return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }

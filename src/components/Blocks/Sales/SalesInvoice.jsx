@@ -107,7 +107,7 @@ export default function SalesInvoice() {
     e.preventDefault();
   };
 
-  const handleItemChange = (e, key) => {
+  const handleItemChange = (e, key, max = null) => {
     const value = e.target.value;
     const id = e.target.id;
     const updatedItems = [...items];
@@ -138,7 +138,9 @@ export default function SalesInvoice() {
         };
       });
     }
-    setItems(updatedItems);
+    if(updatedItems[key].quantity <= max){
+      setItems(updatedItems);
+    }
   };
   const deleteItem = (key, eggType) => {
     const eggs = [...selectedEggs];

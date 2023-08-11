@@ -19,6 +19,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
             case "invoice_items":
                 $sales_id = $_GET['sales_id'] !== 0 ? $_GET['sales_id'] : null;
                 echo json_encode($sales->retrieveInvoiceItems($sales_id));
+                break;
+            case "egg_sales":
+                echo json_encode($sales->retrieveEggSales());
         }
         break;
     case "POST":

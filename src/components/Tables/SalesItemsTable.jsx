@@ -19,7 +19,11 @@ export default function SalesItemsTable({
       <thead>
         <tr>
           {["item", "price", "quantity", "total"].map((header, index) => {
-            return <th key={index} align="justify">{capitalize(toTitle(header))}</th>;
+            return (
+              <th key={index} align="justify">
+                {capitalize(toTitle(header))}
+              </th>
+            );
           })}
         </tr>
       </thead>
@@ -95,8 +99,9 @@ export default function SalesItemsTable({
                       type="number"
                       id="price"
                       step={0.25}
+                      disabled={!label.item}
                       classes="p-1 items-center justify-center w-[100px]"
-                      inputClasses="bg-default rounded px-2  text-end"
+                      inputClasses="bg-default rounded px-2  text-end disabled:text-gray-500"
                       value={label.price}
                       onChange={(e) => handleItemChange(e, key)}
                     />
@@ -106,10 +111,12 @@ export default function SalesItemsTable({
                       name="quantity"
                       type="number"
                       id="quantity"
+                      disabled={!label.item}
+                      max={label.item && eggList.find(egg => egg.egg_type_name === label.item).egg_type_total_count}
                       classes="p-1 items-center justify-center w-[100px]"
-                      inputClasses="bg-default rounded px-2 text-end"
+                      inputClasses="bg-default rounded px-2 text-end  disabled:text-gray-500"
                       value={label.quantity}
-                      onChange={(e) => handleItemChange(e, key)}
+                      onChange={(e) => handleItemChange(e, key, label.item && eggList.find(egg => egg.egg_type_name === label.item).egg_type_total_count)}
                     />
                   </td>
                   <td align="center">

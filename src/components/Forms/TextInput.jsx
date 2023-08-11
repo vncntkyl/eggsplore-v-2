@@ -15,7 +15,8 @@ export default function TextInput({
   onChange,
   value,
   name = null,
-  step = 1
+  step = 1,
+  max,
 }) {
   return (
     <div className={classNames("flex gap-2", `flex-${orientation}`, classes)}>
@@ -30,6 +31,7 @@ export default function TextInput({
         type={type}
         id={id}
         min={0}
+        max={max}
         step={step}
         placeholder={textHint}
         disabled={disabled}
