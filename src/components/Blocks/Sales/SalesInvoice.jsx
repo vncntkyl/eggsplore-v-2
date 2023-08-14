@@ -138,7 +138,7 @@ export default function SalesInvoice() {
         };
       });
     }
-    if(updatedItems[key].quantity <= max){
+    if (updatedItems[key].quantity <= max) {
       setItems(updatedItems);
     }
   };
@@ -213,8 +213,7 @@ export default function SalesInvoice() {
             }
           />
         </div>
-        <div className="w-full px-2">
-          {dateRange.end_date}
+        <div className="w-full px-1">
           <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
             <SalesInvoiceTable
               setModal={setModalTitle}

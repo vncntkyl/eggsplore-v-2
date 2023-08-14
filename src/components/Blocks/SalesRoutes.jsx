@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { GrNext } from "react-icons/gr";
 import SalesInvoice from "./Sales/SalesInvoice";
+import EggSales from "./Sales/EggSales";
 
 export default function Sales() {
   const { toTitle, capitalize, getPath } = useFunction();
@@ -83,7 +84,7 @@ export default function Sales() {
         )}
       >
         <Routes>
-          <Route path="/egg_sales/*" element={<></>} />
+          <Route path="/egg_sales/*" element={<EggSales />} />
           <Route path="/sales_invoice/*" element={<SalesInvoice />} />
         </Routes>
       </div>

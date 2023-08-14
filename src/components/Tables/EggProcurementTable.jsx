@@ -18,6 +18,7 @@ export default function EggProcurementTable({
 
   const { retrieveEggProcurement } = useAuth();
   useEffect(() => {
+    if (filter === "range") return;
     const setup = async () => {
       const response = await retrieveEggProcurement(filter);
       setProcurementLogs(response);
