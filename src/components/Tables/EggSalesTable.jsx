@@ -3,8 +3,9 @@ import { useAuth } from "../../context/authContext";
 import { useFunction } from "../../context/FunctionContext";
 import { Button } from "../Forms";
 import { AiOutlineEye } from "react-icons/ai";
+import { format } from "date-fns";
 
-export default function EggSalesTable() {
+export default function EggSalesTable({ setEggSalesInformation, setModal }) {
   const [eggSalesData, setEggSalesData] = useState([]);
   const { retrieveEggSales } = useAuth();
   const { capitalize, toTitle } = useFunction();
@@ -28,7 +29,7 @@ export default function EggSalesTable() {
           {Object.keys(eggSalesData[0]).map((key, index) => {
             return (
               <th key={index} className="p-2 bg-main text-white sticky top-0">
-                {key === "sold" ? "Egg Trays Sold" : capitalize(toTitle(key))}
+                {key === "sold" ? "Egg Trays Sold" : key === "date" ? "Week" :capitalize(toTitle(key))}
               </th>
             );
           })}
@@ -40,7 +41,7 @@ export default function EggSalesTable() {
           return (
             <tr key={key}>
               <td align="center" className="p-2">
-                {data.week}
+                {format(new Date(data.date),"w")}
               </td>
               <td align="center" className="p-2">
                 {data.sold}
@@ -54,16 +55,8 @@ export default function EggSalesTable() {
               <td align="center" className="p-2">
                 <Button
                   onClick={() => {
-                    // setProcurement({
-                    //   egg_procurement_id: item.egg_procurement_id,
-                    //   date_procured: item.date_procured,
-                    //   egg_type: item.egg_type,
-                    //   quantity: item.quantity,
-                    //   supplier: item.supplier,
-                    //   amount: item.amount,
-                    //   update: true,
-                    // });
-                    // setModal("edit egg production");
+                    setEggSalesInformation(data);
+                    setModal("view egg sales");
                   }}
                   className="bg-yellow p-1 rounded"
                   value={<AiOutlineEye className="text-white" />}

@@ -22,6 +22,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 break;
             case "egg_sales":
                 echo json_encode($sales->retrieveEggSales());
+                break;
+            case "eggs_sold":
+                $week = $_GET['week'];
+                echo json_encode($sales->retrieveEggsSold($week));
+                break;
         }
         break;
     case "POST":

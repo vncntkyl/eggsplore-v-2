@@ -100,17 +100,18 @@ class Sales extends Controller
     function retrieveEggSales()
     {
         try {
-            $this->setStatement("SELECT WEEK(sin.date) as week, SUM(sit.quantity) as sold, SUM(sit.total_amount) as profit 
+            $this->setStatement("SELECT sin.date as date, SUM(sit.quantity) as sold, SUM(sit.total_amount) as profit 
             FROM ep_sales_items AS sit 
             LEFT JOIN ep_sales_invoice AS sin ON sit.sales_id = sin.sales_id 
             GROUP BY WEEK(sin.date) ORDER BY WEEK(sin.date) DESC");
-        $this->statement->execute();
+            $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }
     }
-    function retrieveEggsSold($week){
+    function retrieveEggsSold($week)
+    {
         try {
             $this->setStatement("SELECT
             et.egg_type_name,
@@ -133,8 +134,8 @@ class Sales extends Controller
             ) AS sit ON et.egg_type_name = sit.item_name
         GROUP BY
             et.egg_type_name;");
-        $this->statement->execute([":week" => $week]);
-
+            $this->statement->execute([":week" => $week]);
+            return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }

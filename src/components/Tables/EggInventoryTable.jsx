@@ -24,7 +24,7 @@ export default function EggInventoryTable({
       const salesInfo = await retrieveEggSales();
       setInventoryLogs(
         response.map((item) => {
-          const sales = salesInfo.find((sales) => sales.week === item.week);
+          const sales = salesInfo.find((sales) => format(new Date(sales.date),"w") == item.week);
           return {
             week: item.week,
             egg_produced: item.total_combined_eggs,
