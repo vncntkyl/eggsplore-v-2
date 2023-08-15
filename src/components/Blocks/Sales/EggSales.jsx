@@ -170,7 +170,7 @@ export default function EggSales() {
                           </td>
                         </tr>
                         <tr>
-                          <td></td>
+                          <td align="left" className="p-2 px-8">Total</td>
                           <td align="left" className="p-2 px-8">{total.quantity}</td>
                           <td align="left" className="p-2 px-8">
                             {Intl.NumberFormat("en-PH", {
