@@ -5,6 +5,7 @@ import GeneralManagement from "./GeneralManagement";
 import ChickProcurement from "./ChickProcurement";
 import ChickenMaintenance from "./ChickenMaintenance";
 import EggsControlAndMonitoring from "./EggControlsAndMonitoring/Index";
+import EggDeliveryMonitoring from "./EggDeliveryMonitoring/";
 import Sales from "./SalesRoutes";
 
 export default function AdminDashboard() {
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
           path="/eggs_control_and_monitoring/*"
           element={<EggsControlAndMonitoring />}
         />
-        <Route path="/eggs_delivery_monitoring/*" element={<></>} />
+        <Route path="/eggs_delivery_monitoring/*" element={<EggDeliveryMonitoring/>} />
         <Route path="/sales/*" element={<Sales />} />
         <Route path="/financials/*" element={<></>} />
         <Route path="/general_management/*" element={<GeneralManagement />} />

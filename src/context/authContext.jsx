@@ -3,10 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { developmentURLs as url } from "./config";
-import { values as poultryManagement } from "./PoultryManagement";
-import { values as medicineManagement } from "./MedicineManagement";
-import { values as feedsManagement } from "./FeedsManagement";
-import { values as salesManagement } from "./SalesManagement";
+import { values as poultryManagement } from "./PoultryContext";
+import { values as medicineManagement } from "./MedicineContext";
+import { values as feedsManagement } from "./FeedsContext";
+import { values as salesManagement } from "./SalesContext";
+import {values as deliveryManagement } from "./DeliveryContext";
 
 const AuthContext = React.createContext();
 
@@ -372,10 +373,11 @@ export function AuthProvider({ children }) {
     deleteBuilding,
     getCurrentUser,
     setCurrentUser,
-    ...poultryManagement,
-    ...medicineManagement,
-    ...feedsManagement,
     ...salesManagement,
+    ...feedsManagement,
+    ...poultryManagement,
+    ...deliveryManagement,
+    ...medicineManagement,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

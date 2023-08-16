@@ -35,8 +35,7 @@ class Chicken extends Controller
     function insert_chick_procurement($procurement_date, $count, $supplier)
     {
         try {
-            $sqlStatement = "
-            SET @current_date = DATE_FORMAT(NOW(), '%y%m%d');
+            $sqlStatement = "SET @current_date = DATE_FORMAT(NOW(), '%y%m%d');
             SET @min_batch_number = CONVERT(CONCAT(@current_date, '-000') USING utf8mb4);
             SET @max_batch_number = CONVERT(CONCAT(@current_date, '-999') USING utf8mb4);
 

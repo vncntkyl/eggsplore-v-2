@@ -46,6 +46,7 @@ export default function SalesInvoiceTable({
                   "log_date",
                   "update",
                   "egg_procurement_id",
+                  "dispatch_id",
                 ].includes(key)
             )
             .map((header, key) => {

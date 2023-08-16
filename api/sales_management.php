@@ -27,6 +27,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $week = $_GET['week'];
                 echo json_encode($sales->retrieveEggsSold($week));
                 break;
+            case "delivery_invoice":
+                $dispatch_id = $_GET['dispatch_id'];
+                echo json_encode($sales->retrieveDeliveryInvoice($dispatch_id));
+                break;
+            case "invoice_for_dispatch":
+                echo json_encode($sales->retrieveSalesInvoiceForDispatch());
         }
         break;
     case "POST":
@@ -37,7 +43,5 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 echo $sales->createSalesInvoice($invoice) ? 1 : 0;
                 break;
         }
-        break;
-    case "PUT":
         break;
 }

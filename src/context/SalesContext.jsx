@@ -80,7 +80,7 @@ const retrieveEggsSold = async (week) => {
     const response = await axios.get(url.manageSalesURL, {
       params: {
         retrieve: "eggs_sold",
-        week: week
+        week: week,
       },
     });
     if (response.status === 200) {
@@ -90,11 +90,57 @@ const retrieveEggsSold = async (week) => {
     return e.message;
   }
 };
+const retrieveDeliveryInvoice = async (dispatch_id) => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "delivery_invoice",
+        dispatch_id: dispatch_id,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+const retrieveSalesInvoiceForDispatch = async () => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "invoice_for_dispatch",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+const updateSalesDeliveryInvoice = async (sales_id, dispatch_id) => {
+  try {
+    const salesInformation = {
+      sales_id: sales_id,
+      dispatch_id: dispatch_id,
+    };
+    const response = await axios.put(url.manageSalesURL, salesInformation);
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 export const values = {
   insertSalesInvoice,
   retrieveSalesInvoice,
   retrieveLatestInvoice,
+  retrieveDeliveryInvoice,
   retrieveItems,
   retrieveEggSales,
   retrieveEggsSold,
+  retrieveSalesInvoiceForDispatch,
+  updateSalesDeliveryInvoice,
 };

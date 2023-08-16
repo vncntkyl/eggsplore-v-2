@@ -9,9 +9,11 @@ export const developmentURLs = {
   manageBuildingURL: "http://localhost/eggsplore-v-2/api/building_management.php",
   manageLocationsURL: "http://localhost/eggsplore-v-2/api/locations_management.php",
   manageSalesURL: "http://localhost/eggsplore-v-2/api/sales_management.php",
+  manageDeliveryURL: "http://localhost/eggsplore-v-2/api/delivery_monitoring.php",
 };
 export const buildURLs = {
   manageLocationsURL: "../api/locations_management.php",
+  manageDeliveryURL: "../api/delivery_monitoring.php",
   manageBuildingURL: "../api/building_management.php",
   manageMedicineURL: "../api/medicine_management.php",
   manageChickenURL: "../api/chicken_management.php",

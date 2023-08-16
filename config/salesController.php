@@ -140,4 +140,24 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
+    function retrieveSalesInvoiceForDispatch()
+    {
+        try {
+            $this->setStatement("SELECT * FROM ep_sales_invoice WHERE delivery_id IS NULL");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveDeliveryInvoice($dispatch_id)
+    {
+        try {
+            $this->setStatement("SELECT * FROM ep_sales_invoice WHERE delivery_id = ?");
+            $this->statement->execute([$dispatch_id]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
 }
