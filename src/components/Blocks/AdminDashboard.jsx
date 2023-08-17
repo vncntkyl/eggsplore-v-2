@@ -7,6 +7,7 @@ import ChickenMaintenance from "./ChickenMaintenance";
 import EggsControlAndMonitoring from "./EggControlsAndMonitoring/Index";
 import EggDeliveryMonitoring from "./EggDeliveryMonitoring/";
 import Sales from "./SalesRoutes";
+import Financials from "./Financials";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -27,9 +28,12 @@ export default function AdminDashboard() {
           path="/eggs_control_and_monitoring/*"
           element={<EggsControlAndMonitoring />}
         />
-        <Route path="/eggs_delivery_monitoring/*" element={<EggDeliveryMonitoring/>} />
+        <Route
+          path="/eggs_delivery_monitoring/*"
+          element={<EggDeliveryMonitoring />}
+        />
         <Route path="/sales/*" element={<Sales />} />
-        <Route path="/financials/*" element={<></>} />
+        <Route path="/financials/*" element={<Financials />} />
         <Route path="/general_management/*" element={<GeneralManagement />} />
       </Routes>
     </div>

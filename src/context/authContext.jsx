@@ -7,7 +7,8 @@ import { values as poultryManagement } from "./PoultryContext";
 import { values as medicineManagement } from "./MedicineContext";
 import { values as feedsManagement } from "./FeedsContext";
 import { values as salesManagement } from "./SalesContext";
-import {values as deliveryManagement } from "./DeliveryContext";
+import { values as deliveryManagement } from "./DeliveryContext";
+import { values as financialManagement } from "./FinancialContext";
 
 const AuthContext = React.createContext();
 
@@ -378,6 +379,7 @@ export function AuthProvider({ children }) {
     ...poultryManagement,
     ...deliveryManagement,
     ...medicineManagement,
+    ...financialManagement,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

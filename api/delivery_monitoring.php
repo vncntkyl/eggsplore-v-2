@@ -35,7 +35,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
                         array_push($status, 0);
                     }
                 }
-
                 echo !in_array(0,$status) ? 1 : 0;
                 break;
         }
