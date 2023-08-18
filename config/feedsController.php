@@ -118,7 +118,7 @@ class Feeds extends Controller
                     $filter = json_decode($filter);
                     $sqlStatement .= " WHERE log_date >= '" . $filter->start_date . "' AND log_date <= '" . $filter->end_date . "' ORDER BY log_date DESC";
                 }
-            }else{
+            } else {
                 $sqlStatement .= " ORDER BY log_date DESC";
             }
             $this->setStatement($sqlStatement);
@@ -179,6 +179,29 @@ class Feeds extends Controller
                 FROM ep_feeds_consumption
                 GROUP BY feed_id
             ) m ON i.feed_id = m.feed_id");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveOverviewToday()
+    {
+        try {
+            $this->setStatement("SELECT
+            buildings.id,
+            buildings.number,
+            COALESCE(SUM(fc.consumed),
+            0) AS total_consumed,
+            COALESCE(SUM(mi.intake),
+            0) AS total_intake
+        FROM
+            ep_building AS buildings
+        LEFT JOIN ep_feeds_consumption fc ON
+            buildings.id = fc.building_id AND  DATE(fc.date_procured) = DATE('2023-08-05')
+        LEFT JOIN ep_medication_intake mi ON
+            buildings.id = mi.building_id AND DATE(mi.date_procured) = DATE('2023-08-05')
+            GROUP BY buildings.id;");
             $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {

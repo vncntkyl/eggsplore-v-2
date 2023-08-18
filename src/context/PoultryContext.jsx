@@ -33,6 +33,20 @@ const retrieveEggProduction = async (dateFilter) => {
     return e.message;
   }
 };
+const retrieveEggOverview = async () => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "egg_overview",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 
 const updateEggProduction = async (eggData) => {
   try {
@@ -269,13 +283,14 @@ const updateChickenPopulation = async (chickendata) => {
 };
 
 export const values = {
+  retrieveEggOverview,
   retrieveProduction,
   addChickProcurement,
   insertEggProduction,
   updateEggProduction,
   insertEggSegregation,
   insertEggProcurement,
-  retrieveEggInventory, 
+  retrieveEggInventory,
   updateEggProcurement,
   retrieveEggProduction,
   retrieveEggProcurement,

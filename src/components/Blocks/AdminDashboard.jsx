@@ -8,6 +8,7 @@ import EggsControlAndMonitoring from "./EggControlsAndMonitoring/Index";
 import EggDeliveryMonitoring from "./EggDeliveryMonitoring/";
 import Sales from "./SalesRoutes";
 import Financials from "./Financials";
+import Dashboard from "./Dashboard.jsx";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -20,8 +21,8 @@ export default function AdminDashboard() {
     <div className="p-4 body flex flex-col gap-2 mx-12">
       <Breadcrumb />
       <Routes>
-        <Route path="/*" element={<></>} />
-        <Route path="/dashboard/*" element={<></>} />
+        <Route path="/*" element={<Dashboard />} />
+        <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/chick_procurement/*" element={<ChickProcurement />} />
         <Route path="/chicken_maintenance/*" element={<ChickenMaintenance />} />
         <Route

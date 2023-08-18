@@ -17,13 +17,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
     case "POST":
         if ($_POST['create_income']) {
-            $income_statement = $_POST['create_income'];
-            var_dump($income_statement);
+            $income_statement = json_decode($_POST['create_income']);
             $income_data = array();
             foreach ($income_statement as $inc) {
                 array_push($income_data, $inc);
             }
-            var_dump($income_data);
+            echo $financial->create_income_statement($income_data) ? 1 : 0;
         }
         break;
 }

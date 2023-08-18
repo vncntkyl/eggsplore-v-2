@@ -17,6 +17,7 @@ export default function TextInput({
   name = null,
   step = 1,
   max,
+  wfull = "w-full"
 }) {
   return (
     <div className={classNames("flex gap-2", `flex-${orientation}`, classes)}>
@@ -38,8 +39,9 @@ export default function TextInput({
         ref={inputRef}
         onChange={onChange}
         className={classNames(
-          "outline-none border-none p-1 w-full",
-          inputClasses
+          "outline-none border-none p-1 ",
+          inputClasses,
+          wfull
         )}
       />
     </div>

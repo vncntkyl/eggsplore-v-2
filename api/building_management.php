@@ -13,7 +13,7 @@ if (isset($_GET['getBuilding'])) {
     } else if ($param === "relation") {
         $result = $bldg->retrieve_all_user_buildings();
         echo json_encode($result);
-    } else{
+    } else {
         $result = $bldg->retrieve_buildings($param);
         echo json_encode($result);
     }
@@ -23,7 +23,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         if (isset($_POST['add_bldg'])) {
             $bldg_name = $_POST['number'];
             $bldg_capacity = $_POST['capacity'];
-            echo $bldg->addBuilding($bldg_name,$bldg_capacity) ? 1 : 0;
+            echo $bldg->addBuilding($bldg_name, $bldg_capacity) ? 1 : 0;
         }
         break;
     case "PUT":

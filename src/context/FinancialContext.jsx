@@ -1,7 +1,7 @@
 import { developmentURLs as url } from "./config";
 import axios from "axios";
 
-const retrieveMonthlyIncome = async () => {
+const retrieveIncome = async () => {
   try {
     const response = await axios.get(url.manageFinancialsURL, {
       params: {
@@ -31,12 +31,13 @@ const retrieveSalesFromRange = async (startDate, endDate) => {
     console.log(e.message);
   }
 };
-const createIncomeStatement = async (incomeStatement) => {
+const createIncomeStatement = async (incomeStatement, dateRange, date) => {
   try {
+    const data = {...dateRange, ...incomeStatement, log_date: date};
     const incomeStatementData = new FormData();
     incomeStatementData.append(
       "create_income",
-      JSON.stringify(incomeStatement)
+      JSON.stringify(data)
     );
 
     const response = await axios.post(
@@ -52,7 +53,7 @@ const createIncomeStatement = async (incomeStatement) => {
 };
 
 export const values = {
-  retrieveMonthlyIncome,
+  retrieveIncome,
   retrieveSalesFromRange,
   createIncomeStatement,
 };

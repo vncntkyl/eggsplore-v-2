@@ -12,6 +12,38 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
+    function retrieveEggOverview(){
+        try {
+            $this->setStatement("SELECT
+            bldg.id,
+            bldg.number,
+            users.user_id,
+            u.first_name,
+            COALESCE(SUM(ep.egg_count),
+            0) AS total_egg_count
+        FROM
+            ep_building AS bldg
+        CROSS JOIN(
+            SELECT DISTINCT
+                user_id
+            FROM
+                ep_egg_production
+        ) AS users
+        LEFT JOIN ep_users AS u
+        ON
+            users.user_id = u.user_id
+        LEFT JOIN ep_egg_production AS ep
+        ON
+            bldg.id = ep.building_id AND users.user_id = ep.user_id AND DATE(ep.date_produced) = DATE('2023-08-05')
+        GROUP BY
+            bldg.id,
+            users.user_id;");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
     function retrieveEggProduction($filter = "all")
     {
         try {

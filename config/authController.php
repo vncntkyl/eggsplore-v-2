@@ -35,4 +35,3 @@ class Controller
         echo "Line: " . $e->getLine();
     }
 }
-?>
