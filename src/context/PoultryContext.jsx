@@ -2,11 +2,12 @@ import { developmentURLs as url } from "./config";
 import axios from "axios";
 
 //EGG MANAGEMENT
-const insertEggProduction = async (eggData, method) => {
+const insertEggProduction = async (eggData, method, building_no) => {
   try {
     const eggFD = new FormData();
     eggFD.append("method", method);
     eggFD.append("egg_data", JSON.stringify(eggData));
+    eggFD.append("building_no",building_no);
     const response = await axios.post(url.manageEggsURL, eggFD);
     if (response.status === 200) {
       return response.data;
@@ -38,6 +39,20 @@ const retrieveEggOverview = async () => {
     const response = await axios.get(url.manageEggsURL, {
       params: {
         retrieve: "egg_overview",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+const retrieveEggPerformance = async () => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "performance_overview",
       },
     });
     if (response.status === 200) {
@@ -294,6 +309,7 @@ export const values = {
   updateEggProcurement,
   retrieveEggProduction,
   retrieveEggProcurement,
+  retrieveEggPerformance,
   updateChickProcurement,
   retrieveSegregationLogs,
   updateChickenPopulation,

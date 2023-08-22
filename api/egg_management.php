@@ -25,6 +25,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
             echo json_encode($egg->retrieveEggsInventory());
         } else if ($retrieve_type === "egg_overview") {
             echo json_encode($egg->retrieveEggOverview());
+        } else if ($retrieve_type === "performance_overview") {
+            echo json_encode($egg->retrieveEggInventoryOverview());
         }
         break;
     case "POST":
@@ -32,7 +34,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
         switch ($method) {
             case "staff_add":
                 $egg_data = json_decode($_POST['egg_data']);
-                echo $egg->procureEgg($egg_data) ? 1 : 0;
+                $building_no = $_POST['building_no'];
+                echo $egg->procureEgg($egg_data, $building_no) ? 1 : 0;
                 break;
             case "add_segregation":
                 $segregated_eggs = json_decode($_POST['segregation_data']);

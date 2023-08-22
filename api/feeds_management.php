@@ -14,8 +14,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else if (isset($_GET['feeds_inventory'])) {
             $filter = isset($_GET['filter']) ? (gettype($_GET['filter']) == "object" ? json_decode($_GET['filter']) : $_GET['filter']) : "all";
             echo json_encode($feeds->retrieve_feeds_inventory($filter));
-        } else if (isset($_GET['feeds_medicine'])){
+        } else if (isset($_GET['feeds_medicine'])) {
             echo json_encode($feeds->retrieveOverviewToday());
+        } else if (isset($_GET['feeds_medicine_summary'])) {
+            echo json_encode($feeds->retrieveInventorySummary());
         } else {
             echo json_encode($feeds->retrieve_feeds($_GET['id']));
         }

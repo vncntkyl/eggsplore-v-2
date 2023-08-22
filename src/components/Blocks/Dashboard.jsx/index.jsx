@@ -2,16 +2,18 @@ import { useState } from "react";
 import { Button } from "../../Forms";
 import { AiFillPrinter } from "react-icons/ai";
 import { format } from "date-fns";
-import CurrentDateTime from "../../Fragments/CurrentDateTime";
+// import CurrentDateTime from "../../Fragments/CurrentDateTime";
 import DashboardCards from "../../Fragments/DashboardCards";
-
+import DashboardGraphs from "../../Fragments/DashboardGraphs";
 export default function Dashboard() {
   const [modalTitle, setModalTitle] = useState(null);
+
   return (
     <>
       <div className="flex flex-row justify-between items-center w-full">
         <p className="font-semibold">
-          As of <CurrentDateTime />
+          {/* As of <CurrentDateTime /> */}
+          {format(new Date(), "MMMM dd, yyyy")}
         </p>
         <Button
           onClick={() => setModalTitle("create income statement")}
@@ -28,6 +30,8 @@ export default function Dashboard() {
       </div>
       {/* CARDS */}
       <DashboardCards />
+      {/* GRAPHS */}
+      <DashboardGraphs />
     </>
   );
 }

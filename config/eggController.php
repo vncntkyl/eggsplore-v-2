@@ -3,43 +3,107 @@ require_once 'authController.php';
 class Egg extends Controller
 {
 
-    function procureEgg($egg_data)
+    function procureEgg($egg_data, $building_no)
     {
         try {
-            $this->setStatement("INSERT INTO ep_egg_production (date_produced, egg_count, defect_count, building_id, user_id, log_date) VALUES (?,?,?,?,?,?)");
+            $this->setStatement("SET @current_date = DATE_FORMAT(NOW(), '%y%m%d');
+            SET @building_number = " . $building_no . "; 
+            SET @min_batch_number = CONVERT(CONCAT(@current_date, '-', @building_number, '-00') USING utf8mb4);
+            SET @max_batch_number = CONVERT(CONCAT(@current_date, '-', @building_number, '-99') USING utf8mb4);
+
+            SELECT
+                    MAX(batch_id) AS latest
+            INTO @latest_batch_number
+            FROM
+                ep_egg_production
+            WHERE
+                batch_id >= @min_batch_number AND batch_id <= @max_batch_number;
+
+            SET @latest_batch_number = COALESCE(@latest_batch_number, CONCAT(@current_date, '-', @building_number, '-00'));
+            SET @next_batch_number = CONCAT(@current_date, '-', @building_number, '-', LPAD(SUBSTRING(@latest_batch_number, 10) + 1, 2, '0'));
+            INSERT INTO ep_egg_production (date_produced, batch_id, egg_count, defect_count, building_id, user_id, log_date) VALUES (?,@next_batch_number, ?,?,?,?,?)
+            ");
             return $this->statement->execute([$egg_data->date, $egg_data->count, $egg_data->defect, $egg_data->building, $egg_data->staff, $egg_data->log_date]);
         } catch (PDOException $e) {
             $this->getError($e);
         }
     }
-    function retrieveEggOverview(){
+    function retrieveEggOverview()
+    {
         try {
             $this->setStatement("SELECT
             bldg.id,
+            ep.batch_id,
             bldg.number,
-            users.user_id,
-            u.first_name,
-            COALESCE(SUM(ep.egg_count),
-            0) AS total_egg_count
+            ep.egg_count
         FROM
             ep_building AS bldg
-        CROSS JOIN(
-            SELECT DISTINCT
-                user_id
-            FROM
-                ep_egg_production
-        ) AS users
-        LEFT JOIN ep_users AS u
-        ON
-            users.user_id = u.user_id
         LEFT JOIN ep_egg_production AS ep
         ON
-            bldg.id = ep.building_id AND users.user_id = ep.user_id AND DATE(ep.date_produced) = DATE('2023-08-05')
-        GROUP BY
-            bldg.id,
-            users.user_id;");
+            bldg.id = ep.building_id AND DATE(ep.date_produced) = CURDATE();");
             $this->statement->execute();
             return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveEggInventoryOverview()
+    {
+        try {
+            $this->setStatement("WITH
+            Weeks AS(
+            SELECT DISTINCT
+                WEEK(date_produced) AS 'week'
+            FROM
+                ep_egg_production
+            UNION
+        SELECT DISTINCT
+            WEEK(DATE) AS 'week'
+        FROM
+            ep_sales_invoice
+        )
+        SELECT
+            Weeks.week AS 'date',
+            COALESCE(ep.produced, 0) AS 'produced',
+            COALESCE(sin.sold, 0) AS 'sold'
+        FROM
+            Weeks
+        LEFT JOIN(
+            SELECT
+                WEEK(date_produced) AS 'week',
+                SUM(egg_count) + COALESCE(SUM(quantity),
+                0) AS 'produced'
+            FROM
+                ep_egg_production AS ep
+            LEFT JOIN ep_egg_procurement AS epr
+            ON
+                MONTH(ep.date_produced) = WEEK(epr.date_procured)
+            GROUP BY
+                WEEK(date_produced)
+            ORDER BY
+            WEEK(date_produced) DESC
+        ) AS ep
+        ON
+            Weeks.week = ep.week
+        LEFT JOIN(
+            SELECT
+                WEEK(DATE) AS 'week',
+                SUM(quantity) AS 'sold'
+            FROM
+                ep_sales_items AS sit
+            LEFT JOIN ep_sales_invoice AS SIN
+            ON
+                sit.sales_id = sin.sales_id
+            GROUP BY
+                WEEK(DATE)
+        ) AS SIN
+        ON
+            Weeks.week = sin.week
+        ORDER BY
+            'date'
+        DESC;");
+        $this->statement->execute();
+        return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }
@@ -258,8 +322,8 @@ class Egg extends Controller
             FROM ep_egg_procurement
             GROUP BY WEEK(log_date)
         ) AS procurement_eggs ON production_eggs.week = procurement_eggs.week ORDER BY production_eggs.week DESC;");
-        $this->statement->execute();
-        return $this->statement->fetchAll();
+            $this->statement->execute();
+            return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }

@@ -11,6 +11,7 @@ export default {
       "2xl": "1536px",
     },
     extend: {
+      scrollbar: ["rounded"],
       backgroundImage: {
         login: "url('./assets/login_img.jpg')",
       },
@@ -84,7 +85,7 @@ export default {
         "red-light-1": "#FDB4B4",
         "red-dark": "#883030",
         "red-dark-1": "#5c1c1c",
-        "yellow": "#f1c232",
+        yellow: "#f1c232",
         "yellow-light": "#fdf6b4",
         "yellow-dark": "#807519",
         "green-light": "#B5FDB4",
@@ -106,5 +107,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")({ nocompatible: true })],
 };

@@ -110,6 +110,44 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
+    function retrieveEggSalesOverview()
+    {
+        try {
+            $this->setStatement("WITH AllMonths AS (
+                SELECT 1 AS month
+                UNION SELECT 2
+                UNION SELECT 3
+                UNION SELECT 4
+                UNION SELECT 5
+                UNION SELECT 6
+                UNION SELECT 7
+                UNION SELECT 8
+                UNION SELECT 9
+                UNION SELECT 10
+                UNION SELECT 11
+                UNION SELECT 12
+            )
+            
+            SELECT
+                AllMonths.month AS date,
+                COALESCE(SUM(sit.total_amount), 0) as profit
+            FROM
+                AllMonths
+            LEFT JOIN
+                ep_sales_invoice AS sin ON MONTH(sin.date) = AllMonths.month
+            LEFT JOIN
+                ep_sales_items AS sit ON sin.sales_id = sit.sales_id
+            GROUP BY
+                AllMonths.month
+            ORDER BY
+                AllMonths.month ASC;
+            ");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
     function retrieveEggsSold($week)
     {
         try {

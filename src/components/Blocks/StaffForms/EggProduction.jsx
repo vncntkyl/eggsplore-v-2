@@ -41,7 +41,12 @@ export default function EggProduction({ building }) {
       log_date: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
     };
     try {
-      const response = await insertEggProduction(data, "staff_add");
+      const response = await insertEggProduction(
+        data,
+        "staff_add",
+        eggData.building_number
+      );
+      console.log(response);
       if (response === 1) {
         toggleAlert({
           type: "success",

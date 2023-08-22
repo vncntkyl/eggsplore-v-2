@@ -208,4 +208,33 @@ class Feeds extends Controller
             $this->getError($e);
         }
     }
+    function retrieveInventorySummary()
+    {
+
+        try {
+            $this->setStatement("WITH AllMonths AS( 
+                SELECT 1 AS MONTH 
+                UNION SELECT 2 
+                UNION SELECT 3 
+                UNION SELECT 4 
+                UNION SELECT 5 
+                UNION SELECT 6 
+                UNION SELECT 7 
+                UNION SELECT 8 
+                UNION SELECT 9 
+                UNION SELECT 10 
+                UNION SELECT 11 
+                UNION SELECT 12 ) 
+                SELECT AllMonths.month AS date, 
+                COALESCE(SUM(med.amount) + SUM(feeds.amount), 0) AS cost 
+                FROM AllMonths 
+                LEFT JOIN ep_medicine_inventory AS med ON MONTH(med.log_date) = AllMonths.month 
+                LEFT JOIN ep_feeds_inventory AS feeds ON MONTH(feeds.log_date) = AllMonths.month 
+                GROUP BY AllMonths.month ORDER BY AllMonths.month ASC;");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
 }

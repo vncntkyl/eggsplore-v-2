@@ -75,6 +75,20 @@ const retrieveEggSales = async () => {
     return e.message;
   }
 };
+const retrieveSalesOverview = async () => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "sales_overview",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 const retrieveEggsSold = async (week) => {
   try {
     const response = await axios.get(url.manageSalesURL, {
@@ -138,6 +152,7 @@ export const values = {
   retrieveSalesInvoice,
   retrieveLatestInvoice,
   retrieveDeliveryInvoice,
+  retrieveSalesOverview,
   retrieveItems,
   retrieveEggSales,
   retrieveEggsSold,

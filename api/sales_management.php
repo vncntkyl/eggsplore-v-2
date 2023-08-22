@@ -33,6 +33,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 break;
             case "invoice_for_dispatch":
                 echo json_encode($sales->retrieveSalesInvoiceForDispatch());
+                break;
+            case "sales_overview":
+                echo json_encode($sales->retrieveEggSalesOverview());
+                break;
         }
         break;
     case "POST":
