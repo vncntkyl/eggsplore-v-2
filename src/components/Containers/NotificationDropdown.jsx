@@ -3,13 +3,32 @@ import { data } from "../../data/NotificationData";
 import avatar_1 from "../../assets/avatar_1.png";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../context/authContext";
 
 export default function NotificationDropdown() {
   const { trimString } = useFunction();
   const [notifications, setNotifications] = useState([]);
 
+  const { getNotifications } = useAuth();
+
   useEffect(() => {
-    setNotifications(data.slice(0, 3));
+    const setup = async () => {
+      const response = await getNotifications();
+      setNotifications(
+        response.map((res) => {
+          return {
+            ...res,
+            hasRead: false,
+          };
+        })
+      );
+    };
+
+    const realtimeData = setInterval(setup, 1000);
+
+    return () => {
+      clearInterval(realtimeData);
+    };
   }, []);
   return (
     <div className="absolute top-full right-0 w-sidebar bg-white rounded-md shadow-md animate-slide-down">

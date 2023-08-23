@@ -58,3 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo 1;
     }
 }
+
+if (isset($_GET['user_notifications'])) {
+    $notifications = $user->getUserNotifications();
+    $newNotifications = array();
+    foreach ($notifications as $notification) {
+        array_push($newNotifications, $user->getNotification($notification->source_table, $notification->record_id));
+    }
+    echo json_encode($newNotifications);
+}

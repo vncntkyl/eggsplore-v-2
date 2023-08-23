@@ -101,6 +101,20 @@ export function AuthProvider({ children }) {
     }
     return null;
   };
+  const getNotifications = async () => {
+    try {
+      const response = await axios.get(url.manageUserURL, {
+        params: {
+          user_notifications: true,
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
 
   //BUILDING MANAGEMENT
   const getBuilding = async (id = null) => {
@@ -374,6 +388,7 @@ export function AuthProvider({ children }) {
     deleteBuilding,
     getCurrentUser,
     setCurrentUser,
+    getNotifications,
     ...salesManagement,
     ...feedsManagement,
     ...poultryManagement,
