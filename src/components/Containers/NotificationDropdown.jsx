@@ -1,5 +1,4 @@
 import { useFunction } from "../../context/FunctionContext";
-import { data } from "../../data/NotificationData";
 import avatar_1 from "../../assets/avatar_1.png";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
