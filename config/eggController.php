@@ -70,18 +70,41 @@ class Egg extends Controller
             Weeks
         LEFT JOIN(
             SELECT
-                WEEK(date_produced) AS 'week',
-                SUM(egg_count) + COALESCE(SUM(quantity),
+                ep.year AS 'year',
+                ep.week AS 'week',
+                COALESCE(SUM(ep.egg_count),
+                0) + COALESCE(SUM(epr.quantity),
                 0) AS 'produced'
             FROM
-                ep_egg_production AS ep
-            LEFT JOIN ep_egg_procurement AS epr
-            ON
-                MONTH(ep.date_produced) = WEEK(epr.date_procured)
+                (
+                SELECT
+                    YEAR(date_produced) AS 'year',
+                    WEEK(date_produced) AS 'week',
+                    SUM(egg_count) AS 'egg_count'
+                FROM
+                    ep_egg_production
+                GROUP BY
+                    WEEK(date_produced)
+            ) AS ep
+        LEFT JOIN(
+            SELECT YEAR(date_procured) AS 'year',
+                WEEK(date_procured) AS 'week',
+                SUM(quantity) AS 'quantity'
+            FROM
+                ep_egg_procurement
             GROUP BY
-                WEEK(date_produced)
-            ORDER BY
-            WEEK(date_produced) DESC
+                WEEK(date_procured)
+        ) AS epr
+        ON
+            ep.week = epr.week
+        GROUP BY
+            WEEK
+        ORDER BY
+            YEAR
+        DESC
+            ,
+            WEEK
+        DESC
         ) AS ep
         ON
             Weeks.week = ep.week
@@ -102,8 +125,106 @@ class Egg extends Controller
         ORDER BY
             'date'
         DESC;");
-        $this->statement->execute();
-        return $this->statement->fetchAll();
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveEggProductionReport($start, $end)
+    {
+        try {
+            $this->setStatement("SELECT
+            b.number AS building_no,
+            COALESCE(SUM(ep.egg_count), 0) AS produced_eggs,
+            COALESCE(SUM(ep.defect_count), 0) AS defect_eggs
+        FROM
+            ep_building AS b
+        LEFT JOIN
+            ep_egg_production AS ep ON b.id = ep.building_id
+        WHERE
+            DATE(ep.date_produced) >= DATE(:start_date) AND DATE(ep.date_produced) <= DATE(:end_date)
+        GROUP BY
+            b.id;");
+            $this->statement->execute([":start_date" => $start, ":end_date" => $end]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveEggProductionAndSalesReport($start, $end)
+    {
+        try {
+            $this->setStatement("WITH ep_months AS (SELECT DISTINCT
+                                MONTH(date_produced) AS 'month'
+                            FROM
+                                ep_egg_production
+                                WHERE date_produced >= :start_date AND date_produced <= :end_date
+                            UNION
+                        SELECT DISTINCT
+                            MONTH(date) AS 'month'
+                        FROM
+                            ep_sales_invoice
+                            WHERE date >= :start_date AND date <= :end_date)
+                            SELECT ep_months.month,
+                            COALESCE(ep.produced,0) AS eggs_produced,
+                            COALESCE(sin.sold,0) AS eggs_sold
+                            FROM
+                            ep_months
+                            LEFT JOIN (
+                    SELECT
+                    ep.year AS 'year',
+                    ep.month AS 'month',
+                    COALESCE(SUM(ep.egg_count), 0) + COALESCE(SUM(epr.quantity), 0) AS 'produced'
+                    FROM
+                    (
+                        SELECT
+                            YEAR(date_produced) AS 'year',
+                            MONTH(date_produced) AS 'month',
+                            SUM(egg_count) AS 'egg_count'
+                        FROM
+                            ep_egg_production
+                            WHERE date_produced >= :start_date AND date_produced <= :end_date
+                        GROUP BY
+                            MONTH(date_produced)
+                    ) AS ep
+                    LEFT JOIN
+                    (
+                        SELECT
+                        YEAR(date_procured) AS 'year',
+                            MONTH(date_procured) AS 'month',
+                            SUM(quantity) AS 'quantity'
+                        FROM
+                            ep_egg_procurement
+                            WHERE date_procured >= :start_date AND date_procured <= :end_date
+                        GROUP BY
+                            MONTH(date_procured)
+                    ) AS epr
+                    ON
+                    ep.month = epr.month
+                    GROUP BY month
+                    ORDER BY
+                    year DESC,
+                    month DESC
+                            ) AS ep
+                    ON ep_months.month = ep.month
+                    LEFT JOIN (
+                    SELECT
+                                MONTH(sin.date) AS 'month',
+                                SUM(quantity) AS 'sold'
+                            FROM
+                                ep_sales_items AS sit
+                            LEFT JOIN ep_sales_invoice AS sin
+                            ON
+                                sit.sales_id = sin.sales_id
+                            WHERE sin.date >= :start_date AND sin.date <= :end_date
+                            GROUP BY
+                                MONTH(sin.date)
+                    ) AS sin
+                    ON ep_months.month = sin.month
+                    ORDER BY sin.month DESC;");
+            $this->statement->execute([":start_date" => $start, ":end_date" => $end]);
+            return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }
@@ -150,13 +271,13 @@ class Egg extends Controller
     {
         try {
             $this->setStatement("SELECT
-            ep.egg_production_id,
+            ep.batch_id,
             (ep.egg_count - COALESCE(ep.defect_count, 0)) AS eggs,
             ep.date_produced
         FROM
             ep_egg_production AS ep
         LEFT JOIN
-            ep_egg_segregation AS es ON ep.egg_production_id = es.production_id
+            ep_egg_segregation AS es ON ep.batch_id = es.production_id
         WHERE
             es.production_id IS NULL AND ep.user_id = ?
         ORDER BY
@@ -324,6 +445,31 @@ class Egg extends Controller
         ) AS procurement_eggs ON production_eggs.week = procurement_eggs.week ORDER BY production_eggs.week DESC;");
             $this->statement->execute();
             return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveSegregatedEggs($start, $end)
+    {
+        try {
+            $this->setStatement("SELECT
+            COALESCE(SUM(ep.egg_count) + SUM(ep.defect_count),0) as eggs,
+            COALESCE(SUM(es.no_weight),0) AS no_weight, 
+            COALESCE(SUM(es.pewee),0) AS pewee,
+            COALESCE(SUM(es.pullet),0) AS pullet,
+            COALESCE(SUM(es.brown),0) AS brown,
+            COALESCE(SUM(es.small),0) AS small,
+            COALESCE(SUM(es.medium),0) AS 'medium',
+            COALESCE(SUM(es.large),0) AS large,
+            COALESCE(SUM(es.extra_large),0) AS extra_large,
+            COALESCE(SUM(es.jumbo),0) AS jumbo,
+            COALESCE(SUM(es.crack),0) AS crack,
+            COALESCE(SUM(es.soft_shell),0) AS soft_shell
+            FROM ep_egg_production AS ep
+            LEFT JOIN ep_egg_segregation AS es ON es.production_id = ep.batch_id 
+            WHERE DATE(ep.date_produced) >= DATE(:start_date) AND DATE(ep.date_produced) <= DATE(:end_date)");
+            $this->statement->execute([":start_date" => $start, ":end_date" => $end]);
+            return $this->statement->fetch();
         } catch (PDOException $e) {
             $this->getError($e);
         }

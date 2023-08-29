@@ -198,9 +198,9 @@ class Feeds extends Controller
         FROM
             ep_building AS buildings
         LEFT JOIN ep_feeds_consumption fc ON
-            buildings.id = fc.building_id AND  DATE(fc.date_procured) = DATE('2023-08-05')
+            buildings.id = fc.building_id AND  DATE(fc.date_procured) = CURDATE()
         LEFT JOIN ep_medication_intake mi ON
-            buildings.id = mi.building_id AND DATE(mi.date_procured) = DATE('2023-08-05')
+            buildings.id = mi.building_id AND DATE(mi.date_procured) = CURDATE()
             GROUP BY buildings.id;");
             $this->statement->execute();
             return $this->statement->fetchAll();
@@ -232,6 +232,27 @@ class Feeds extends Controller
                 LEFT JOIN ep_feeds_inventory AS feeds ON MONTH(feeds.log_date) = AllMonths.month 
                 GROUP BY AllMonths.month ORDER BY AllMonths.month ASC;");
             $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveMaintenanceReport($start_date, $end_date)
+    {
+        try {
+            $this->setStatement("SELECT
+            med.log_date as month,
+            COALESCE(SUM(med.amount),0) AS medicine_expense,
+            COALESCE(SUM(feeds.amount),0) AS feeds_expense
+        FROM
+            ep_medicine_inventory AS med
+        LEFT JOIN
+            ep_feeds_inventory AS feeds ON MONTH(feeds.log_date) = MONTH(med.log_date)
+        WHERE
+            med.log_date >= DATE(?) AND med.log_date <= DATE(?)
+        GROUP BY
+            MONTH(med.log_date);");
+            $this->statement->execute([$start_date, $end_date]);
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);

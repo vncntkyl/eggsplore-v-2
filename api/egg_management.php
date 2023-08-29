@@ -27,6 +27,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
             echo json_encode($egg->retrieveEggOverview());
         } else if ($retrieve_type === "performance_overview") {
             echo json_encode($egg->retrieveEggInventoryOverview());
+        } else if ($retrieve_type === "egg_production_report") {
+            $date_start = $_GET['start'];
+            $date_end = $_GET['end'];
+            echo json_encode($egg->retrieveEggProductionReport($date_start, $date_end));
+        } else if ($retrieve_type === "egg_segregation_report") {
+            $date_start = $_GET['start'];
+            $date_end = $_GET['end'];
+            echo json_encode($egg->retrieveSegregatedEggs($date_start, $date_end));
         }
         break;
     case "POST":

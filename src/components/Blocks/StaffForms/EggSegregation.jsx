@@ -80,7 +80,7 @@ export default function EggSegregation({ building }) {
     const building_id = document.querySelector("#building_id");
     const data = { ...eggData };
     data.building_number = parseInt(building_id.value);
-    data.production_id = parseInt(selectedProduction);
+    data.production_id = selectedProduction;
     data.user_id = parseInt(JSON.parse(getCurrentUser()).user_id);
     data.log_date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     try {
@@ -196,8 +196,7 @@ export default function EggSegregation({ building }) {
                                 ...current,
                                 unsorted_egg_production: eggProductionList.find(
                                   (egg) =>
-                                    egg.egg_production_id ===
-                                    parseInt(e.target.value)
+                                    egg.batch_id === e.target.value
                                 ).eggs,
                               }));
                             }}
@@ -207,18 +206,16 @@ export default function EggSegregation({ building }) {
                               selected={!selectedProduction}
                               disabled
                             >
-                              Select Egg Production Type
+                              Select production batch
                             </option>
                             {eggProductionList.map((egg, index) => {
                               return (
                                 <option
                                   key={index}
-                                  value={egg.egg_production_id}
-                                  selected={
-                                    egg.egg_production_id === eggData[eggKey]
-                                  }
+                                  value={egg.batch_id}
+                                  selected={egg.batch_id === eggData[eggKey]}
                                 >
-                                  {`production #${egg.egg_production_id} - ${egg.date_produced}`}
+                                  {`Batch #${egg.batch_id}`}
                                 </option>
                               );
                             })}

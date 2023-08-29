@@ -36,9 +36,9 @@ const getFeedsInventory = async (dateFilter) => {
       params: {
         feeds_inventory: true,
         filter:
-        typeof dateFilter === "object"
-          ? JSON.stringify(dateFilter)
-          : dateFilter,
+          typeof dateFilter === "object"
+            ? JSON.stringify(dateFilter)
+            : dateFilter,
       },
     });
     if (response.status === 200) {
@@ -67,6 +67,22 @@ const getFeedsAndMedicineSummary = async () => {
     const response = await axios.get(url.manageFeedsURL, {
       params: {
         feeds_medicine_summary: true,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
+const getMaintenanceReport = async (start_date, end_date) => {
+  try {
+    const response = await axios.get(url.manageFeedsURL, {
+      params: {
+        maintenance_report: true,
+        start: start_date,
+        end: end_date,
       },
     });
     if (response.status === 200) {
@@ -138,6 +154,7 @@ export const values = {
   addFeedsInventory,
   updateFeedsConsumption,
   updateFeedsInventory,
+  getMaintenanceReport,
   getFeedsAndMedicineOverview,
   getFeedsAndMedicineSummary,
 };

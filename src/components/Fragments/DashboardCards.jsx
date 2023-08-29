@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/authContext";
-import classNames from "classnames";
-import { useFunction } from "../../context/FunctionContext";
 
 export default function DashboardCards() {
   const { getFeedsAndMedicineOverview, retrieveEggOverview } = useAuth();
-  const { capitalize, toTitle } = useFunction();
   const [cardInformation, setCardInformation] = useState([]);
   const [eggSummary, setEggSummary] = useState([]);
 

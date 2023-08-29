@@ -7,7 +7,7 @@ const insertEggProduction = async (eggData, method, building_no) => {
     const eggFD = new FormData();
     eggFD.append("method", method);
     eggFD.append("egg_data", JSON.stringify(eggData));
-    eggFD.append("building_no",building_no);
+    eggFD.append("building_no", building_no);
     const response = await axios.post(url.manageEggsURL, eggFD);
     if (response.status === 200) {
       return response.data;
@@ -53,6 +53,38 @@ const retrieveEggPerformance = async () => {
     const response = await axios.get(url.manageEggsURL, {
       params: {
         retrieve: "performance_overview",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+const retrieveEggProductionReport = async (start_date, end_date) => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "egg_production_report",
+        start: start_date,
+        end: end_date,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
+const getSegregatedEggs = async (start_date, end_date) => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "egg_segregation_report",
+        start: start_date,
+        end: end_date,
       },
     });
     if (response.status === 200) {
@@ -298,8 +330,9 @@ const updateChickenPopulation = async (chickendata) => {
 };
 
 export const values = {
-  retrieveEggOverview,
+  getSegregatedEggs,
   retrieveProduction,
+  retrieveEggOverview,
   addChickProcurement,
   insertEggProduction,
   updateEggProduction,
@@ -317,4 +350,5 @@ export const values = {
   retrieveChickenPopulation,
   retrieveEggClasifications,
   retrieveEggsForSegregation,
+  retrieveEggProductionReport,
 };

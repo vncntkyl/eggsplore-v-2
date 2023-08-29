@@ -148,6 +148,26 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
+    function retrieveSalesSummaryReport($start, $end){
+        try {
+            $this->setStatement("SELECT
+            YEAR(sin.date) AS year,
+            MONTH(sin.date) AS month,
+            COALESCE(SUM(sit.total_amount),
+            0) AS profit
+        FROM
+            ep_sales_invoice AS SIN
+        LEFT JOIN ep_sales_items AS sit
+        ON
+            sin.sales_id = sit.sales_id
+        WHERE
+            DATE(sin.date) >= DATE(:start_date) AND DATE(sin.date) <= DATE(:end_date)");
+            $this->statement->execute([":start_date" => $start, ":end_date" => $end]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
     function retrieveEggsSold($week)
     {
         try {
