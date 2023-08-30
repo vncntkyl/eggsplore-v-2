@@ -34,6 +34,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
             case "invoice_for_dispatch":
                 echo json_encode($sales->retrieveSalesInvoiceForDispatch());
                 break;
+            case "dispatch_invoices":
+                echo json_encode($sales->retrieveInvoicesForDelivery($_GET['delivery_id']));
+                break;
             case "sales_overview":
                 echo json_encode($sales->retrieveEggSalesOverview());
                 break;

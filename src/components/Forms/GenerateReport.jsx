@@ -14,6 +14,10 @@ export default function GenerateReport({
   fileName,
   additionalData = [],
   dateCoverage = [],
+  closeModal,
+  isInvoice = false,
+  isIncomeStatement = false,
+  calculations = [],
 }) {
   const { capitalize } = useFunction();
   const generateAdditionalData = (doc, margin, height) => {
@@ -136,11 +140,366 @@ export default function GenerateReport({
       baseline: "bottom",
     });
     doc.save(fileName);
+    closeModal(null);
+  };
+  const formatCurrency = (amount) => {
+    const peso = Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+    }).format(amount);
+    return "PHP " + peso.substring(1);
+  };
+  const generateSalesInvoice = () => {
+    const invoiceData = isInvoice;
+    const doc = new jsPDF({ orientation: "portrait", format: "a4" });
+
+    const width =
+      doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    let marginLeft, marginRight;
+    doc.autoTable({
+      startY: 48,
+      styles: {
+        halign: "center",
+        lineWidth: 0.5,
+        theme: "grid",
+      },
+      theme: "grid",
+      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
+      margin: { top: 30 },
+      head: [tableHeader],
+      body: record,
+      didDrawPage: (data) => {
+        marginLeft = data.settings.margin.left;
+        marginRight = data.settings.margin.right;
+
+        doc.text("Edwin and Lina Poultry Farm", width / 2, 10, {
+          align: "center",
+          baseline: "top",
+        });
+
+        doc.setFontSize(12);
+        doc.text("Sales Invoice", width / 2, 20, {
+          align: "center",
+        });
+        doc.setFontSize(11);
+
+        doc.text(
+          "Date: " + format(new Date(invoiceData.date), "MMMM dd, yyyy"),
+          marginLeft,
+          27,
+          {
+            align: "left",
+            baseline: "top",
+          }
+        );
+        doc.text("Customer Name: " + invoiceData.customer, marginLeft, 34, {
+          align: "left",
+          baseline: "top",
+        });
+        doc.text(
+          "Invoice No: " + invoiceData.invoice_no,
+          width -
+            marginRight -
+            doc.getTextWidth("Invoice No: " + invoiceData.invoice_no),
+          27,
+          {
+            align: "left",
+            baseline: "top",
+          }
+        );
+        doc.text("Shipping Address: " + invoiceData.location, marginRight, 41, {
+          align: "left",
+          baseline: "top",
+        });
+
+        doc.text(
+          "Total Amount: " + formatCurrency(invoiceData.amount),
+          width -
+            marginLeft -
+            doc.getTextWidth(
+              "Total Amount: " + formatCurrency(invoiceData.amount)
+            ),
+          doc.autoTable.previous.finalY + 10,
+          {
+            align: "left",
+            baseline: "top",
+          }
+        );
+        doc.text(
+          "If you have any questions regarding this invoice, please contact [mobile number]",
+          width / 2,
+          doc.autoTable.previous.finalY + 30,
+          { align: "center", baseline: "bottom" }
+        );
+        doc.save(fileName);
+      },
+    });
+  };
+  const generateIncomeStatement = () => {
+    const incomeStatement = isIncomeStatement;
+    console.log(incomeStatement);
+    const totalGoodsCost = calculations[0]();
+    const grossProfit = calculations[1]();
+    const totalOperatingCost = calculations[2]();
+    const netIncomeBeforeTaxes = calculations[3]();
+    const taxes = calculations[4]();
+    const netIncome = calculations[5]();
+
+    const doc = new jsPDF({ orientation: "portrait", format: "a4" });
+    const width =
+      doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    const height =
+      doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+    doc.text("Edwin and Lina Poultry Farm", width / 2, 10, {
+      align: "center",
+      baseline: "top",
+    });
+
+    doc.setFontSize(12);
+    doc.text("Income Statement", width / 2, 20, {
+      align: "center",
+    });
+    doc.setFontSize(11);
+    let date = "";
+
+    if (
+      format(new Date(dateCoverage.start_date), "MMMM yyyy") ===
+      format(new Date(dateCoverage.end_date), "MMMM yyyy")
+    ) {
+      date = format(new Date(dateCoverage.start_date), "MMMM yyyy");
+    } else {
+      date =
+        format(new Date(dateCoverage.start_date), "MMMM yyyy") +
+        " - " +
+        format(new Date(dateCoverage.end_date), "MMMM yyyy");
+    }
+    doc.text(date, width / 2, 25, {
+      align: "center",
+    });
+    doc.setFont("helvetica", "bold");
+    doc.text("Revenue", 15, 30, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.setFont("helvetica", "normal");
+    doc.text("Egg Sales", 30, 37, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(incomeStatement.egg_sales), width - 15, 37, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.setFont("helvetica", "bold");
+    doc.text("Cost Of Goods Sold", 15, 44, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.setFont("helvetica", "normal");
+    doc.text("Feeds and Medicine", 30, 51, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(
+      formatCurrency(incomeStatement.medicine_and_feeds_cost),
+      width - 15,
+      51,
+      {
+        align: "right",
+        baseline: "top",
+      }
+    );
+    doc.text("Labor", 30, 58, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(incomeStatement.labor), width - 15, 58, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.text("Other Direct", 30, 65, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(
+      formatCurrency(incomeStatement.other_direct_cost),
+      width - 15,
+      65,
+      {
+        align: "right",
+        baseline: "top",
+      }
+    );
+    doc.text("Total Cost of Goods Sold", 30, 72, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(totalGoodsCost), width - 15, 72, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.setLineWidth(0.5);
+    doc.line(15, 79, width - 15, 79);
+    doc.setFont("helvetica", "bold");
+    doc.text("Gross Profit", 15, 83, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(grossProfit), width - 15, 83, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.line(15, 90, width - 15, 90);
+
+    doc.text("Operating Expenses", 15, 93, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.setFont("helvetica", "normal");
+    doc.text("Transportation and Logistics", 30, 100, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(incomeStatement.expenses), width - 15, 100, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.text("Rent And Utilities", 30, 107, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(
+      formatCurrency(incomeStatement.rent_and_utilities),
+      width - 15,
+      107,
+      {
+        align: "right",
+        baseline: "top",
+      }
+    );
+    doc.text("Insurance", 30, 114, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(incomeStatement.insurance), width - 15, 114, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.text("Repairs And Maintenance", 30, 121, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(
+      formatCurrency(incomeStatement.repairs_and_maintenance),
+      width - 15,
+      121,
+      {
+        align: "right",
+        baseline: "top",
+      }
+    );
+    doc.text("Salaries And Wages", 30, 128, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(
+      formatCurrency(incomeStatement.salaries_and_wages),
+      width - 15,
+      128,
+      {
+        align: "right",
+        baseline: "top",
+      }
+    );
+    doc.text("Other Operating Expenses", 30, 135, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(
+      formatCurrency(incomeStatement.other_operating_expenses),
+      width - 15,
+      135,
+      {
+        align: "right",
+        baseline: "top",
+      }
+    );
+    doc.text("Total Operating Cost", 30, 142, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(totalOperatingCost), width - 15, 142, {
+      align: "right",
+      baseline: "top",
+    });
+
+    doc.line(15, 149, width - 15, 149);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Net Income Before Taxes", 15, 153, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(netIncomeBeforeTaxes), width - 15, 153, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.text("Taxes", 15, 160, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(taxes), width - 15, 160, {
+      align: "right",
+      baseline: "top",
+    });
+    doc.text("Net Income", 15, 167, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(netIncome), width - 15, 167, {
+      align: "right",
+      baseline: "top",
+    });
+
+    doc.setFont("helvetica", "normal");
+
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+
+    doc.text("Generated by: ", 15, height - 40, {
+      align: "left",
+      baseline: "bottom",
+    });
+    doc.text(
+      `${capitalize(user.first_name)} ${capitalize(user.last_name)}`,
+      15,
+      height - 25,
+      {
+        align: "left",
+        baseline: "bottom",
+      }
+    );
+    const currentDate = toDate(new Date());
+    const printDate = format(currentDate, "MM/dd/yyyy hh:mm:ss a");
+    const dateFormatted = "Printed on " + printDate;
+    doc.text(dateFormatted, 15, height - 10, {
+      align: "left",
+      baseline: "bottom",
+    });
+    doc.save("Income Statement " + date);
+    closeModal();
   };
   return (
     <>
       <Button
-        onClick={() => generate()}
+        onClick={() => {
+          if (isInvoice) {
+            generateSalesInvoice();
+          } else if (isIncomeStatement) {
+            generateIncomeStatement();
+          } else {
+            generate();
+          }
+        }}
         value={
           <div className="flex items-center gap-1">
             <span>{title}</span>

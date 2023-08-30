@@ -163,6 +163,21 @@ const updateSalesDeliveryInvoice = async (sales_id, dispatch_id) => {
     console.log(e.message);
   }
 };
+const getInvoicesForDelivery = async (delivery_id) => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "dispatch_invoices",
+        delivery_id: delivery_id,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 export const values = {
   retrieveItems,
   retrieveEggSales,
@@ -171,6 +186,7 @@ export const values = {
   retrieveSalesInvoice,
   retrieveLatestInvoice,
   retrieveSalesOverview,
+  getInvoicesForDelivery,
   retrieveDeliveryInvoice,
   updateSalesDeliveryInvoice,
   retrieveSalesSummaryReport,

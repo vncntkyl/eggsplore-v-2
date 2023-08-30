@@ -324,7 +324,9 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex items-center justify-end gap-2">
-                  {reportConfig.category !== "" && reportConfig.type === "csv" && reportData ? (
+                  {reportConfig.category !== "" &&
+                  reportConfig.type === "csv" &&
+                  reportData ? (
                     <CSVLink
                       filename={`${
                         reportConfig.filename !== ""
@@ -336,8 +338,11 @@ export default function Dashboard() {
                     >
                       Export
                     </CSVLink>
-                  ) : reportConfig.category !== "" && reportConfig.type === "pdf" && reportData ? (
+                  ) : reportConfig.category !== "" &&
+                    reportConfig.type === "pdf" &&
+                    reportData ? (
                     <GenerateReport
+                      closeModal={setModalTitle}
                       dateCoverage={dateRange}
                       additionalData={additionalData}
                       tableHeader={reportData[0]}

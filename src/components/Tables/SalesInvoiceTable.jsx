@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFunction } from "../../context/FunctionContext";
 import { useAuth } from "../../context/authContext";
 import { Button } from "../Forms";
-import { AiFillPrinter, AiOutlineEye } from "react-icons/ai";
+import { AiOutlineEye } from "react-icons/ai";
 import { HiPencilAlt } from "react-icons/hi";
 import { format } from "date-fns";
 
@@ -100,13 +100,6 @@ export default function SalesInvoiceTable({
                     }}
                     className="bg-yellow p-1 rounded"
                     value={<HiPencilAlt className="text-white" />}
-                  />
-                  <Button
-                    onClick={() => {
-                      setModal("print sales invoice");
-                    }}
-                    className="bg-yellow p-1 rounded"
-                    value={<AiFillPrinter className="text-white" />}
                   />
                 </div>
               </td>

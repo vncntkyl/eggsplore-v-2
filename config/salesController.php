@@ -97,6 +97,16 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
+    function retrieveInvoicesForDelivery($delivery_id)
+    {
+        try {
+            $this->setStatement("SELECT * FROM ep_sales_invoice WHERE delivery_id = ?");
+            $this->statement->execute([$delivery_id]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
     function retrieveEggSales()
     {
         try {
@@ -148,7 +158,8 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
-    function retrieveSalesSummaryReport($start, $end){
+    function retrieveSalesSummaryReport($start, $end)
+    {
         try {
             $this->setStatement("SELECT
             YEAR(sin.date) AS year,

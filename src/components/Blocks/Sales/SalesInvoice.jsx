@@ -9,6 +9,8 @@ import { useAuth } from "../../../context/authContext";
 import SalesItemsTable from "../../Tables/SalesItemsTable";
 import classNames from "classnames";
 import SalesInvoiceTable from "../../Tables/SalesInvoiceTable";
+import GenerateReport from "../../Forms/GenerateReport";
+import { AiFillPrinter } from "react-icons/ai";
 
 export default function SalesInvoice() {
   const [refresh, doRefresh] = useState(0);
@@ -149,6 +151,13 @@ export default function SalesInvoice() {
     const updatedItems = [...items];
     updatedItems.splice(key, 1);
     setItems(updatedItems);
+  };
+  const formatCurrency = (amount) => {
+    const peso = Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+    }).format(amount);
+    return "PHP " + peso.substring(1);
   };
 
   useEffect(() => {
@@ -296,7 +305,7 @@ export default function SalesInvoice() {
                         {selectedInvoice.customer}
                       </span>
                     </p>
-                    <p className="font-semibold text-start whitespace-nowrap flex gap-2">
+                    <p className="font-semibold text-start flex gap-2 max-w-[300px]">
                       Location:
                       <span className="font-normal">
                         {selectedInvoice.location}
@@ -326,6 +335,31 @@ export default function SalesInvoice() {
                     }).format(selectedInvoice.amount)}
                   </span>
                 </div>
+                <GenerateReport
+                  isInvoice={selectedInvoice}
+                  fileTitle={selectedInvoice.invoice_no}
+                  fileName={selectedInvoice.invoice_no}
+                  className="bg-main hover:bg-secondary transition-all text-white p-1 mt-2 rounded ml-auto"
+                  tableHeader={["Item Name", "Price", "Quantity", "Amount"]}
+                  record={
+                    salesItems &&
+                    salesItems.map(
+                      ({ item_name, price, quantity, total_amount }) => [
+                        capitalize(toTitle(item_name)),
+                        formatCurrency(price),
+                        quantity,
+                        formatCurrency(total_amount),
+                      ]
+                    )
+                  }
+                  title={
+                    <>
+                      <div className="flex flex-row items-center gap-2">
+                        <AiFillPrinter className="text-white" /> Print Invoice
+                      </div>
+                    </>
+                  }
+                />
               </div>
             ) : (
               <>

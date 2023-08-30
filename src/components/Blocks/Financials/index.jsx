@@ -1,13 +1,14 @@
 /* eslint-disable react/prop-types */
 import { AiFillCalendar, AiFillPlusCircle } from "react-icons/ai";
 import { Button, TextInput } from "../../Forms";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Alert, Modal } from "../../Containers";
 import { useFunction } from "../../../context/FunctionContext";
 import { format } from "date-fns";
 import classNames from "classnames";
 import { useAuth } from "../../../context/authContext";
 import MonthlyIncomeStatement from "./MonthlyIncomeStatement";
+import GenerateReport from "../../Forms/GenerateReport";
 
 export default function Financials() {
   const [modalTitle, setModalTitle] = useState(null);
@@ -42,8 +43,7 @@ export default function Financials() {
 
   const { capitalize, toTitle } = useFunction();
   const { retrieveSalesFromRange, createIncomeStatement } = useAuth();
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const incomeStatement = { ...salesData };
     incomeStatement.transport_and_logistics = incomeStatement.expenses
       ? incomeStatement.expenses
@@ -243,7 +243,7 @@ export default function Financials() {
           className="min-w-[550px]"
           content={
             <>
-              <form onSubmit={handleSubmit} className="w-full">
+              <form className="w-full">
                 <div className="flex flex-row gap-2 items-center pb-2">
                   <Header title="Time Period" />
                   <Button
@@ -396,11 +396,21 @@ export default function Financials() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    type="submit"
-                    value="Create"
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <GenerateReport
+                    isIncomeStatement={salesData}
                     className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                    title="Create"
+                    dateCoverage={dateRange}
+                    calculations={[
+                      getTotalGoodsCost,
+                      getGrossProfit,
+                      getTotalOperatingExpenses,
+                      getNetIncomeBeforeTaxes,
+                      getTaxes,
+                      getNetIncome,
+                    ]}
+                    closeModal={handleSubmit}
                   />
                   <Button
                     value="Cancel"
