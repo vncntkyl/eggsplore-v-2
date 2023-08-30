@@ -166,8 +166,6 @@ export default function SalesInvoice() {
       setEggs(eggtypes);
       const locations = await getLocation();
       setLocations(locations);
-      const itemsData = await retrieveItems(salesId);
-      setSalesItems(itemsData);
       const response = await retrieveLatestInvoice();
       let newInvoice = "";
       const currentInvoice = response.invoice_no;
@@ -192,10 +190,17 @@ export default function SalesInvoice() {
     setup();
     const realtimeData = setInterval(setup, 1000);
 
+    const getItems = async () => {
+      if (modalTitle === "edit sales invoice") {
+        const itemsData = await retrieveItems(salesId);
+        setSalesItems(itemsData);
+      }
+    };
+    getItems();
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh, salesId]);
+  }, [refresh, modalTitle]);
   return (
     <>
       <div>
@@ -390,7 +395,11 @@ export default function SalesInvoice() {
                               type="text"
                               list="locations"
                               id={label}
-                              value={salesInvoice[label]}
+                              value={
+                                modalTitle === "edit sales invoice"
+                                  ? selectedInvoice[label]
+                                  : salesInvoice[label]
+                              }
                               onChange={(e) => {
                                 setSalesInvoice((current) => {
                                   return {
@@ -424,19 +433,35 @@ export default function SalesInvoice() {
                             labelClasses="whitespace-nowrap text-start w-1/2"
                             inputClasses="bg-default rounded px-2 w-1/2 disabled:text-gray-500"
                             onChange={(e) => {
-                              setSalesInvoice((current) => {
-                                return {
-                                  ...current,
-                                  [label]: e.target.value,
-                                };
-                              });
+                              if (modalTitle === "edit sales invoice") {
+                                setInvoice((current) => {
+                                  return {
+                                    ...current,
+                                    [label]: e.target.value,
+                                  };
+                                });
+                              } else {
+                                setSalesInvoice((current) => {
+                                  return {
+                                    ...current,
+                                    [label]: e.target.value,
+                                  };
+                                });
+                              }
                             }}
                             value={
                               label === "date"
-                                ? format(
-                                    new Date(salesInvoice[label]),
-                                    "yyyy-MM-dd"
-                                  )
+                                ? modalTitle === "edit sales invoice"
+                                  ? format(
+                                      new Date(selectedInvoice[label]),
+                                      "yyyy-MM-dd"
+                                    )
+                                  : format(
+                                      new Date(salesInvoice[label]),
+                                      "yyyy-MM-dd"
+                                    )
+                                : modalTitle === "edit sales invoice"
+                                ? selectedInvoice[label]
                                 : salesInvoice[label]
                             }
                           />
@@ -446,7 +471,10 @@ export default function SalesInvoice() {
                   <hr />
                   <div>
                     <SalesItemsTable
-                      items={items}
+                      items={
+                        modalTitle === "edit sales invoice" ? salesItems : items
+                      }
+                      edit={modalTitle === "edit sales invoice"}
                       handleItemChange={handleItemChange}
                       eggList={eggs}
                       deleteItem={deleteItem}
