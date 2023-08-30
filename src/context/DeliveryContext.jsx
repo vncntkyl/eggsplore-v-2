@@ -24,13 +24,31 @@ const insertDeliveryInformation = async (deliveryData, invoices) => {
     const deliveryForm = new FormData();
     deliveryForm.append("method", "insert_delivery_info");
     deliveryForm.append("deliveryData", JSON.stringify(deliveryData));
-    deliveryForm.append("invoices",JSON.stringify(invoices))
+    deliveryForm.append("invoices", JSON.stringify(invoices));
     const response = await axios.post(url.manageDeliveryURL, deliveryForm);
     if (response.status === 200) {
       return response.data;
     }
   } catch (e) {
     return e.message;
+  }
+};
+const updateDeliveryInformation = async (deliveryData, invoices) => {
+  try {
+    const deliveryInformation = {
+      update: true,
+      deliveryData: deliveryData,
+      invoices: invoices,
+    };
+    const response = await axios.put(
+      url.manageDeliveryURL,
+      deliveryInformation
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
   }
 };
 const updateDeliveryStatus = async (
@@ -61,5 +79,6 @@ const updateDeliveryStatus = async (
 export const values = {
   retrieveDeliveryInformation,
   insertDeliveryInformation,
+  updateDeliveryInformation,
   updateDeliveryStatus,
 };

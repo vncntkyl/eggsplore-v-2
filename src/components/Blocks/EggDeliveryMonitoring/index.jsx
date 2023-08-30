@@ -40,7 +40,10 @@ export default function EggDeliveryMonitoring() {
   const {
     insertDeliveryInformation,
     updateDeliveryStatus,
+    retrieveSalesInvoice,
+    getInvoicesForDelivery,
     retrieveSalesInvoiceForDispatch,
+    updateDeliveryInformation,
   } = useAuth();
   const { capitalize, toTitle } = useFunction();
 
@@ -125,28 +128,27 @@ export default function EggDeliveryMonitoring() {
   };
   const handleUpdate = async (e) => {
     e.preventDefault();
-    // const response = await updateChickProcurement(
-    //   newProcurement,
-    //   selectedProcurement.chick_id
-    // );
-    // setModalTitle(null);
-    // if (response === 1) {
-    //   toggleAlert({
-    //     type: "success",
-    //     title: "Procurement Update Success",
-    //     message: "Successfully updated the procurement information.",
-    //     show: true,
-    //   });
-    // } else {
-    //   toggleAlert({
-    //     type: "warning",
-    //     title: "Procurement Update Error",
-    //     message:
-    //       "There has been an error on updating chick procurement. Please try again.",
-    //     show: true,
-    //   });
-    // }
-    // doRefresh((count) => (count = count + 1));
+    const response = await updateDeliveryInformation(deliveryInformation, selectedInvoices);
+    console.log(response);
+    setModalTitle(null);
+    if (response === 1) {
+      toggleAlert({
+        type: "success",
+        title: "Update Delivery Information Success",
+        message: "You have successfull updated delivery information.",
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Update Delivery Information Error",
+        message:
+          "There has been an error on updating delivery information. Please try again.",
+        show: true,
+      });
+    }
+    doRefresh((count) => (count = count + 1));
+   
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -184,15 +186,30 @@ export default function EggDeliveryMonitoring() {
       const response = await retrieveSalesInvoiceForDispatch();
       setSalesInvoices(response);
     };
-
     setup();
-    const realtimeData = setInterval(setup, 1000);
+  }, [refresh, modalTitle]);
 
-    return () => {
-      clearInterval(realtimeData);
+  useEffect(() => {
+    const setup = async () => {
+      const invoices = await retrieveSalesInvoice();
+      const response = await getInvoicesForDelivery(
+        deliveryInformation.delivery_id
+      );
+      setSalesInvoices(invoices);
+      setSelectedInvoices(
+        response.map((sales) => ({
+          sales_id: sales.sales_id,
+          invoice_no: sales.invoice_no,
+        }))
+      );
     };
-  }, [refresh]);
-
+    if (
+      modalTitle === "edit delivery information" ||
+      modalTitle === "view delivery information"
+    ) {
+      setup();
+    }
+  }, [modalTitle]);
   return (
     <>
       <div className="flex flex-col gap-4 items-end px-32">
@@ -279,7 +296,9 @@ export default function EggDeliveryMonitoring() {
                   </div>
                 </form>
               </>
-            ) : modalTitle === "add delivery information" ? (
+            ) : modalTitle === "add delivery information" ||
+              modalTitle === "edit delivery information" ||
+              modalTitle === "view delivery information" ? (
               <DeliveryForm
                 handleClose={handleClose}
                 handleRegistration={handleRegistration}

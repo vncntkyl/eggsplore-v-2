@@ -14,7 +14,7 @@ class Delivery extends Controller
                 } else if ($filter === 'this_week') {
                     $sqlStatement .= " WHERE WEEK(log_date) = WEEK(NOW()) ORDER BY log_date DESC";
                 } else if ($filter === 'this_month') {
-                    $sqlStatement .= " WHERE MONTH(date) = MONTH(NOW()) ORDER BY date DESC";
+                    $sqlStatement .= " WHERE MONTH(log_date) = MONTH(NOW()) ORDER BY log_date DESC";
                 } else {
                     $filter = json_decode($filter);
                     $sqlStatement .= " WHERE log_date >= '" . $filter->start_date . "' AND log_date <= '" . $filter->end_date . "' ORDER BY log_date DESC";
@@ -69,7 +69,7 @@ class Delivery extends Controller
     {
         try {
             $this->setStatement("UPDATE ep_delivery_monitoring SET location = ?, departure_date = ?, target_arrival = ?, driver_name = ?, assistant_driver_name = ?,
-            driver_expense = ?, assistant_driver_expense = ?, parking_expense = ?, food_expense = ?, gas_expense = ?, toll_gate_expense = ?, tenor_and_load_expense = ?,
+            driver_expense = ?, assistant_driver_expense = ?, parking_expense = ?, food_expense = ?, gas_expense = ?, toll_gate_expense = ?, tenor_and_load_expense = ?
                          WHERE delivery_id = ?");
             return $this->statement->execute($delivery_data);
         } catch (PDOException $e) {

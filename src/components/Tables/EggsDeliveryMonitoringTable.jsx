@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { Button } from "../Forms";
 import { HiPencilAlt } from "react-icons/hi";
 import Badge from "../Fragments/Badge";
+import { AiOutlineEye } from "react-icons/ai";
 
 export default function EggsDeliveryMonitoringTable({
   setDelivery,
@@ -22,6 +23,7 @@ export default function EggsDeliveryMonitoringTable({
     if (filter === "range") return;
     const setup = async () => {
       const response = await retrieveDeliveryInformation(filter);
+      console.log(response);
       setDeliveryLogs(response);
       setLoading(false);
     };
@@ -73,8 +75,9 @@ export default function EggsDeliveryMonitoringTable({
               <td className="p-2" align="center">
                 <Button
                   type="button"
+                  disabled={item.status !== "pending"}
                   onClick={() => {
-                    setDelivery(item)
+                    setDelivery(item);
                     setModal("update delivery status");
                   }}
                   className="relative group/status flex w-full items-center justify-center"
@@ -85,9 +88,11 @@ export default function EggsDeliveryMonitoringTable({
                           ? format(new Date(item.actual_arrival), "MMM d, yyyy")
                           : "---"}
                       </span>
-                      <div className=" absolute top-0 right-0 p-1 transition-all hidden group-hover/status:block animate-fade">
-                        <HiPencilAlt className="text-black" />
-                      </div>
+                      {item.status === "pending" && (
+                        <div className=" absolute top-0 right-0 p-1 transition-all hidden group-hover/status:block animate-fade">
+                          <HiPencilAlt className="text-black" />
+                        </div>
+                      )}
                     </>
                   }
                 />
@@ -107,14 +112,24 @@ export default function EggsDeliveryMonitoringTable({
                 />
               </td>
               <td className="p-2" align="center">
-                <Button
-                  onClick={() => {
-                    setDelivery(item);
-                    setModal("edit delivery information");
-                  }}
-                  className="bg-yellow p-1 rounded"
-                  value={<HiPencilAlt className="text-white" />}
-                />
+                <div className="flex items-center justify-center gap-1">
+                  <Button
+                    onClick={() => {
+                      setDelivery(item);
+                      setModal("view delivery information");
+                    }}
+                    className="bg-yellow p-1 rounded"
+                    value={<AiOutlineEye className="text-white" />}
+                  />
+                  <Button
+                    onClick={() => {
+                      setDelivery(item);
+                      setModal("edit delivery information");
+                    }}
+                    className="bg-yellow p-1 rounded"
+                    value={<HiPencilAlt className="text-white" />}
+                  />
+                </div>
               </td>
             </tr>
           );

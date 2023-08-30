@@ -29,29 +29,51 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $delivery_id = $delivery->insert_delivery_monitoring($delivery_list);
 
                 foreach ($invoice_list as $invoice) {
-                    if($delivery->updateSalesDeliveryInvoice($delivery_id, $invoice)){
+                    if ($delivery->updateSalesDeliveryInvoice($delivery_id, $invoice)) {
                         array_push($status, 1);
-                    }else{
+                    } else {
                         array_push($status, 0);
                     }
                 }
-                echo !in_array(0,$status) ? 1 : 0;
+                echo !in_array(0, $status) ? 1 : 0;
                 break;
         }
         break;
     case "PUT":
         $delivery_data = json_decode(file_get_contents('php://input'));
-        if ($delivery->update_delivery_status($delivery_data->column, $delivery_data->value, $delivery_data->delivery_id)) {
-            $delivery_status = "";
-            if ($delivery_data->column === "actual_arrival") {
-                if (date($delivery_data->value) <= date($delivery_data->target_arrival)) {
-                    $delivery_status = "on time";
-                } else {
-                    $delivery_status = "delayed";
+        if ($delivery_data->update) {
+            $data = $delivery_data->deliveryData;
+            $delivery_id = $data->delivery_id;
+            $delivery_list = array();
+
+            unset($data->delivery_id);
+            unset($data->dispatch_id);
+            unset($data->actual_arrival);
+            unset($data->status);
+            unset($data->log_date);
+
+            foreach ($data as $del) {
+                array_push($delivery_list, $del);
+            }
+            array_push($delivery_list, intval($delivery_id));
+            
+            if($delivery->update_delivery_information($delivery_list)){
+                echo 1;
+            }else{
+                echo 0;
+            }
+        } else {
+            if ($delivery->update_delivery_status($delivery_data->column, $delivery_data->value, $delivery_data->delivery_id)) {
+                $delivery_status = "";
+                if ($delivery_data->column === "actual_arrival") {
+                    if (date($delivery_data->value) <= date($delivery_data->target_arrival)) {
+                        $delivery_status = "on time";
+                    } else {
+                        $delivery_status = "delayed";
+                    }
+                    echo $delivery->update_delivery_status("status", $delivery_status, $delivery_data->delivery_id) ? 1 : 0;
                 }
-                echo $delivery->update_delivery_status("status", $delivery_status, $delivery_data->delivery_id) ? 1 : 0;
             }
         }
-        break;
         break;
 }

@@ -3,6 +3,8 @@ import React from "react";
 import { useFunction } from "../../context/FunctionContext";
 import TextInput from "./TextInput";
 import Button from "./Button";
+import { format } from "date-fns";
+import Badge from "../Fragments/Badge";
 
 export default function DeliveryForm({
   modalTitle,
@@ -29,7 +31,17 @@ export default function DeliveryForm({
             : "text"
         }
         id={label}
-        value={deliveryInformation[label]}
+        disabled={modalTitle === "view delivery information"}
+        value={
+          modalTitle === "view delivery information" ||
+          modalTitle === "edit delivery information"
+            ? ["departure_date", "target_arrival", "actual_arrival"].includes(
+                label
+              )
+              ? format(new Date(deliveryInformation[label]), "yyyy-MM-dd")
+              : deliveryInformation[label]
+            : deliveryInformation[label]
+        }
         withLabel={
           label.includes("name")
             ? capitalize(toTitle(label.replace(/_name/g, "")))
@@ -48,8 +60,8 @@ export default function DeliveryForm({
           })
         }
         classes="p-1 items-center justify-between"
-        labelClasses="whitespace-nowrap w-1/2 text-start"
-        inputClasses="bg-default rounded px-2 w-1/2 disabled:text-gray-500"
+        labelClasses="whitespace-nowrap w-1/2 text-start font-semibold"
+        inputClasses="bg-default rounded px-2 w-1/2 disabled:bg-transparent"
       />
     );
   };
@@ -64,6 +76,29 @@ export default function DeliveryForm({
     >
       <table>
         <tbody>
+          {modalTitle === "view delivery information" && (
+            <tr>
+              <td colSpan={2}>{generateField("dispatch_id")}</td>
+              <td colSpan={2}>
+                <div className="flex flex-row items-center gap-2">
+                  <p className="font-semibold">Delivery Status </p>
+                  <Badge
+                    type={
+                      deliveryInformation.status === "delayed"
+                        ? "warning"
+                        : deliveryInformation.status === "on time"
+                        ? "success"
+                        : deliveryInformation.status === "cancelled"
+                        ? "failure"
+                        : "default"
+                    }
+                    message={deliveryInformation.status}
+                    className="w-fit p-1 text-[.8rem] font-semibold"
+                  />
+                </div>
+              </td>
+            </tr>
+          )}
           <tr>
             <td colSpan={2}>{generateField("location")}</td>
             <td colSpan={2}>{generateField("departure_date")}</td>
@@ -101,67 +136,89 @@ export default function DeliveryForm({
             <td colSpan={2}>{generateField("food_expense")}</td>
           </tr>
           <tr>
-            <td>
+            <td colSpan={4}>
               <hr />
             </td>
           </tr>
           <tr>
             <td className="font-semibold text-start text-[1.1rem]" colSpan={5}>
-              Select Sales Invoices
+              {modalTitle === "view delivery information"
+                ? "Sales Invoices"
+                : "Select Sales Invoices"}
             </td>
           </tr>
           <tr>
-            <div className="max-h-[125px] border-2 px-1 overflow-y-auto">
-              {salesInvoices.map((invoice, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-row items-center w-full"
-                  >
-                    <input
-                      type="checkbox"
-                      name="invoice"
-                      id={invoice.invoice_no}
-                      value={invoice.invoice_no}
-                      onChange={(e) => {
-                        let updatedList = [...selectedInvoices];
-                        if (e.target.checked) {
-                          updatedList.push(invoice);
-                        } else {
-                          updatedList = updatedList.filter((item) => item.sales_id != invoice.sales_id);
-                        }
-                        setSelectedInvoices(updatedList);
-                      }}
-                      className="peer/invoice hidden"
-                    />
-                    <label
-                      htmlFor={invoice.invoice_no}
-                      className="peer-checked/invoice:bg-gray-400 w-full text-start"
-                    >
-                      {invoice.invoice_no}
-                    </label>
-                  </div>
-                );
-              })}
-            </div>
+            {modalTitle === "view delivery information" ? (
+              <>
+                <ul className="border-2">
+                  {selectedInvoices.map((invoice, index) => {
+                    return <li key={index}>{invoice.invoice_no}</li>;
+                  })}
+                </ul>
+              </>
+            ) : (
+              <>
+                <div className="max-h-[125px] border-2 px-1 overflow-y-auto">
+                  {salesInvoices.map((invoice, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="flex flex-row items-center w-full"
+                      >
+                        <input
+                          type="checkbox"
+                          name="invoice"
+                          checked={selectedInvoices.find(
+                            (selectedInvoice) =>
+                              selectedInvoice.invoice_no === invoice.invoice_no
+                          )}
+                          id={invoice.invoice_no}
+                          value={invoice.invoice_no}
+                          onChange={(e) => {
+                            let updatedList = [...selectedInvoices];
+                            if (e.target.checked) {
+                              updatedList.push(invoice);
+                            } else {
+                              updatedList = updatedList.filter(
+                                (item) => item.sales_id != invoice.sales_id
+                              );
+                            }
+                            setSelectedInvoices(updatedList);
+                          }}
+                          className="peer/invoice hidden"
+                        />
+                        <label
+                          htmlFor={invoice.invoice_no}
+                          className="peer-checked/invoice:bg-gray-400 w-full text-start"
+                        >
+                          {invoice.invoice_no}
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </tr>
         </tbody>
       </table>
 
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          type="submit"
-          value={
-            modalTitle === "add delivery information" ? "Submit" : "Update"
-          }
-          className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
-        />
-        <Button
-          value="Cancel"
-          onClick={() => handleClose()}
-          className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
-        />
-      </div>
+      {!modalTitle.includes("view") && (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            type="submit"
+            value={
+              modalTitle === "add delivery information" ? "Submit" : "Update"
+            }
+            className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+          />
+          <Button
+            value="Cancel"
+            onClick={() => handleClose()}
+            className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
+          />
+        </div>
+      )}
     </form>
   );
 }
