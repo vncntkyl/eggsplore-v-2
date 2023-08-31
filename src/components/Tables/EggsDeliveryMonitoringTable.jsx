@@ -85,6 +85,8 @@ export default function EggsDeliveryMonitoringTable({
                       <span>
                         {item.actual_arrival
                           ? format(new Date(item.actual_arrival), "MMM d, yyyy")
+                          : item.status === "cancelled"
+                          ? "N/A"
                           : "---"}
                       </span>
                       {item.status === "pending" && (
