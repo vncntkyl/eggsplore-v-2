@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   ChickenManagement,
   EggProduction,
@@ -19,6 +17,6 @@ export default function StaffRoutes({ panel, building }) {
     case "Feeds Management":
       return <FeedsManagement building={building} />;
     case "Egg Segregation":
-      return <EggSegregation building={building}/>;
+      return <EggSegregation />;
   }
 }

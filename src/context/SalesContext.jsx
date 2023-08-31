@@ -149,6 +149,19 @@ const retrieveSalesSummaryReport = async (st, en) => {
     return e.message;
   }
 };
+const updateSalesInvoice = async (sales_data) => {
+  try {
+    const salesInformation = {
+      data: sales_data,
+    };
+    const response = await axios.put(url.manageSalesURL, salesInformation);
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 const updateSalesDeliveryInvoice = async (sales_id, dispatch_id) => {
   try {
     const salesInformation = {
@@ -184,6 +197,7 @@ export const values = {
   retrieveEggsSold,
   insertSalesInvoice,
   retrieveSalesInvoice,
+  updateSalesInvoice,
   retrieveLatestInvoice,
   retrieveSalesOverview,
   getInvoicesForDelivery,

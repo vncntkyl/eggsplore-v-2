@@ -54,4 +54,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 break;
         }
         break;
+    case "PUT":
+        $sales_data = json_decode(file_get_contents('php://input'));
+        if (isset($sales_data->data)) {
+            $data = $sales_data->data;
+            echo $sales->updateSalesInvoice($data) ? 1 : 0;
+        } else {
+            echo 1;
+        }
+        break;
 }

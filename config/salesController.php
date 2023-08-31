@@ -60,6 +60,64 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
+    function updateSalesInvoice($data)
+    {
+        try {
+            $this->setStatement("UPDATE ep_sales_invoice SET date = ?, customer = ?, location = ?, amount = ? WHERE sales_id = ?");
+            if ($this->statement->execute([
+                $data->date,
+                $data->customer,
+                $data->location,
+                $data->amount,
+                $data->sales_id
+            ])) {
+                $status = array();
+                $sales_id = $data->sales_id;
+
+                $invoiceItems = $this->retrieveInvoiceItems($sales_id);
+
+                foreach ($invoiceItems as $invoiceItem) {
+                    $itemExists = false;
+                    foreach ($data->items as $item) {
+                        if (isset($item->item_id) && $invoiceItem->item_id == $item->item_id) {
+                            $itemExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!$itemExists) {
+                        //delete
+                        if ($this->deleteInvoiceItem($invoiceItem->item_id)) {
+                            array_push($status, 1);
+                        } else {
+                            array_push($status, 0);
+                        }
+                    }
+                }
+                foreach ($data->items as $item) {
+                    if (!isset($item->item_id)) {
+                        //insert
+                        if ($this->insertInvoiceItem($sales_id, str_replace("_", " ", $item->item_name), $item->quantity, $item->price, $item->total_amount)) {
+                            array_push($status, 1);
+                        } else {
+                            array_push($status, 0);
+                        }
+                    } else {
+                        //update   
+                        if ($this->updateInvoiceItem($item)) {
+                            array_push($status, 1);
+                        } else {
+                            array_push($status, 0);
+                        }
+                    }
+                }
+
+                return !in_array(0, $status);
+            }
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
     function insertInvoiceItem($sales_id, $item_name, $qty, $price, $amount)
     {
         try {
@@ -93,6 +151,30 @@ class Sales extends Controller
                 $this->statement->execute([$sales_id]);
                 return $this->statement->fetchAll();
             }
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function updateInvoiceItem($data)
+    {
+        try {
+            $this->setStatement("UPDATE ep_sales_items SET item_name = ?, quantity = ?, price = ?, total_amount = ? WHERE item_id = ?");
+            return $this->statement->execute([
+                $data->item_name,
+                $data->quantity,
+                $data->price,
+                $data->total_amount,
+                $data->item_id
+            ]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function deleteInvoiceItem($item_id)
+    {
+        try {
+            $this->setStatement("DELETE FROM ep_sales_items WHERE item_id = ?");
+            return $this->statement->execute([$item_id]);
         } catch (PDOException $e) {
             $this->getError($e);
         }

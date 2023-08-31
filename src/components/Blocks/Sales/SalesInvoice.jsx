@@ -44,6 +44,7 @@ export default function SalesInvoice() {
     retrieveLatestInvoice,
     retrieveEggClasifications,
     insertSalesInvoice,
+    updateSalesInvoice,
     retrieveItems,
     getLocation,
   } = useAuth();
@@ -107,21 +108,52 @@ export default function SalesInvoice() {
   };
   const handleUpdate = async (e) => {
     e.preventDefault();
+    const data = { ...selectedInvoice, items: salesItems };
+    const response = await updateSalesInvoice(data);
+    console.log(response);
+    // setModalTitle(null);
+    if (response === 1) {
+      toggleAlert({
+        type: "success",
+        title: "Invoice Update Success",
+        message: "Successfully updated invoice.",
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Invoice Update Error",
+        message:
+          "There has been an error on updating invoice. Please try again.",
+        show: true,
+      });
+    }
+    doRefresh((count) => (count = count + 1));
   };
 
   const handleItemChange = (e, key, max = null) => {
     const value = e.target.value;
     const id = e.target.id;
-    const updatedItems = [...items];
+    let updatedItems = [...items];
+    if (modalTitle === "edit sales invoice") {
+      updatedItems = [...salesItems];
+    }
     switch (id) {
       case "item":
-        updatedItems[key][id] = value;
+        {
+          if (modalTitle === "edit sales invoice") {
+            updatedItems[key].item_name = value;
+          } else {
+            updatedItems[key][id] = value;
+          }
+        }
         break;
       case "quantity":
         updatedItems[key][id] = parseInt(value);
         break;
       case "price":
       case "total":
+      case "total_amount":
         updatedItems[key][id] = parseFloat(value);
         break;
     }
@@ -132,25 +164,50 @@ export default function SalesInvoice() {
         updatedItems[key].price * updatedItems[key].quantity
       );
       updatedItems[key].total = product;
-      const totalSum = items.reduce((sum, item) => sum + item.total, 0);
-      setSalesInvoice((current) => {
-        return {
-          ...current,
-          amount: totalSum,
-        };
-      });
+      updatedItems[key].total_amount = product;
+      let totalSum = items.reduce((sum, item) => sum + item.total, 0);
+      if (modalTitle === "edit sales invoice") {
+        totalSum = salesItems.reduce(
+          (sum, item) => sum + parseFloat(item.total_amount),
+          0
+        );
+        setInvoice((current) => {
+          return {
+            ...current,
+            amount: totalSum,
+          };
+        });
+      } else {
+        setSalesInvoice((current) => {
+          return {
+            ...current,
+            amount: totalSum,
+          };
+        });
+      }
     }
     if (updatedItems[key].quantity <= max) {
-      setItems(updatedItems);
+      if (modalTitle === "edit sales invoice") {
+        setSalesItems(updatedItems);
+      } else {
+        setItems(updatedItems);
+      }
     }
   };
   const deleteItem = (key, eggType) => {
     const eggs = [...selectedEggs];
     eggs.splice(eggs.indexOf(eggType), 1);
     setSelectedEggs(eggs);
-    const updatedItems = [...items];
+    let updatedItems = [...items];
+    if (modalTitle === "edit sales invoice") {
+      updatedItems = [...salesItems];
+    }
     updatedItems.splice(key, 1);
-    setItems(updatedItems);
+    if (modalTitle === "edit sales invoice") {
+      setSalesItems(updatedItems);
+    } else {
+      setItems(updatedItems);
+    }
   };
   const formatCurrency = (amount) => {
     const peso = Intl.NumberFormat("en-PH", {
@@ -191,9 +248,13 @@ export default function SalesInvoice() {
     const realtimeData = setInterval(setup, 1000);
 
     const getItems = async () => {
-      if (modalTitle === "edit sales invoice") {
+      if (
+        modalTitle === "edit sales invoice" ||
+        modalTitle === "view sales invoice"
+      ) {
         const itemsData = await retrieveItems(salesId);
         setSalesItems(itemsData);
+        setSelectedEggs(itemsData.map((item) => item.item_name));
       }
     };
     getItems();
@@ -478,27 +539,54 @@ export default function SalesInvoice() {
                       handleItemChange={handleItemChange}
                       eggList={eggs}
                       deleteItem={deleteItem}
-                      itemLength={items.length}
+                      itemLength={
+                        modalTitle === "edit sales invoice"
+                          ? salesItems && salesItems.length
+                          : items.length
+                      }
                       selectedEggs={selectedEggs}
                       setSelectedEggs={setSelectedEggs}
                     />
                   </div>
                   <hr />
+
                   <div className="grid grid-cols-[repeat(5,1fr)] items-center px-1 pr-5 gap-1">
-                    {items.length < eggs.length && (
-                      <Button
-                        value="Add Item"
-                        onClick={() =>
-                          setItems((current) => {
-                            return [
-                              ...current,
-                              { item: "", quantity: 1, price: 0, total: 0 },
-                            ];
-                          })
-                        }
-                        className="bg-tertiary p-1 px-2 rounded-md flex justify-center"
-                      />
-                    )}
+                    {modalTitle === "edit sales invoice"
+                      ? salesItems &&
+                        salesItems.length < eggs.length && (
+                          <Button
+                            value="Add Item"
+                            onClick={() =>
+                              setSalesItems((current) => {
+                                return [
+                                  ...current,
+                                  {
+                                    sales_id: selectedInvoice.sales_id,
+                                    item_name: "",
+                                    quantity: 1,
+                                    price: 0,
+                                    total_amount: 0,
+                                  },
+                                ];
+                              })
+                            }
+                            className="bg-tertiary p-1 px-2 rounded-md flex justify-center"
+                          />
+                        )
+                      : items.length < eggs.length && (
+                          <Button
+                            value="Add Item"
+                            onClick={() =>
+                              setItems((current) => {
+                                return [
+                                  ...current,
+                                  { item: "", quantity: 1, price: 0, total: 0 },
+                                ];
+                              })
+                            }
+                            className="bg-tertiary p-1 px-2 rounded-md flex justify-center"
+                          />
+                        )}
                     <p className="col-[4] text-end font-semibold">
                       Total Amount:
                     </p>
@@ -506,7 +594,11 @@ export default function SalesInvoice() {
                       {Intl.NumberFormat("en-PH", {
                         style: "currency",
                         currency: "PHP",
-                      }).format(salesInvoice.amount)}
+                      }).format(
+                        modalTitle === "edit sales invoice"
+                          ? selectedInvoice.amount
+                          : salesInvoice.amount
+                      )}
                     </span>
                   </div>
                   <div className="flex items-center justify-end gap-2">

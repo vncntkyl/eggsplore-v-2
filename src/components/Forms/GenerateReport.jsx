@@ -155,7 +155,9 @@ export default function GenerateReport({
 
     const width =
       doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-    let marginLeft, marginRight;
+    const height =
+      doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+    let margin;
     doc.autoTable({
       startY: 48,
       styles: {
@@ -169,8 +171,7 @@ export default function GenerateReport({
       head: [tableHeader],
       body: record,
       didDrawPage: (data) => {
-        marginLeft = data.settings.margin.left;
-        marginRight = data.settings.margin.right;
+        margin = data.settings.margin.left;
 
         doc.text("Edwin and Lina Poultry Farm", width / 2, 10, {
           align: "center",
@@ -185,21 +186,21 @@ export default function GenerateReport({
 
         doc.text(
           "Date: " + format(new Date(invoiceData.date), "MMMM dd, yyyy"),
-          marginLeft,
+          margin,
           27,
           {
             align: "left",
             baseline: "top",
           }
         );
-        doc.text("Customer Name: " + invoiceData.customer, marginLeft, 34, {
+        doc.text("Customer Name: " + invoiceData.customer, margin, 34, {
           align: "left",
           baseline: "top",
         });
         doc.text(
           "Invoice No: " + invoiceData.invoice_no,
           width -
-            marginRight -
+            margin -
             doc.getTextWidth("Invoice No: " + invoiceData.invoice_no),
           27,
           {
@@ -207,7 +208,7 @@ export default function GenerateReport({
             baseline: "top",
           }
         );
-        doc.text("Shipping Address: " + invoiceData.location, marginRight, 41, {
+        doc.text("Shipping Address: " + invoiceData.location, margin, 41, {
           align: "left",
           baseline: "top",
         });
@@ -215,20 +216,21 @@ export default function GenerateReport({
         doc.text(
           "Total Amount: " + formatCurrency(invoiceData.amount),
           width -
-            marginLeft -
+            margin -
             doc.getTextWidth(
               "Total Amount: " + formatCurrency(invoiceData.amount)
             ),
-          doc.autoTable.previous.finalY + 10,
+          height / 2 + 10,
           {
             align: "left",
             baseline: "top",
           }
         );
+
         doc.text(
           "If you have any questions regarding this invoice, please contact [mobile number]",
           width / 2,
-          doc.autoTable.previous.finalY + 30,
+          height / 2 + 30,
           { align: "center", baseline: "bottom" }
         );
         doc.save(fileName);

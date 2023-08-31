@@ -62,9 +62,11 @@ export default function SalesItemsTable({
                           id="item"
                           className="bg-default rounded p-1 px-2 w-full disabled:text-gray-500"
                           onChange={(e) => {
-                            if (selectedEggs.includes(label.item)) {
+                            const egg = label.item || label.item_name;
+                            console.log(e.target.value, e.target.id, key);
+                            if (selectedEggs.includes(egg)) {
                               const eggs = [...selectedEggs];
-                              eggs.splice(eggs.indexOf(label.item), 1);
+                              eggs.splice(eggs.indexOf(egg), 1);
                               eggs.push(e.target.value);
                               setSelectedEggs(eggs);
                             } else {
@@ -75,7 +77,11 @@ export default function SalesItemsTable({
                             handleItemChange(e, key);
                           }}
                         >
-                          <option value="" selected={!label.item} disabled>
+                          <option
+                            value=""
+                            selected={edit ? !label.item_name : !label.item}
+                            disabled
+                          >
                             Select Egg Type
                           </option>
                           {eggList.map((type, index) => {
@@ -104,8 +110,8 @@ export default function SalesItemsTable({
                         name="price"
                         type="number"
                         id="price"
-                        step={0.25}
-                        disabled={!label.item}
+                        step={0.01}
+                        disabled={edit ? !label.item_name : !label.item}
                         classes="p-1 items-center justify-center w-[100px]"
                         inputClasses="bg-default rounded px-2  text-end disabled:text-gray-500"
                         value={label.price}
@@ -117,12 +123,17 @@ export default function SalesItemsTable({
                         name="quantity"
                         type="number"
                         id="quantity"
-                        disabled={!label.item}
+                        disabled={edit ? !label.item_name : !label.item}
                         max={
-                          label.item &&
-                          eggList.find(
-                            (egg) => egg.egg_type_name === label.item
-                          ).egg_type_total_count
+                          edit
+                            ? label.item_name &&
+                              eggList.find(
+                                (egg) => egg.egg_type_name === label.item_name
+                              ).egg_type_total_count
+                            : label.item_name &&
+                              eggList.find(
+                                (egg) => egg.egg_type_name === label.item
+                              ).egg_type_total_count
                         }
                         classes="p-1 items-center justify-center w-[100px]"
                         inputClasses="bg-default rounded px-2 text-end  disabled:text-gray-500"
@@ -131,10 +142,16 @@ export default function SalesItemsTable({
                           handleItemChange(
                             e,
                             key,
-                            label.item &&
-                              eggList.find(
-                                (egg) => egg.egg_type_name === label.item
-                              ).egg_type_total_count
+                            edit
+                              ? label.item_name &&
+                                  eggList.find(
+                                    (egg) =>
+                                      egg.egg_type_name === label.item_name
+                                  ).egg_type_total_count
+                              : label.item_name &&
+                                  eggList.find(
+                                    (egg) => egg.egg_type_name === label.item
+                                  ).egg_type_total_count
                           )
                         }
                       />
@@ -144,11 +161,11 @@ export default function SalesItemsTable({
                         name="total"
                         type="number"
                         id="total"
-                        step={0.25}
+                        step={0.01}
                         disabled
                         classes="p-1 items-center justify-center w-[100px]"
                         inputClasses="bg-default rounded px-2 text-end disabled:text-gray-500"
-                        value={label.total}
+                        value={edit ? label.total_amount : label.total}
                         onChange={(e) => handleItemChange(e, key)}
                       />
                     </td>
@@ -157,7 +174,13 @@ export default function SalesItemsTable({
                         <Button
                           className="bg-red-light p-1 rounded"
                           value={<FaMinusSquare className="text-white" />}
-                          onClick={() => deleteItem(key, label.item)}
+                          onClick={() => {
+                            if(edit){
+                              deleteItem(key, label.item_name)
+                            }else{
+                              deleteItem(key, label.item)
+                            }
+                          }}
                         />
                       </td>
                     )}

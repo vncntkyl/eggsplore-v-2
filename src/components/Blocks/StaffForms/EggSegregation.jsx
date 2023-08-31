@@ -6,15 +6,13 @@ import { useAuth } from "../../../context/authContext";
 import { Alert, Modal } from "../../Containers";
 import EggSegregationTable from "../../Tables/EggSegregationTable";
 // eslint-disable-next-line react/prop-types
-export default function EggSegregation({ building }) {
+export default function EggSegregation() {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
-  const [currentBuilding, setCurrentBuilding] = useState([]);
   const [eggProductionList, setEggProductionList] = useState([]);
   const [selectedProduction, setSelectedProduction] = useState(null);
   const [eggData, setEggData] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
-    building_number: 0,
     unsorted_egg_production: 0,
     no_weight: 0,
     pewee: 0,
@@ -37,7 +35,6 @@ export default function EggSegregation({ building }) {
   const { toTitle, capitalize } = useFunction();
   const {
     getCurrentUser,
-    getBuilding,
     retrieveEggsForSegregation,
     insertEggSegregation,
   } = useAuth();
@@ -77,9 +74,7 @@ export default function EggSegregation({ building }) {
 
   const handleSubmit = async () => {
     setModalTitle(null);
-    const building_id = document.querySelector("#building_id");
     const data = { ...eggData };
-    data.building_number = parseInt(building_id.value);
     data.production_id = selectedProduction;
     data.user_id = parseInt(JSON.parse(getCurrentUser()).user_id);
     data.log_date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
@@ -113,7 +108,6 @@ export default function EggSegregation({ building }) {
     setSelectedProduction(null);
     setEggData({
       date: format(new Date(), "yyyy-MM-dd"),
-      building_number: 0,
       unsorted_egg_production: 0,
       no_weight: 0,
       pewee: 0,
@@ -132,13 +126,11 @@ export default function EggSegregation({ building }) {
   useEffect(() => {
     const user = JSON.parse(getCurrentUser());
     const setup = async () => {
-      const response = await getBuilding(building);
-      setCurrentBuilding(response);
       const eggListResponse = await retrieveEggsForSegregation(user.user_id);
       setEggProductionList(eggListResponse);
     };
     setup();
-  }, [refresh, building]);
+  }, [refresh]);
 
   return (
     <>
@@ -157,27 +149,7 @@ export default function EggSegregation({ building }) {
                 {Object.keys(eggData)
                   .splice(0, 7)
                   .map((eggKey, index) => {
-                    return eggKey === "building_number" ? (
-                      <>
-                        <TextInput
-                          type="hidden"
-                          value={currentBuilding.id}
-                          id="building_id"
-                        />
-                        <TextInput
-                          id={eggKey}
-                          key={index}
-                          withLabel={capitalize(toTitle(eggKey)) + ":"}
-                          value={currentBuilding.number}
-                          type="number"
-                          disabled={true}
-                          orientation="row"
-                          classes="p-1 items-center "
-                          labelClasses="whitespace-nowrap w-full text-start"
-                          inputClasses="w-full rounded px-2"
-                        />
-                      </>
-                    ) : eggKey === "unsorted_egg_production" ? (
+                    return eggKey === "unsorted_egg_production" ? (
                       <div key={index} className="flex flex-col gap-2">
                         <div className="flex gap-2 p-1 items-center">
                           <label

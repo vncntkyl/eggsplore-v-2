@@ -267,7 +267,7 @@ class Egg extends Controller
     }
     //EGG SEGREGATION FUNCTIONS
 
-    function retrieveEggsForSegregation($staff_id)
+    function retrieveEggsForSegregation()
     {
         try {
             $this->setStatement("SELECT
@@ -279,10 +279,10 @@ class Egg extends Controller
         LEFT JOIN
             ep_egg_segregation AS es ON ep.batch_id = es.production_id
         WHERE
-            es.production_id IS NULL AND ep.user_id = ?
+            es.production_id IS NULL
         ORDER BY
             ep.log_date DESC");
-            $this->statement->execute([$staff_id]);
+            $this->statement->execute([]);
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);

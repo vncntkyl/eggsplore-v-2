@@ -109,12 +109,11 @@ const updateEggProduction = async (eggData) => {
   }
 };
 
-const retrieveEggsForSegregation = async (user_id) => {
+const retrieveEggsForSegregation = async () => {
   try {
     const response = await axios.get(url.manageEggsURL, {
       params: {
         retrieve: "unsorted_egg_production",
-        user_id: user_id,
       },
     });
     if (response.status === 200) {

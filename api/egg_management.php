@@ -12,7 +12,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $filter = isset($_GET['filter']) ? (gettype($_GET['filter']) == "object" ? json_decode($_GET['filter']) : $_GET['filter']) : "all";
             echo json_encode($egg->retrieveEggProduction($filter));
         } else if ($retrieve_type === "unsorted_egg_production") {
-            echo json_encode($egg->retrieveEggsForSegregation($_GET['user_id']));
+            echo json_encode($egg->retrieveEggsForSegregation());
         } else if ($retrieve_type === "segregation_logs") {
             echo json_encode($egg->retrieveEggSegregationLogs($_GET['user_id']));
         } else if ($retrieve_type === "egg_classifications") {

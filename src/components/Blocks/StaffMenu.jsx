@@ -99,12 +99,12 @@ export default function StaffMenu() {
       <div
         className={classNames(
           "flex min-h-[55vh] rounded-md shadow-md w-full",
-          !currentBldg || !activeForm
+          (!activeForm || activeForm !== "Egg Segregation") && !currentBldg
             ? "bg-default-dark items-center justify-center"
             : "bg-white"
         )}
       >
-        {!currentBldg || !activeForm ? (
+        {(!activeForm || activeForm !== "Egg Segregation") && !currentBldg ? (
           <span className="text-[1.1rem] text-gray-600 font-semibold">
             {!currentBldg && !activeForm
               ? "Please select from the menu and building"
