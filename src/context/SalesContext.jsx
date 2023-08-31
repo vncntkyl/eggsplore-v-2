@@ -133,6 +133,21 @@ const retrieveSalesInvoiceForDispatch = async () => {
     return e.message;
   }
 };
+const retrieveSalesInvoiceForUpdate = async (deliveryID) => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "edit_invoices",
+        delivery_id: deliveryID
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 const retrieveSalesSummaryReport = async (st, en) => {
   try {
     const response = await axios.get(url.manageSalesURL, {
@@ -162,20 +177,7 @@ const updateSalesInvoice = async (sales_data) => {
     console.log(e.message);
   }
 };
-const updateSalesDeliveryInvoice = async (sales_id, dispatch_id) => {
-  try {
-    const salesInformation = {
-      sales_id: sales_id,
-      dispatch_id: dispatch_id,
-    };
-    const response = await axios.put(url.manageSalesURL, salesInformation);
-    if (response.status === 200) {
-      return response.data;
-    }
-  } catch (e) {
-    console.log(e.message);
-  }
-};
+
 const getInvoicesForDelivery = async (delivery_id) => {
   try {
     const response = await axios.get(url.manageSalesURL, {
@@ -202,7 +204,7 @@ export const values = {
   retrieveSalesOverview,
   getInvoicesForDelivery,
   retrieveDeliveryInvoice,
-  updateSalesDeliveryInvoice,
   retrieveSalesSummaryReport,
+  retrieveSalesInvoiceForUpdate,
   retrieveSalesInvoiceForDispatch,
 };

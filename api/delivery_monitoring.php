@@ -29,7 +29,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $delivery_id = $delivery->insert_delivery_monitoring($delivery_list);
 
                 foreach ($invoice_list as $invoice) {
-                    if ($delivery->updateSalesDeliveryInvoice($delivery_id, $invoice)) {
+                    if ($delivery->insertSalesDeliveryInvoice($delivery_id, $invoice)) {
                         array_push($status, 1);
                     } else {
                         array_push($status, 0);
@@ -42,6 +42,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case "PUT":
         $delivery_data = json_decode(file_get_contents('php://input'));
         if ($delivery_data->update) {
+            $invoices = $delivery_data->invoices;
             $data = $delivery_data->deliveryData;
             $delivery_id = $data->delivery_id;
             $delivery_list = array();
@@ -56,10 +57,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 array_push($delivery_list, $del);
             }
             array_push($delivery_list, intval($delivery_id));
-            
-            if($delivery->update_delivery_information($delivery_list)){
-                echo 1;
-            }else{
+
+            if ($delivery->update_delivery_information($delivery_list)) {
+                echo $delivery->updateSalesDeliveryInvoice($delivery_id, $invoices) ? 1 : 0;
+            } else {
                 echo 0;
             }
         } else {

@@ -23,7 +23,6 @@ export default function EggsDeliveryMonitoringTable({
     if (filter === "range") return;
     const setup = async () => {
       const response = await retrieveDeliveryInformation(filter);
-      console.log(response);
       setDeliveryLogs(response);
       setLoading(false);
     };

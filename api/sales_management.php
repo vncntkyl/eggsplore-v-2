@@ -37,6 +37,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
             case "dispatch_invoices":
                 echo json_encode($sales->retrieveInvoicesForDelivery($_GET['delivery_id']));
                 break;
+            case "edit_invoices":
+                echo json_encode($sales->retrieveAssignedSalesInvoices($_GET['delivery_id']));
+                break;
             case "sales_overview":
                 echo json_encode($sales->retrieveEggSalesOverview());
                 break;
@@ -59,8 +62,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
         if (isset($sales_data->data)) {
             $data = $sales_data->data;
             echo $sales->updateSalesInvoice($data) ? 1 : 0;
-        } else {
-            echo 1;
         }
         break;
 }

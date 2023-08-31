@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import classNames from "classnames";
+import { format } from "date-fns";
 
 export default function TextInput({
   id,
@@ -17,7 +18,8 @@ export default function TextInput({
   name = null,
   step = 1,
   max,
-  wfull = "w-full"
+  min = 0,
+  wfull = "w-full",
 }) {
   return (
     <div className={classNames("flex gap-2", `flex-${orientation}`, classes)}>
@@ -31,7 +33,7 @@ export default function TextInput({
         value={value}
         type={type}
         id={id}
-        min={0}
+        min={type === "date" ? min : 0}
         max={max}
         step={step}
         placeholder={textHint}

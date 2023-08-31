@@ -1,5 +1,6 @@
 <?php
 require_once 'authController.php';
+require_once 'salesController.php';
 class Delivery extends Controller
 {
     function retrieve_delivery_monitoring($filter = "all")
@@ -47,7 +48,7 @@ class Delivery extends Controller
             VALUES (@next_dispatch_id, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
             $this->setStatement($sqlStatement);
             $this->statement->execute($delivery_data);
-            
+
             $sqlStatement = "SELECT delivery_id FROM ep_delivery_monitoring ORDER BY log_date DESC LIMIT 1";
             $this->setStatement($sqlStatement);
             $this->statement->execute();
@@ -76,11 +77,54 @@ class Delivery extends Controller
             $this->getError($e);
         }
     }
-    function updateSalesDeliveryInvoice($delivery_id, $sales_id)
+    function insertSalesDeliveryInvoice($delivery_id, $sales_id)
     {
         try {
             $this->setStatement("UPDATE ep_sales_invoice SET delivery_id = ? WHERE sales_id = ?");
             return $this->statement->execute([$delivery_id, $sales_id]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function deleteSalesDeliveryInvoice($sales_id)
+    {
+        try {
+            $this->setStatement("UPDATE ep_sales_invoice SET delivery_id = NULL WHERE sales_id = ?");
+            return $this->statement->execute([$sales_id]);
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function updateSalesDeliveryInvoice($delivery_id, $invoices)
+    {
+        $sales = new Sales();
+        $status = array();
+        try {
+            $deliveryInvoices = $sales->retrieveInvoicesForDelivery($delivery_id);
+            foreach ($deliveryInvoices as $deliveryInvoice) {
+                $itemExists = false;
+                foreach ($invoices as $invoice) {
+                    if (isset($invoice->sales_id) && $deliveryInvoice->sales_id == $invoice->sales_id) {
+                        $itemExists = true;
+                        break;
+                    }
+                }
+                if (!$itemExists) {
+                    if ($this->deleteSalesDeliveryInvoice($deliveryInvoice->sales_id)) {
+                        array_push($status, 1);
+                    } else {
+                        array_push($status, 0);
+                    }
+                }
+            }
+            foreach ($invoices as $invoice) {
+                if ($this->insertSalesDeliveryInvoice($delivery_id, $invoice->sales_id)) {
+                    array_push($status, 1);
+                } else {
+                    array_push($status, 0);
+                }
+            }
+            return !in_array(0, $status);
         } catch (PDOException $e) {
             $this->getError($e);
         }

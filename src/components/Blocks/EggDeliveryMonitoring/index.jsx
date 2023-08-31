@@ -40,7 +40,7 @@ export default function EggDeliveryMonitoring() {
   const {
     insertDeliveryInformation,
     updateDeliveryStatus,
-    retrieveSalesInvoice,
+    retrieveSalesInvoiceForUpdate,
     getInvoicesForDelivery,
     retrieveSalesInvoiceForDispatch,
     updateDeliveryInformation,
@@ -128,7 +128,10 @@ export default function EggDeliveryMonitoring() {
   };
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const response = await updateDeliveryInformation(deliveryInformation, selectedInvoices);
+    const response = await updateDeliveryInformation(
+      deliveryInformation,
+      selectedInvoices
+    );
     console.log(response);
     setModalTitle(null);
     if (response === 1) {
@@ -148,7 +151,6 @@ export default function EggDeliveryMonitoring() {
       });
     }
     doRefresh((count) => (count = count + 1));
-   
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -191,10 +193,13 @@ export default function EggDeliveryMonitoring() {
 
   useEffect(() => {
     const setup = async () => {
-      const invoices = await retrieveSalesInvoice();
+      const invoices = await retrieveSalesInvoiceForUpdate(
+        deliveryInformation.delivery_id
+      );
       const response = await getInvoicesForDelivery(
         deliveryInformation.delivery_id
       );
+      console.log(invoices);
       setSalesInvoices(invoices);
       setSelectedInvoices(
         response.map((sales) => ({
