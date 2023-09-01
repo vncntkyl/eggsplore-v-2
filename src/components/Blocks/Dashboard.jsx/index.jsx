@@ -20,6 +20,7 @@ export default function Dashboard() {
     type: "",
   });
   const [additionalData, setAdditionalData] = useState([]);
+  const [eggClassifications, setEggClassifications] = useState([]);
   const { capitalize, toTitle } = useFunction();
   const {
     getMaintenanceReport,
@@ -195,182 +196,216 @@ export default function Dashboard() {
       {/* CARDS */}
       <DashboardCards />
       {/* GRAPHS */}
-      <DashboardGraphs />
+      <DashboardGraphs
+        setModal={setModalTitle}
+        setEggClassifications={setEggClassifications}
+      />
       {modalTitle && (
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
-          className="min-w-[550px]"
+          className={
+            modalTitle === "egg classifications"
+              ? "min-w-[300px]"
+              : "min-w-[550px]"
+          }
           content={
-            <>
-              <form onSubmit={handleSubmit} className="w-full">
-                <div className="pb-2">
-                  <TextInput
-                    id="name"
-                    withLabel="Name (optional)"
-                    value={reportConfig.filename}
-                    onChange={(e) => {
-                      setReportConfig((current) => {
-                        return {
-                          ...current,
-                          filename: e.target.value,
-                        };
-                      });
-                    }}
-                    classes="p-1 items-center justify-between"
-                    labelClasses="whitespace-nowrap text-start w-1/2"
-                    inputClasses="bg-default rounded px-2 w-1/2"
-                  />
-                  <div className="flex flex-row gap-4 items-center">
-                    <label className="w-full text-start">Select Date</label>
-                    {Object.keys(dateRange).map((label, index) => {
+            modalTitle === "egg classifications" ? (
+              <>
+                <table className="w-full rounded-md overflow-hidden">
+                  <thead>
+                    <tr className=" bg-main p-2 text-white">
+                      <th className="p-1">Type</th>
+                      <th className="p-1">Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {eggClassifications.map((type, index) => {
                       return (
-                        <TextInput
-                          key={index}
-                          name={label}
-                          type="date"
-                          value={dateRange[label]}
-                          classes="p-1 items-center justify-between"
-                          labelClasses="whitespace-nowrap text-start"
-                          inputClasses="bg-default rounded px-2"
-                          onChange={(e) => {
-                            setReportConfig((current) => {
-                              return {
-                                ...current,
-                                category: "",
-                              };
-                            });
-                            setRange((current) => {
-                              return { ...current, [label]: e.target.value };
-                            });
-                          }}
-                        />
+                        <tr key={index} className="odd:bg-default">
+                          <td className="p-1 px-2">
+                            {capitalize(type.egg_type_name)}
+                          </td>
+                          <td className="p-1 px-2">
+                            {type.egg_type_total_count}
+                          </td>
+                        </tr>
                       );
                     })}
-                  </div>
-                  <div className="flex p-1 items-center justify-between gap-4">
-                    <label htmlFor="category" className="text-start w-1/2">
-                      Category
-                    </label>
-                    <select
-                      id="category"
-                      disabled={
-                        Object.values(dateRange).filter((item) => item !== "")
-                          .length !== 2
-                      }
-                      className="bg-default rounded p-1 px-2 w-full"
-                      onChange={(e) => handleDataChange(e)}
-                    >
-                      <option
-                        value=""
-                        disabled
-                        selected={reportConfig.category === ""}
-                      >
-                        select category
-                      </option>
-                      {[
-                        "egg production",
-                        "maintenance cost",
-                        "egg sales performance",
-                      ].map((opt, index) => {
-                        return (
-                          <option
-                            key={index}
-                            value={opt}
-                            selected={reportConfig.category === opt}
-                          >
-                            {capitalize(opt)}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
-                  <div className="flex p-1 items-center justify-between gap-4">
-                    <label htmlFor="type" className="text-start w-1/2">
-                      Export as
-                    </label>
-                    <select
-                      id="type"
-                      className="bg-default rounded p-1 px-2 w-full"
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <>
+                <form onSubmit={handleSubmit} className="w-full">
+                  <div className="pb-2">
+                    <TextInput
+                      id="name"
+                      withLabel="Name (optional)"
+                      value={reportConfig.filename}
                       onChange={(e) => {
                         setReportConfig((current) => {
                           return {
                             ...current,
-                            type: e.target.value,
+                            filename: e.target.value,
                           };
                         });
                       }}
-                    >
-                      <option
-                        value=""
-                        disabled
-                        selected={reportConfig.type === ""}
+                      classes="p-1 items-center justify-between"
+                      labelClasses="whitespace-nowrap text-start w-1/2"
+                      inputClasses="bg-default rounded px-2 w-1/2"
+                    />
+                    <div className="flex flex-row gap-4 items-center">
+                      <label className="w-full text-start">Select Date</label>
+                      {Object.keys(dateRange).map((label, index) => {
+                        return (
+                          <TextInput
+                            key={index}
+                            name={label}
+                            type="date"
+                            value={dateRange[label]}
+                            classes="p-1 items-center justify-between"
+                            labelClasses="whitespace-nowrap text-start"
+                            inputClasses="bg-default rounded px-2"
+                            onChange={(e) => {
+                              setReportConfig((current) => {
+                                return {
+                                  ...current,
+                                  category: "",
+                                };
+                              });
+                              setRange((current) => {
+                                return { ...current, [label]: e.target.value };
+                              });
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="flex p-1 items-center justify-between gap-4">
+                      <label htmlFor="category" className="text-start w-1/2">
+                        Category
+                      </label>
+                      <select
+                        id="category"
+                        disabled={
+                          Object.values(dateRange).filter((item) => item !== "")
+                            .length !== 2
+                        }
+                        className="bg-default rounded p-1 px-2 w-full"
+                        onChange={(e) => handleDataChange(e)}
                       >
-                        select type
-                      </option>
-                      <option
-                        value="csv"
-                        selected={reportConfig.category === "csv"}
+                        <option
+                          value=""
+                          disabled
+                          selected={reportConfig.category === ""}
+                        >
+                          select category
+                        </option>
+                        {[
+                          "egg production",
+                          "maintenance cost",
+                          "egg sales performance",
+                        ].map((opt, index) => {
+                          return (
+                            <option
+                              key={index}
+                              value={opt}
+                              selected={reportConfig.category === opt}
+                            >
+                              {capitalize(opt)}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+                    <div className="flex p-1 items-center justify-between gap-4">
+                      <label htmlFor="type" className="text-start w-1/2">
+                        Export as
+                      </label>
+                      <select
+                        id="type"
+                        className="bg-default rounded p-1 px-2 w-full"
+                        onChange={(e) => {
+                          setReportConfig((current) => {
+                            return {
+                              ...current,
+                              type: e.target.value,
+                            };
+                          });
+                        }}
                       >
-                        CSV
-                      </option>
-                      <option
-                        value="pdf"
-                        selected={reportConfig.category === "pdf"}
-                      >
-                        PDF
-                      </option>
-                    </select>
+                        <option
+                          value=""
+                          disabled
+                          selected={reportConfig.type === ""}
+                        >
+                          select type
+                        </option>
+                        <option
+                          value="csv"
+                          selected={reportConfig.category === "csv"}
+                        >
+                          CSV
+                        </option>
+                        <option
+                          value="pdf"
+                          selected={reportConfig.category === "pdf"}
+                        >
+                          PDF
+                        </option>
+                      </select>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-end gap-2">
-                  {reportConfig.category !== "" &&
-                  reportConfig.type === "csv" &&
-                  reportData ? (
-                    <CSVLink
-                      filename={`${
-                        reportConfig.filename !== ""
-                          ? reportConfig.filename
-                          : capitalize(reportConfig.category)
-                      }.csv`}
-                      data={reportData}
-                      className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
-                    >
-                      Export
-                    </CSVLink>
-                  ) : reportConfig.category !== "" &&
-                    reportConfig.type === "pdf" &&
+                  <div className="flex items-center justify-end gap-2">
+                    {reportConfig.category !== "" &&
+                    reportConfig.type === "csv" &&
                     reportData ? (
-                    <GenerateReport
-                      closeModal={setModalTitle}
-                      dateCoverage={dateRange}
-                      additionalData={additionalData}
-                      tableHeader={reportData[0]}
-                      record={reportData.slice(1)}
-                      fileTitle={capitalize(reportConfig.category)}
-                      fileName={`${
-                        reportConfig.filename !== ""
-                          ? reportConfig.filename
-                          : capitalize(toTitle(reportConfig.category))
-                      }`}
-                      title="Export"
-                      className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
-                    />
-                  ) : (
+                      <CSVLink
+                        filename={`${
+                          reportConfig.filename !== ""
+                            ? reportConfig.filename
+                            : capitalize(reportConfig.category)
+                        }.csv`}
+                        data={reportData}
+                        className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                      >
+                        Export
+                      </CSVLink>
+                    ) : reportConfig.category !== "" &&
+                      reportConfig.type === "pdf" &&
+                      reportData ? (
+                      <GenerateReport
+                        closeModal={setModalTitle}
+                        dateCoverage={dateRange}
+                        additionalData={additionalData}
+                        tableHeader={reportData[0]}
+                        record={reportData.slice(1)}
+                        fileTitle={capitalize(reportConfig.category)}
+                        fileName={`${
+                          reportConfig.filename !== ""
+                            ? reportConfig.filename
+                            : capitalize(toTitle(reportConfig.category))
+                        }`}
+                        title="Export"
+                        className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                      />
+                    ) : (
+                      <Button
+                        value="Export"
+                        disabled
+                        className="p-1 px-2 rounded-md disabled:bg-gray-500 disabled:cursor-not-allowed"
+                      />
+                    )}
                     <Button
-                      value="Export"
-                      disabled
-                      className="p-1 px-2 rounded-md disabled:bg-gray-500 disabled:cursor-not-allowed"
+                      value="Cancel"
+                      onClick={() => handleClose()}
+                      className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
                     />
-                  )}
-                  <Button
-                    value="Cancel"
-                    onClick={() => handleClose()}
-                    className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
-                  />
-                </div>
-              </form>
-            </>
+                  </div>
+                </form>
+              </>
+            )
           }
         />
       )}

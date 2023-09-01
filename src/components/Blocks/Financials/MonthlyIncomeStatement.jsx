@@ -1,7 +1,9 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/authContext";
 import classNames from "classnames";
 import { useFunction } from "../../../context/FunctionContext";
+import { getYear } from "date-fns";
 export default function MonthlyIncomeStatement() {
   const { retrieveIncome } = useAuth();
   const [income, setIncome] = useState(null);
@@ -56,8 +58,8 @@ export default function MonthlyIncomeStatement() {
           <span>
             {Intl.DateTimeFormat("en-PH", {
               month: "long",
-            }).format(new Date(0, income.current_month - 1))}
-            {" " + income.current_year}
+            }).format(new Date())}
+            {" " + getYear(new Date())}
           </span>{" "}
           <span>Summary</span>
         </p>
@@ -153,7 +155,7 @@ export default function MonthlyIncomeStatement() {
                   title={capitalize(toTitle(label))}
                   indent
                   number={income[`total_${label}`]}
-                  className={'pr-8'}
+                  className={"pr-8"}
                 />
               );
             }

@@ -16,12 +16,13 @@ import { AiFillInfoCircle } from "react-icons/ai";
 import { MdOpenInNew } from "react-icons/md";
 import { format, getYear } from "date-fns";
 
-export default function DashboardGraphs() {
+export default function DashboardGraphs({ setEggClassifications, setModal }) {
   const [eggData, setEggData] = useState([]);
   const [eggSales, setEggSales] = useState([]);
   const [chickenMaintenance, setMaintenance] = useState([]);
   const [eggDataSummary, setSummary] = useState([]);
   const [eggTypesTotal, setEggTypesTotal] = useState([]);
+
   const {
     retrieveEggPerformance,
     retrieveEggClasifications,
@@ -34,6 +35,7 @@ export default function DashboardGraphs() {
     const setup = async () => {
       const response = await retrieveEggPerformance();
       const classifications = await retrieveEggClasifications();
+      setEggClassifications(classifications);
       const sales = await retrieveSalesOverview();
       const maintenanceCost = await getFeedsAndMedicineSummary();
       setMaintenance(
@@ -44,9 +46,9 @@ export default function DashboardGraphs() {
               "MMM"
             ),
             "Total Cost": parseFloat(item.cost),
-          }
+          };
         })
-      )
+      );
       setEggSales(
         sales
           .sort((a, b) => a.date - b.date)
@@ -124,7 +126,7 @@ export default function DashboardGraphs() {
               </div>
             );
           })}
-          <div className="border-b flex flex-col p-1 px-2">
+          <div className="border-b flex flex-col p-1 px-2 relative group/link">
             <p className="flex flex-row gap-1 items-center relative group">
               Egg Trays Available
               <span>
@@ -138,6 +140,14 @@ export default function DashboardGraphs() {
               {eggTypesTotal}
               {/* {eggDataSummary.produced - eggDataSummary.sold} */}
             </span>
+            <button
+              onClick={() => {
+                setModal("egg classifications");
+              }}
+              className="absolute  bottom-0 right-0 hidden group-hover/link:block animate-fade"
+            >
+              <MdOpenInNew />
+            </button>
           </div>
         </div>
         <ResponsiveContainer width={"100%"} height={350}>

@@ -120,7 +120,7 @@ class User extends Controller
                 $sql = "SELECT * FROM " . $table . " WHERE egg_production_id = ?;";
                 break;
             case "ep_chicken":
-                $sql = "SELECT * FROM " . $table . " WHERE chicken = ?;";
+                $sql = "SELECT * FROM " . $table . " WHERE chicken_id = ?;";
                 break;
             case "ep_medication_intake":
             case "ep_feeds_consumption":
