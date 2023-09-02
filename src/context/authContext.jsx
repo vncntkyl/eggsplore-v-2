@@ -92,6 +92,21 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
+  const updatePassword = async (old, updated, id) => {
+    try {
+      const fd = new FormData();
+      fd.append("update_password", true);
+      fd.append("currentPassword", old);
+      fd.append("newPassword", updated);
+      fd.append("userId", id);
+      const response = await axios.post(url.manageUserURL, fd);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
   const getCurrentUser = () => {
     return localStorage.getItem("currentUser");
   };
@@ -380,6 +395,7 @@ export function AuthProvider({ children }) {
     updateFeeds,
     deleteFeeds,
     registerUser,
+    updatePassword,
     updateLocation,
     deleteLocation,
     updateMedicine,

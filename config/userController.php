@@ -138,4 +138,19 @@ class User extends Controller
             $this->getError($e);
         }
     }
+    function updatePassword($current, $new, $user_id)
+    {
+        $oldPassword = md5($current);
+        $newPassword = md5($new);
+        try {
+            $this->setStatement("SELECT * FROM ep_users WHERE user_id = ? AND password = ?");
+            $this->statement->execute([$user_id, $oldPassword]);
+            if ($this->statement->rowCount() > 0) {
+                $this->setStatement("UPDATE ep_users SET password = ? WHERE user_id = ?");
+                return $this->statement->execute([$newPassword, $user_id]);
+            }
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
 }
