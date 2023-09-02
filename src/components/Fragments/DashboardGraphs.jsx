@@ -85,7 +85,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
       );
       setEggTypesTotal(
         classifications.reduce(
-          (sum, value) => sum + value.egg_type_total_count,
+          (sum, value) => sum + parseInt(value.egg_type_total_count),
           0
         )
       );
