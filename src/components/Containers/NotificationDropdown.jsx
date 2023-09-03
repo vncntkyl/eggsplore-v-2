@@ -110,6 +110,7 @@ export default function NotificationDropdown({ toggleNotification }) {
                     "notifications",
                     JSON.stringify(readNotifications)
                   );
+                  window.location.href = notif.link;
                 }}
               >
                 {!notificationsRead.find(
