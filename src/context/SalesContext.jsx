@@ -193,6 +193,38 @@ const getInvoicesForDelivery = async (delivery_id) => {
     return e.message;
   }
 };
+const retrieveSalesLocationReport = async (start, end) => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "sales_location_report",
+        start: start,
+        end: end,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
+const retrieveEggSalesReport = async (start, end) => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "egg_sales_report",
+        start: start,
+        end: end,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 export const values = {
   retrieveItems,
   retrieveEggSales,
@@ -203,8 +235,10 @@ export const values = {
   retrieveLatestInvoice,
   retrieveSalesOverview,
   getInvoicesForDelivery,
+  retrieveEggSalesReport,
   retrieveDeliveryInvoice,
   retrieveSalesSummaryReport,
+  retrieveSalesLocationReport,
   retrieveSalesInvoiceForUpdate,
   retrieveSalesInvoiceForDispatch,
 };

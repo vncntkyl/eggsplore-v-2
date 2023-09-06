@@ -23,10 +23,14 @@ export default function Dashboard() {
   const [eggClassifications, setEggClassifications] = useState([]);
   const { capitalize, toTitle } = useFunction();
   const {
-    getMaintenanceReport,
-    retrieveEggProductionReport,
-    retrieveSalesSummaryReport,
+    getFeedsReport,
+    getMedicineReport,
     getSegregatedEggs,
+    getMaintenanceReport,
+    retrieveEggSalesReport,
+    retrieveSalesSummaryReport,
+    retrieveEggProductionReport,
+    retrieveSalesLocationReport,
   } = useAuth();
 
   const handleClose = () => {
@@ -121,7 +125,88 @@ export default function Dashboard() {
             dateRange.end_date
           );
 
-          console.log(dateRange);
+          const medicineReport = await getMedicineReport(
+            dateRange.start_date,
+            dateRange.end_date
+          );
+          const feedsReport = await getFeedsReport(
+            dateRange.start_date,
+            dateRange.end_date
+          );
+          setAdditionalData(() => {
+            return [
+              {
+                headers: ["Month", "Medicine Name", "Amount"],
+                title: "Medicine Expenses Breakdown",
+                record: medicineReport.map(
+                  (
+                    { month, medicine_name, medicine_expense },
+                    index,
+                    array
+                  ) => {
+                    const previousMonth =
+                      index > 0
+                        ? format(
+                            new Date(`${array[index - 1].month}-01`),
+                            "MMMM"
+                          )
+                        : null;
+                    const currentMonth = format(
+                      new Date(`${month}-01`),
+                      "MMMM"
+                    );
+
+                    if (currentMonth === previousMonth) {
+                      return [
+                        "",
+                        capitalize(medicine_name),
+                        formatCurrency(medicine_expense),
+                      ];
+                    } else {
+                      return [
+                        currentMonth,
+                        capitalize(medicine_name),
+                        formatCurrency(medicine_expense),
+                      ];
+                    }
+                  }
+                ),
+              },
+              {
+                headers: ["Month", "Feeds Name", "Amount"],
+                title: "Feeds Expenses Breakdown",
+                record: feedsReport.map(
+                  ({ month, name, feeds_expense }, index, array) => {
+                    const previousMonth =
+                      index > 0
+                        ? format(
+                            new Date(`${array[index - 1].month}-01`),
+                            "MMMM"
+                          )
+                        : null;
+                    const currentMonth = format(
+                      new Date(`${month}-01`),
+                      "MMMM"
+                    );
+
+                    if (currentMonth === previousMonth) {
+                      return [
+                        "",
+                        capitalize(name),
+                        formatCurrency(feeds_expense),
+                      ];
+                    } else {
+                      return [
+                        currentMonth,
+                        capitalize(name),
+                        formatCurrency(feeds_expense),
+                      ];
+                    }
+                  }
+                ),
+              },
+            ];
+          });
           const maintenanceReport = maintenanceResponse.map((data) => {
             return {
               month: format(new Date(data.month), "MMMM"),
@@ -149,18 +234,49 @@ export default function Dashboard() {
             dateRange.start_date,
             dateRange.end_date
           );
+          const salesLocationReport = await retrieveSalesLocationReport(
+            dateRange.start_date,
+            dateRange.end_date
+          );
+          const eggSalesReport = await retrieveEggSalesReport(
+            dateRange.start_date,
+            dateRange.end_date
+          );
 
           const salesReport = salesResponse.map((data) => {
             return {
               month: format(new Date(`${data.year}-${data.month}-01`), "MMMM"),
-              profit: formatCurrency(data.profit),
+              revenue: formatCurrency(data.revenue),
             };
+          });
+          setAdditionalData(() => {
+            return [
+              {
+                headers: ["Egg Category", "Quantity", "Amount"],
+                title: "Egg Category Sales Breakdown",
+                record: eggSalesReport.map(
+                  ({ egg_type_name, total_quantity, total_amount }) => [
+                    capitalize(toTitle(egg_type_name)),
+                    total_quantity,
+                    formatCurrency(total_amount),
+                  ]
+                ),
+              },
+              {
+                headers: ["Location", "Amount"],
+                title: "Regional Sales Breakdown",
+                record: salesLocationReport.map(({ location, amount }) => [
+                  capitalize(location),
+                  formatCurrency(amount),
+                ]),
+              },
+            ];
           });
           setReportData([
             Object.keys(salesReport[0]).map((key) => {
               return capitalize(key);
             }),
-            ...salesReport.map(({ month, profit }) => [month, profit]),
+            ...salesReport.map(({ month, revenue }) => [month, revenue]),
           ]);
         }
         break;
@@ -376,7 +492,7 @@ export default function Dashboard() {
                       reportConfig.type === "pdf" &&
                       reportData ? (
                       <GenerateReport
-                        closeModal={setModalTitle}
+                        closeModal={handleClose}
                         dateCoverage={dateRange}
                         additionalData={additionalData}
                         tableHeader={reportData[0]}

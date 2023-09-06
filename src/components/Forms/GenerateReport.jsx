@@ -140,7 +140,7 @@ export default function GenerateReport({
       baseline: "bottom",
     });
     doc.save(fileName);
-    closeModal(null);
+    closeModal();
   };
   const formatCurrency = (amount) => {
     const peso = Intl.NumberFormat("en-PH", {

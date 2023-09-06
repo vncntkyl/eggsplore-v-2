@@ -241,17 +241,51 @@ class Feeds extends Controller
     {
         try {
             $this->setStatement("SELECT
-            med.log_date as month,
-            COALESCE(SUM(med.amount),0) AS medicine_expense,
-            COALESCE(SUM(feeds.amount),0) AS feeds_expense
+            DATE(med.log_date) as month,
+            COALESCE(SUM(med.amount), 0) AS medicine_expense,
+            COALESCE(SUM(feeds.amount), 0) AS feeds_expense
         FROM
             ep_medicine_inventory AS med
-        LEFT JOIN
-            ep_feeds_inventory AS feeds ON MONTH(feeds.log_date) = MONTH(med.log_date)
+        LEFT JOIN (
+            SELECT
+                log_date,
+                COALESCE(SUM(amount), 0) AS amount
+            FROM
+                ep_feeds_inventory
+            WHERE
+                DATE(log_date) >= :start_date AND DATE(log_date) <= :end_date
+            GROUP BY
+                MONTH(log_date)
+        ) AS feeds ON MONTH(feeds.log_date) = MONTH(med.log_date)
         WHERE
-            med.log_date >= DATE(?) AND med.log_date <= DATE(?)
+            DATE(med.log_date) >= :start_date AND DATE(med.log_date) <= :end_date
         GROUP BY
             MONTH(med.log_date);");
+            $this->statement->execute([":start_date" => $start_date, ":end_date" => $end_date]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveFeedsReport($start_date, $end_date)
+    {
+        try {
+            $this->setStatement("SELECT
+            DATE_FORMAT(feeds.log_date, '%Y-%m') as month,
+            feed.name,
+             COALESCE(SUM(feeds.amount),0) AS feeds_expense
+                FROM
+                        ep_feeds_inventory AS feeds
+                    LEFT JOIN
+                    ep_feeds as feed ON feeds.feed_id = feed.id
+                    WHERE
+                        feeds.log_date >= ? AND feeds.log_date <= ?
+                GROUP BY
+                month,
+                feed.name
+            ORDER BY
+                month, 
+                feed.name;");
             $this->statement->execute([$start_date, $end_date]);
             return $this->statement->fetchAll();
         } catch (PDOException $e) {

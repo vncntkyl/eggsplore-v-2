@@ -22,6 +22,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $date_start = $_GET['start'];
             $date_end = $_GET['end'];
             echo json_encode($feeds->retrieveMaintenanceReport($date_start, $date_end));
+        } else if(isset($_GET['feeds_report'])){
+            $date_start = $_GET['start'];
+            $date_end = $_GET['end'];
+            echo json_encode($feeds->retrieveFeedsReport($date_start, $date_end));
         }else {
             echo json_encode($feeds->retrieve_feeds($_GET['id']));
         }

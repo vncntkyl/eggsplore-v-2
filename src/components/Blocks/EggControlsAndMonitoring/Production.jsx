@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "../../Fragments/DatePicker";
 import EggProductionTable from "../../Tables/EggProductionTable";
 import { Alert, Modal } from "../../Containers";

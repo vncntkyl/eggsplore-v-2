@@ -14,6 +14,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
         }else if (isset($_GET['medicine_inventory'])) {
             $filter = isset($_GET['filter']) ? (gettype($_GET['filter']) == "object" ? json_decode($_GET['filter']) : $_GET['filter']) : "all";
             echo json_encode($medicine->retrieve_medicine_inventory($filter));
+        }else if(isset($_GET['medicine_report'])){
+
+            echo json_encode($medicine->get_medicine_report($_GET['start_date'],$_GET['end_date']));
         } else {
             echo json_encode($medicine->retrieve_medicine($_GET['id']));
         }

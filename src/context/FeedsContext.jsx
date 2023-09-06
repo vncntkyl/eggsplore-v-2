@@ -92,6 +92,22 @@ const getMaintenanceReport = async (start_date, end_date) => {
     console.log(e.message);
   }
 };
+const getFeedsReport = async (start_date, end_date) => {
+  try {
+    const response = await axios.get(url.manageFeedsURL, {
+      params: {
+        feeds_report: true,
+        start: start_date,
+        end: end_date,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 const addFeedsInventory = async (newInventory) => {
   try {
     const feedsData = new FormData();
@@ -147,6 +163,7 @@ const updateFeedsConsumption = async (feedsConsumption) => {
   }
 };
 export const values = {
+  getFeedsReport,
   getFeedQuantity,
   getFeedsConsumption,
   addFeedsConsumption,

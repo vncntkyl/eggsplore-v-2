@@ -36,9 +36,9 @@ const getMedicineInventory = async (dateFilter) => {
       params: {
         medicine_inventory: true,
         filter:
-        typeof dateFilter === "object"
-          ? JSON.stringify(dateFilter)
-          : dateFilter,
+          typeof dateFilter === "object"
+            ? JSON.stringify(dateFilter)
+            : dateFilter,
       },
     });
     if (response.status === 200) {
@@ -103,7 +103,24 @@ const updateMedicationIntake = async (medicationIntake) => {
     console.log(e.message);
   }
 };
+const getMedicineReport = async (start, end) => {
+  try {
+    const response = await axios.get(url.manageMedicineURL, {
+      params: {
+        medicine_report: true,
+        start_date: start,
+        end_date: end,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 export const values = {
+  getMedicineReport,
   getMedicineQuantity,
   getMedicationIntake,
   addMedicationIntake,

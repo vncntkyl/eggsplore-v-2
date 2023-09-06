@@ -119,7 +119,7 @@ class Medicine extends Controller
                     $sqlStatement .= " WHERE MONTH(log_date) = MONTH(NOW()) ORDER BY log_date DESC";
                 } else {
                     $filter = json_decode($filter);
-                    $sqlStatement .= " WHERE log_date >= '" . $filter->start_date . "' AND log_date <= '" . $filter->end_date . "' ORDER BY log_date DESC" ;
+                    $sqlStatement .= " WHERE log_date >= '" . $filter->start_date . "' AND log_date <= '" . $filter->end_date . "' ORDER BY log_date DESC";
                 }
             }
             $this->setStatement($sqlStatement);
@@ -194,6 +194,30 @@ class Medicine extends Controller
             $this->setStatement("SELECT * FROM `ep_medication_intake` WHERE medicine_id = ? ORDER BY log_date DESC LIMIT 1;");
             $this->statement->execute([$medicine_id]);
             return $this->statement->fetch();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function get_medicine_report($start_date, $end_date)
+    {
+        try {
+            $this->setStatement("SELECT
+            DATE_FORMAT(med.log_date, '%Y-%m') AS month,
+            medicine.medicine_name,
+            COALESCE(SUM(med.amount), 0) AS medicine_expense
+        FROM
+            ep_medicine_inventory AS med
+        JOIN ep_medicine AS medicine ON med.medicine_id = medicine.medicine_id
+        WHERE
+            DATE(med.log_date) >= ? AND DATE(med.log_date) <= ?
+        GROUP BY
+            month,
+            medicine.medicine_name
+        ORDER BY
+            month, 
+            medicine.medicine_name;");
+            $this->statement->execute([$start_date, $end_date]);
+            return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
         }

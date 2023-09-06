@@ -43,8 +43,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
             case "sales_overview":
                 echo json_encode($sales->retrieveEggSalesOverview());
                 break;
+            case "sales_location_report":
+                echo json_encode($sales->retrieveSalesLocationReport($_GET['start'], $_GET['end']));
+                break;
             case "sales_summary_report":
                 echo json_encode($sales->retrieveSalesSummaryReport($_GET['start'], $_GET['end']));
+                break;
+            case "egg_sales_report":
+                echo json_encode($sales->retrieveEggSalesReport($_GET['start'], $_GET['end']));
                 break;
         }
         break;

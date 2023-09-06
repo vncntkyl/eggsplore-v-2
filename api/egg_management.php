@@ -61,7 +61,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
     case "PUT":
         $egg_data = json_decode(file_get_contents('php://input'));
-        if ($egg_data->adminUpdate) {
+        if (isset($egg_data->adminUpdate)) {
             echo $egg->updateProcurement($egg_data) ? 1 : 0;
         } else {
             echo $egg->updateEggProduction($egg_data->egg_count, $egg_data->defect_count, $egg_data->id) ? 1 : 0;

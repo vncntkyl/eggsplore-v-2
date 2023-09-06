@@ -23,7 +23,8 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
-    function retrieveAssignedSalesInvoices($delivery_id){
+    function retrieveAssignedSalesInvoices($delivery_id)
+    {
         try {
             $this->setStatement("SELECT * FROM ep_sales_invoice WHERE delivery_id = ? OR delivery_id IS NULL");
             $this->statement->execute([$delivery_id]);
@@ -256,7 +257,7 @@ class Sales extends Controller
             YEAR(sin.date) AS year,
             MONTH(sin.date) AS month,
             COALESCE(SUM(sit.total_amount),
-            0) AS profit
+            0) AS revenue
         FROM
             ep_sales_invoice AS SIN
         LEFT JOIN ep_sales_items AS sit
@@ -315,6 +316,51 @@ class Sales extends Controller
         try {
             $this->setStatement("SELECT * FROM ep_sales_invoice WHERE delivery_id = ?");
             $this->statement->execute([$dispatch_id]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveSalesLocationReport($start_date, $end_date)
+    {
+        try {
+            $this->setStatement("SELECT 
+            DATE_FORMAT(date, '%Y-%m') AS month, 
+            location, COALESCE(SUM(amount),0) as amount 
+            FROM `ep_sales_invoice` 
+            WHERE DATE(date) >= ? AND DATE(date) <= ?
+            GROUP BY location;");
+            $this->statement->execute([$start_date, $end_date]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveEggSalesReport($start_date, $end_date)
+    {
+        try {
+            $this->setStatement("SELECT
+            et.egg_type_name,
+            SUM(COALESCE(sit.quantity, 0)) AS total_quantity,
+            SUM(COALESCE(sit.total_amount, 0)) AS total_amount
+        FROM
+            ep_egg_types AS et
+        LEFT JOIN
+            (
+                SELECT
+                    sit.item_name,
+                    sit.quantity,
+                    sit.total_amount,
+                    sit.sales_id
+                FROM
+                    ep_sales_items AS sit
+                LEFT JOIN
+                    ep_sales_invoice AS sin ON sit.sales_id = sin.sales_id
+                WHERE DATE(sin.date) >= ? AND DATE(sin.date) <= ?
+            ) AS sit ON et.egg_type_name = sit.item_name
+        GROUP BY
+            et.egg_type_name;");
+            $this->statement->execute([$start_date, $end_date]);
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);
