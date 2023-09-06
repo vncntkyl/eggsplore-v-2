@@ -31,6 +31,7 @@ export default function Dashboard() {
     retrieveSalesSummaryReport,
     retrieveEggProductionReport,
     retrieveSalesLocationReport,
+    retrieveWeeklyEggSalesReport,
   } = useAuth();
 
   const handleClose = () => {
@@ -280,6 +281,78 @@ export default function Dashboard() {
           ]);
         }
         break;
+      case "egg inventory":
+        {
+          const eggSalesReport = await retrieveEggSalesReport(
+            dateRange.start_date,
+            dateRange.end_date
+          );
+          const productionResponse = await retrieveEggProductionReport(
+            dateRange.start_date,
+            dateRange.end_date
+          );
+          const segregationResponse = await getSegregatedEggs(
+            dateRange.start_date,
+            dateRange.end_date
+          );
+          delete segregationResponse.eggs;
+
+          const weeklySalesInventory = await retrieveWeeklyEggSalesReport(
+            dateRange.start_date,
+            dateRange.end_date
+          );
+          const eggsSold = eggSalesReport.reduce((sum, item) => {
+            return sum + parseInt(item.total_quantity);
+          }, 0);
+          const producedEggs = productionResponse.reduce((sum, item) => {
+            return (
+              sum + parseInt(item.produced_eggs) + parseInt(item.defect_eggs)
+            );
+          }, 0);
+          const segregatedEggs = Object.values(segregationResponse).reduce(
+            (sum, item) => {
+              return sum + parseInt(item);
+            },
+            0
+          );
+          const unsegregatedEggs = producedEggs - segregatedEggs;
+          const remainingEggs = producedEggs - eggsSold;
+
+          const inventorySummary = {
+            "produced_eggs": producedEggs,
+            "segregated_eggs": segregatedEggs,
+            "unsegregated_eggs": unsegregatedEggs,
+            "eggs_sold": eggsSold,
+            "remaining_eggs": remainingEggs,
+          };
+          console.log(inventorySummary)
+          let weeklyHeaders = weeklySalesInventory.map(
+            (item) => item.week_number
+          );
+          const quantitiesByWeek = [];
+          let eggTypes = weeklySalesInventory.map((item) => item.egg_type_name);
+          weeklyHeaders = [...new Set(weeklyHeaders.sort((a, b) => a - b))];
+          eggTypes = [...new Set(eggTypes)];
+          const weeklyEggSalesReportHeader = [
+            "Egg Name",
+            ...weeklyHeaders.map((week) => "Week #" + week),
+          ];
+          weeklySalesInventory.forEach((item) => {
+            const { egg_type_name, week_number, quantity } = item;
+            if (!quantitiesByWeek[eggTypes.indexOf(egg_type_name)]) {
+              quantitiesByWeek[eggTypes.indexOf(egg_type_name)] = new Array(
+                weeklyHeaders.length
+              ).fill(0);
+            }
+            quantitiesByWeek[eggTypes.indexOf(egg_type_name)][
+              weeklyHeaders.indexOf(week_number)
+            ] = quantity;
+          });
+          quantitiesByWeek.forEach((quantities, index) => {
+            quantities.unshift(eggTypes[index]);
+          });
+        }
+        break;
     }
     setReportConfig((current) => {
       return {
@@ -420,6 +493,7 @@ export default function Dashboard() {
                         </option>
                         {[
                           "egg production",
+                          "egg inventory",
                           "maintenance cost",
                           "egg sales performance",
                         ].map((opt, index) => {

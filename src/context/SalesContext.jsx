@@ -225,6 +225,22 @@ const retrieveEggSalesReport = async (start, end) => {
     console.log(e.message);
   }
 };
+const retrieveWeeklyEggSalesReport = async (start, end) => {
+  try {
+    const response = await axios.get(url.manageSalesURL, {
+      params: {
+        retrieve: "weekly_egg_sales_report",
+        start: start,
+        end: end,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 export const values = {
   retrieveItems,
   retrieveEggSales,
@@ -239,6 +255,7 @@ export const values = {
   retrieveDeliveryInvoice,
   retrieveSalesSummaryReport,
   retrieveSalesLocationReport,
+  retrieveWeeklyEggSalesReport,
   retrieveSalesInvoiceForUpdate,
   retrieveSalesInvoiceForDispatch,
 };

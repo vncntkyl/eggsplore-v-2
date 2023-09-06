@@ -366,4 +366,29 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
+    function retrieveWeeklyEggSalesReport($start_date, $end_date){
+        try {
+            $this->setStatement("SELECT
+            et.egg_type_name,
+            WEEK(sin.date) AS week_number,
+            SUM(sit.quantity) AS quantity
+        FROM
+            ep_egg_types AS et
+        LEFT JOIN ep_sales_items AS sit
+        ON
+            et.egg_type_name = sit.item_name
+        LEFT JOIN ep_sales_invoice AS SIN
+        ON
+            sit.sales_id = sin.sales_id
+        WHERE
+            DATE(sin.date) >= ? AND DATE(sin.date) <= ?
+        GROUP BY
+            et.egg_type_name,
+            WEEK(sin.date);");
+            $this->statement->execute([$start_date, $end_date]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
 }
