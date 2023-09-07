@@ -1,4 +1,4 @@
-# eggsplore-v-2
+# EGGSPLORE-v-2
 
 Edwin and Lina Poultry Farm Management System (Eggsplore)
 
@@ -17,12 +17,5 @@ ADMIN
 STAFF:   
 	username:jomaricruz  
 	password:jojoreyes  
-
-STILL WORKING ON THE FOLLOWING
-1. DASHBOARD
-2. EGG PROCUREMENT TABLE (ADMIN - BROWN EGG)
-3. EGG INVENTORY TABLE
-4. SALES - DONE WITH SHOWING AND CREATING INVOICES (PENDING EGG SALES PAGE)
-5. FINANCIALS
 
 T H A N K   Y O U !
