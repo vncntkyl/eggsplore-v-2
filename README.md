@@ -1,4 +1,4 @@
-# eggsplore-v-2
+# EGGSPLORE-v-2
 
 Edwin and Lina Poultry Farm Management System (Eggsplore)
 
