@@ -132,12 +132,16 @@ export function AuthProvider({ children }) {
   };
 
   //BUILDING MANAGEMENT
-  const getBuilding = async (id = null) => {
+  const getBuilding = async (id = null, user_id = null) => {
     try {
+      const params = {
+        getBuilding: id ? id : "all",
+      };
+      if (user_id !== null) {
+        params.user = user_id;
+      }
       const response = await axios.get(url.manageBuildingURL, {
-        params: {
-          getBuilding: id ? id : "all",
-        },
+        params: params,
       });
       if (response.status === 200) {
         return response.data;

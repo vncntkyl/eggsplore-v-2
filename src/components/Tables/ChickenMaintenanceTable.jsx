@@ -11,6 +11,7 @@ export default function ChickenMaintenanceTable({
   filter = "all",
   setModal = null,
   setChicken = null,
+  bldgFilter = -1,
 }) {
   const { getCurrentUser, retrieveProduction, getBuilding } = useAuth();
   const { capitalize, toTitle } = useFunction();
@@ -18,6 +19,22 @@ export default function ChickenMaintenanceTable({
   const [currentUser, setCurrentUser] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const showFilteredResults = (obj, user, bldgFilter = -1) => {
+    if (user.user_type !== "admin") {
+      if (bldgFilter !== -1) {
+        return obj.filter(
+          (items) =>
+            items.staff_id === user.user_id && items.building_id == bldgFilter
+        );
+      } else {
+        return obj.filter((items) => items.staff_id === user.user_id);
+      }
+    } else {
+      return obj;
+    }
+  };
+
   useEffect(() => {
     const user = JSON.parse(getCurrentUser());
     const setup = async () => {
@@ -27,33 +44,18 @@ export default function ChickenMaintenanceTable({
 
       const response = await retrieveProduction("ep_chicken", filter);
       setProcurementData(
-        user.user_type == "admin"
-          ? response.map((res) => ({
-              id: res.chicken_id,
-              user_id: res.staff_id,
-              building_id: res.building_id,
-              population: res.chicken_count,
-              mortality: res.mortality_count,
-              missing: res.missing_count,
-              remaining: res.remaining,
-              remarks: res.remarks,
-              date_procured: res.date_procured,
-              date_logged: res.log_date,
-            }))
-          : response
-              .filter((data) => data.staff_id === user.user_id)
-              .map((res) => ({
-                id: res.chicken_id,
-                user_id: res.staff_id,
-                building_id: res.building_id,
-                population: res.chicken_count,
-                mortality: res.mortality_count,
-                missing: res.missing_count,
-                remaining: res.remaining,
-                remarks: res.remarks,
-                date_procured: res.date_procured,
-                date_logged: res.log_date,
-              }))
+        showFilteredResults(response, user, bldgFilter).map((res) => ({
+          id: res.chicken_id,
+          user_id: res.staff_id,
+          building_id: res.building_id,
+          population: res.chicken_count,
+          mortality: res.mortality_count,
+          missing: res.missing_count,
+          remaining: res.remaining,
+          remarks: res.remarks,
+          date_procured: res.date_procured,
+          date_logged: res.log_date,
+        }))
       );
       setLoading(false);
     };
@@ -63,7 +65,7 @@ export default function ChickenMaintenanceTable({
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh, filter]);
+  }, [refresh, filter, bldgFilter]);
   return !loading && procurementData.length > 0 ? (
     <table className="w-full rounded-md shadow-md overflow-hidden bg-white">
       <thead>
@@ -101,7 +103,7 @@ export default function ChickenMaintenanceTable({
               <td className="p-2">{procurement.mortality}</td>
               <td className="p-2">{procurement.missing}</td>
               <td className="p-2">{procurement.remaining}</td>
-              <td className="p-2">{procurement.remarks || '--'}</td>
+              <td className="p-2">{procurement.remarks || "--"}</td>
               <td className="p-2">
                 {format(new Date(procurement.date_procured), "MMM d, yyyy")}
               </td>

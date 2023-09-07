@@ -10,6 +10,8 @@ export default function EggProduction({ building }) {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
   const [currentBuilding, setCurrentBuilding] = useState([]);
+  const [buildings, setBuildings] = useState([]);
+  const [buildingFilter, setBuildingFilter] = useState(-1);
 
   const [eggData, setEggData] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
@@ -46,7 +48,6 @@ export default function EggProduction({ building }) {
         "staff_add",
         eggData.building_number
       );
-      console.log(response);
       if (response === 1) {
         toggleAlert({
           type: "success",
@@ -82,8 +83,13 @@ export default function EggProduction({ building }) {
 
   useEffect(() => {
     const setup = async () => {
-      const response = await getBuilding(building);
-      setCurrentBuilding(response);
+      const response = await getBuilding();
+      const filters = await getBuilding(
+        null,
+        JSON.parse(getCurrentUser()).user_id
+      );
+      setBuildings(filters);
+      setCurrentBuilding(response.find((res) => res.id === building));
 
       setEggData({
         date: format(new Date(), "yyyy-MM-dd"),
@@ -158,9 +164,32 @@ export default function EggProduction({ building }) {
           </form>
         </div>
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">Egg Production Logs</p>
+          <div className="flex flex-col gap-2 p-2">
+            <p className="text-[1.2rem] font-semibold">Egg Production Logs</p>
+            <div className="flex items-center gap-2">
+              <label htmlFor="bldg_filter">Show Building Logs:</label>
+              <select
+                id="bldg_filter"
+                className="bg-default px-2 p-1"
+                onChange={(e) => {
+                  setBuildingFilter(parseInt(e.target.value));
+                }}
+              >
+                <option value="-1" selected>
+                  All
+                </option>
+                {buildings.map((ub, index) => {
+                  return (
+                    <option key={index} value={ub.building_id}>
+                      Building {ub.number}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
           <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
-            <EggProductionTable refresh={refresh} />
+            <EggProductionTable refresh={refresh} bldgFilter={buildingFilter} />
           </div>
         </div>
       </div>

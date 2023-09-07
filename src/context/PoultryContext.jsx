@@ -78,6 +78,22 @@ const retrieveEggProductionReport = async (start_date, end_date) => {
     return e.message;
   }
 };
+const retrieveEggInventoryReport = async (start_date, end_date) => {
+  try {
+    const response = await axios.get(url.manageEggsURL, {
+      params: {
+        retrieve: "egg_inventory_report",
+        start: start_date,
+        end: end_date,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 const getSegregatedEggs = async (start_date, end_date) => {
   try {
     const response = await axios.get(url.manageEggsURL, {
@@ -349,5 +365,6 @@ export const values = {
   retrieveChickenPopulation,
   retrieveEggClasifications,
   retrieveEggsForSegregation,
+  retrieveEggInventoryReport,
   retrieveEggProductionReport,
 };

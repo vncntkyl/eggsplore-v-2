@@ -8,7 +8,11 @@ $bldg = new Building();
 if (isset($_GET['getBuilding'])) {
     $param = $_GET['getBuilding'];
     if ($param === "all") {
-        $result = $bldg->retrieve_buildings();
+        if (isset($_GET['user'])) {
+            $result = $bldg->retrieve_buildings_by_user_id($_GET['user']);
+        } else {
+            $result = $bldg->retrieve_buildings();
+        }
         echo json_encode($result);
     } else if ($param === "relation") {
         $result = $bldg->retrieve_all_user_buildings();

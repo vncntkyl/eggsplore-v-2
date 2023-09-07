@@ -474,4 +474,130 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
+    function retrieveInventoryReport($start, $end)
+    {
+        try {
+            $this->setStatement("WITH
+            ep_weeks AS(
+            SELECT DISTINCT
+                WEEK(date_produced) AS 'week'
+            FROM
+                ep_egg_production
+            WHERE
+                date_produced >= :start_date AND date_produced <= :end_date
+            UNION
+        SELECT DISTINCT
+            WEEK(DATE) AS 'week'
+        FROM
+            ep_sales_invoice
+        WHERE
+            DATE >= :start_date AND DATE <= :end_date
+        )
+        SELECT
+            ep_weeks.week,
+            COALESCE(ep.produced, 0) AS eggs_produced,
+            COALESCE(es.total, 0) AS segregated_eggs,
+        (
+            CASE WHEN COALESCE(ep.produced, 0) > COALESCE(es.total, 0) THEN COALESCE(ep.produced, 0) - COALESCE(es.total, 0) ELSE 0
+        END
+        ) AS unsegregated_eggs,
+        COALESCE(sin.sold, 0) AS eggs_sold,
+            (
+                CASE WHEN COALESCE(ep.produced, 0) > COALESCE(sin.sold, 0) THEN COALESCE(ep.produced, 0) - COALESCE(sin.sold, 0) ELSE 0
+            END
+        ) AS remaining_eggs
+        FROM
+            ep_weeks
+        LEFT JOIN(
+            SELECT
+                ep.year AS 'year',
+                ep.week AS 'week',
+                COALESCE(SUM(ep.egg_count),
+                0) + COALESCE(SUM(epr.quantity),
+                0) AS 'produced'
+            FROM
+                (
+                SELECT
+                    YEAR(date_produced) AS 'year',
+                    WEEK(date_produced) AS 'week',
+                    SUM(egg_count) AS 'egg_count'
+                FROM
+                    ep_egg_production
+                WHERE
+                    date_produced >= :start_date AND date_produced <= :end_date
+                GROUP BY
+                    WEEK(date_produced)
+            ) AS ep
+        LEFT JOIN(
+            SELECT
+                YEAR(date_procured) AS 'year',
+                WEEK(date_procured) AS 'week',
+                SUM(quantity) AS 'quantity'
+            FROM
+                ep_egg_procurement
+            WHERE
+                date_procured >= :start_date AND date_procured <= :end_date
+            GROUP BY
+                WEEK(date_procured)
+        ) AS epr
+        ON
+            ep.week = epr.week
+        GROUP BY
+            WEEK
+        ORDER BY
+            WEEK
+        ASC
+        ) AS ep
+        ON
+            ep_weeks.week = ep.week
+        LEFT JOIN(
+            SELECT
+                WEEK(sin.date) AS 'week',
+                SUM(quantity) AS 'sold'
+            FROM
+                ep_sales_items AS sit
+            LEFT JOIN ep_sales_invoice AS SIN
+            ON
+                sit.sales_id = sin.sales_id
+            WHERE
+                sin.date >= :start_date AND sin.date <= :end_date
+            GROUP BY
+                WEEK(sin.date)
+        ) AS SIN
+        ON
+            ep_weeks.week = sin.week
+        LEFT JOIN(
+            SELECT
+                WEEK(es.log_date) AS 'week',
+                COALESCE(SUM(es.no_weight),
+                0) + COALESCE(SUM(es.pewee),
+                0) + COALESCE(SUM(es.pullet),
+                0) + COALESCE(SUM(es.brown),
+                0) + COALESCE(SUM(es.small),
+                0) + COALESCE(SUM(es.medium),
+                0) + COALESCE(SUM(es.large),
+                0) + COALESCE(SUM(es.extra_large),
+                0) + COALESCE(SUM(es.jumbo),
+                0) + COALESCE(SUM(es.crack),
+                0) + COALESCE(SUM(es.soft_shell),
+                0) AS total
+            FROM
+                ep_egg_segregation AS es
+            WHERE
+                DATE(es.log_date) >= :start_date AND DATE(es.log_date) <= :end_date
+            GROUP BY
+                WEEK(es.log_date)
+        ) AS es
+        ON
+            ep_weeks.week = es.week
+        ORDER BY
+            sin.week
+        ASC
+            ;");
+            $this->statement->execute([":start_date" => $start, ":end_date" => $end]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
 }

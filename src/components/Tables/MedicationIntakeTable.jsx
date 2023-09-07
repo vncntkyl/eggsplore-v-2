@@ -11,6 +11,7 @@ export default function MedicationIntakeTable({
   setIntake,
   setModal,
   setMedicineQuantity,
+  bldgFilter = -1,
 }) {
   const { getMedicationIntake, getBuilding, getMedicine } = useAuth();
   const { capitalize, toTitle } = useFunction();
@@ -20,6 +21,22 @@ export default function MedicationIntakeTable({
   const [medicineList, setMedicineList] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const showFilteredResults = (obj, user, bldgFilter = -1) => {
+    if (user.user_type !== "admin") {
+      if (bldgFilter !== -1) {
+        return obj.filter(
+          (items) =>
+            items.staff_id === user.user_id && items.building_id == bldgFilter
+        );
+      } else {
+        return obj.filter((items) => items.staff_id === user.user_id);
+      }
+    } else {
+      return obj;
+    }
+  };
+
   useEffect(() => {
     const setup = async () => {
       const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -38,18 +55,16 @@ export default function MedicationIntakeTable({
               date_procured: res.date_procured,
               date_logged: res.log_date,
             }))
-          : response
-              .filter((res) => res.staff_id === user.user_id)
-              .map((res) => ({
-                building_id: res.building_id,
-                medicine_id: res.medicine_id,
-                intake: res.intake,
-                disposed: res.disposed,
-                remaining: res.remaining,
-                remarks: res.remarks,
-                date_procured: res.date_procured,
-                date_logged: res.log_date,
-              }))
+          : showFilteredResults(response, user, bldgFilter).map((res) => ({
+              building_id: res.building_id,
+              medicine_id: res.medicine_id,
+              intake: res.intake,
+              disposed: res.disposed,
+              remaining: res.remaining,
+              remarks: res.remarks,
+              date_procured: res.date_procured,
+              date_logged: res.log_date,
+            }))
       );
       const buildingResponse = await getBuilding();
       setBuildings(buildingResponse);
@@ -64,7 +79,7 @@ export default function MedicationIntakeTable({
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh]);
+  }, [refresh, bldgFilter]);
   return !loading && medicationIntake.length > 0 ? (
     <table className="w-full rounded-md shadow-md overflow-hidden">
       <thead>

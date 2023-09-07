@@ -10,6 +10,8 @@ export default function FeedsManagement({ building }) {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
   const [currentBuilding, setCurrentBuilding] = useState([]);
+  const [buildings, setBuildings] = useState([]);
+  const [buildingFilter, setBuildingFilter] = useState(-1);
   const [feedsList, setFeedsList] = useState([]);
   const [feedsQuantity, setFeedsQuantity] = useState([]);
   const [selectedFeeds, setSelectedFeeds] = useState(null);
@@ -119,8 +121,13 @@ export default function FeedsManagement({ building }) {
 
   useEffect(() => {
     const setup = async () => {
-      const response = await getBuilding(building);
-      setCurrentBuilding(response);
+      const response = await getBuilding();
+      const filters = await getBuilding(
+        null,
+        JSON.parse(getCurrentUser()).user_id
+      );
+      setBuildings(filters);
+      setCurrentBuilding(response.find((res) => res.id === building));
       const feeds = await getFeeds();
       setFeedsList(feeds);
       const feedQuantity = await getFeedQuantity();
@@ -317,8 +324,33 @@ export default function FeedsManagement({ building }) {
           </form>
         </div>
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">Feeds Consumption Logs</p>
-          <FeedsConsumptionTable />
+          <div className="flex flex-col gap-2 p-2">
+            <p className="text-[1.2rem] font-semibold">
+              Feeds Consumption Logs
+            </p>
+            <div className="flex items-center gap-2">
+              <label htmlFor="bldg_filter">Show Building Logs:</label>
+              <select
+                id="bldg_filter"
+                className="bg-default px-2 p-1"
+                onChange={(e) => {
+                  setBuildingFilter(parseInt(e.target.value));
+                }}
+              >
+                <option value="-1" selected>
+                  All
+                </option>
+                {buildings.map((ub, index) => {
+                  return (
+                    <option key={index} value={ub.building_id}>
+                      Building {ub.number}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+          <FeedsConsumptionTable bldgFilter={buildingFilter} />
         </div>
       </div>
       {modalTitle && (

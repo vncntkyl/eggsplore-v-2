@@ -10,6 +10,8 @@ export default function ChickenManagement({ building }) {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
   const [currentBuilding, setCurrentBuilding] = useState([]);
+  const [buildings, setBuildings] = useState([]);
+  const [buildingFilter, setBuildingFilter] = useState(-1);
   const [chickenData, setChickenData] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
     building_number: 0,
@@ -57,16 +59,16 @@ export default function ChickenManagement({ building }) {
       if (response === 1) {
         toggleAlert({
           type: "success",
-          title: "Procurement Success",
-          message: "You have successfully submitted!",
+          title: "Chicken Information Update Success",
+          message: "You have successfully submitted new chicken information!",
           show: true,
         });
       } else {
         toggleAlert({
           type: "warning",
-          title: "Procurement Error",
+          title: "Chicken Information Update Error",
           message:
-            "There has been an error on submitting your procurement. Please try again.",
+            "There has been an error on submitting new chicken information. Please try again.",
           show: true,
         });
       }
@@ -111,8 +113,13 @@ export default function ChickenManagement({ building }) {
   };
   useEffect(() => {
     const setup = async () => {
-      const response = await getBuilding(building);
-      setCurrentBuilding(response);
+      const response = await getBuilding();
+      const filters = await getBuilding(
+        null,
+        JSON.parse(getCurrentUser()).user_id
+      );
+      setBuildings(filters);
+      setCurrentBuilding(response.find((res) => res.id === building));
       const populationData = await retrieveChickenPopulation();
       const chickenPopulationData = populationData.find(
         (data) => data.building_id === building
@@ -222,8 +229,7 @@ export default function ChickenManagement({ building }) {
                         inputClasses="w-full rounded px-2"
                         disabled={chickenKey === "remaining"}
                         onChange={(e) => {
-                          handleInputChange(e, chickenKey)
-
+                          handleInputChange(e, chickenKey);
                         }}
                       />
                     );
@@ -238,10 +244,36 @@ export default function ChickenManagement({ building }) {
           </form>
         </div>
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">
-            Chicken Maintenance Logs
-          </p>
-          <ChickenMaintenanceTable refresh={refresh} />
+          <div className="flex flex-col gap-2 p-2">
+            <p className="text-[1.2rem] font-semibold">
+              Chicken Maintenance Logs
+            </p>
+            <div className="flex items-center gap-2">
+              <label htmlFor="bldg_filter">Show Building Logs:</label>
+              <select
+                id="bldg_filter"
+                className="bg-default px-2 p-1"
+                onChange={(e) => {
+                  setBuildingFilter(parseInt(e.target.value));
+                }}
+              >
+                <option value="-1" selected>
+                  All
+                </option>
+                {buildings.map((ub, index) => {
+                  return (
+                    <option key={index} value={ub.building_id}>
+                      Building {ub.number}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+          <ChickenMaintenanceTable
+            refresh={refresh}
+            bldgFilter={buildingFilter}
+          />
         </div>
       </div>
       {modalTitle && (

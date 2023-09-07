@@ -10,6 +10,8 @@ export default function MedicineManagement({ building }) {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
   const [currentBuilding, setCurrentBuilding] = useState([]);
+  const [buildings, setBuildings] = useState([]);
+  const [buildingFilter, setBuildingFilter] = useState(-1);
   const [medicineList, setMedicineList] = useState([]);
   const [medicineQuantity, setMedicineQuantity] = useState([]);
   const [selectedMedicine, setSelectedMedicine] = useState(null);
@@ -119,12 +121,19 @@ export default function MedicineManagement({ building }) {
 
   useEffect(() => {
     const setup = async () => {
-      const response = await getBuilding(building);
-      setCurrentBuilding(response);
+      const response = await getBuilding();
+      const filters = await getBuilding(
+        null,
+        JSON.parse(getCurrentUser()).user_id
+      );
+      setBuildings(filters);
+      setCurrentBuilding(response.find((res) => res.id === building));
+
       const meds = await getMedicine();
       setMedicineList(meds);
       const medQuantity = await getMedicineQuantity();
       setMedicineQuantity(medQuantity);
+      console.log(meds, medQuantity);
       setMedicineData({
         date: format(new Date(), "yyyy-MM-dd"),
         building_number: response.number,
@@ -187,6 +196,34 @@ export default function MedicineManagement({ building }) {
                             id={medicineKey}
                             className="w-full rounded px-2 outline-none border-none p-1"
                             onChange={(e) => {
+                              const medicineInventory = medicineQuantity.find(
+                                (med) =>
+                                  med.medicine_id === parseInt(e.target.value)
+                              );
+                              if (!medicineInventory) {
+                                toggleAlert({
+                                  type: "warning",
+                                  title: "Out of Stock",
+                                  message:
+                                    "Your selected medicine is out of stock. Please contact the administrator to restock the medicine.",
+                                  show: true,
+                                });
+                                return;
+                              }
+                              if (medicineInventory) {
+                                if (
+                                  medicineInventory.remaining_quantity === 0
+                                ) {
+                                  toggleAlert({
+                                    type: "warning",
+                                    title: "Out of Stock",
+                                    message:
+                                      "Your selected medicine is out of stock. Please contact the administrator to restock the medicine.",
+                                    show: true,
+                                  });
+                                  return;
+                                }
+                              }
                               setSelectedMedicine(e.target.value);
                               setMedicineData((current) => ({
                                 ...current,
@@ -302,10 +339,36 @@ export default function MedicineManagement({ building }) {
           </form>
         </div>
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">
-            Medicine Management Logs
-          </p>
-          <MedicationIntakeTable refresh={refresh} />
+          <div className="flex flex-col gap-2 p-2">
+            <p className="text-[1.2rem] font-semibold">
+              Medicine Management Logs
+            </p>
+            <div className="flex items-center gap-2">
+              <label htmlFor="bldg_filter">Show Building Logs:</label>
+              <select
+                id="bldg_filter"
+                className="bg-default px-2 p-1"
+                onChange={(e) => {
+                  setBuildingFilter(parseInt(e.target.value));
+                }}
+              >
+                <option value="-1" selected>
+                  All
+                </option>
+                {buildings.map((ub, index) => {
+                  return (
+                    <option key={index} value={ub.building_id}>
+                      Building {ub.number}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+          <MedicationIntakeTable
+            refresh={refresh}
+            bldgFilter={buildingFilter}
+          />
         </div>
       </div>
       {modalTitle && (

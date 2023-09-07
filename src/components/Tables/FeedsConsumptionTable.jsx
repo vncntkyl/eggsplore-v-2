@@ -11,6 +11,7 @@ export default function FeedsConsumptionTable({
   setConsumption,
   setModal,
   setFeedsQuantity,
+  bldgFilter = -1,
 }) {
   const { getFeedsConsumption, getBuilding, getFeeds } = useAuth();
   const { capitalize, toTitle } = useFunction();
@@ -20,6 +21,21 @@ export default function FeedsConsumptionTable({
   const [feedsList, setFeedsList] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const showFilteredResults = (obj, user, bldgFilter = -1) => {
+    if (user.user_type !== "admin") {
+      if (bldgFilter !== -1) {
+        return obj.filter(
+          (items) =>
+            items.staff_id === user.user_id && items.building_id == bldgFilter
+        );
+      } else {
+        return obj.filter((items) => items.staff_id === user.user_id);
+      }
+    } else {
+      return obj;
+    }
+  };
   useEffect(() => {
     const setup = async () => {
       const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -38,24 +54,22 @@ export default function FeedsConsumptionTable({
               date_procured: res.date_procured,
               date_logged: res.log_date,
             }))
-          : response
-              .filter((res) => res.staff_id === user.user_id)
-              .map((res) => ({
-                id: res.id,
-                building_id: res.building_id,
-                feed_id: res.feed_id,
-                consumed: res.consumed,
-                disposed: res.disposed,
-                remaining: res.remaining,
-                remarks: res.remarks,
-                date_procured: res.date_procured,
-                date_logged: res.log_date,
-              }))
+          : showFilteredResults(response, user, bldgFilter).map((res) => ({
+              id: res.id,
+              building_id: res.building_id,
+              feed_id: res.feed_id,
+              consumed: res.consumed,
+              disposed: res.disposed,
+              remaining: res.remaining,
+              remarks: res.remarks,
+              date_procured: res.date_procured,
+              date_logged: res.log_date,
+            }))
       );
       const buildingResponse = await getBuilding();
       setBuildings(buildingResponse);
       const feedResponse = await getFeeds();
-      console.log(feedResponse);
+      console.log(showFilteredResults(response, user, bldgFilter));
       setFeedsList(feedResponse);
 
       setLoading(false);
@@ -66,7 +80,7 @@ export default function FeedsConsumptionTable({
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh]);
+  }, [refresh, bldgFilter]);
   return !loading && feedsConsumption.length > 0 ? (
     <table className="w-full rounded-md shadow-md overflow-hidden">
       <thead>
@@ -109,7 +123,9 @@ export default function FeedsConsumptionTable({
                 }
               </td>
               <td className="p-2">
-                {capitalize(feedsList.find((feeds) => feeds.id === consumed.feed_id).name)}
+                {capitalize(
+                  feedsList.find((feeds) => feeds.id === consumed.feed_id).name
+                )}
               </td>
               <td className="p-2">{consumed.consumed}</td>
               <td className="p-2">{consumed.disposed}</td>

@@ -34,7 +34,7 @@ export default function EggSegregationTable() {
             .map((segregation, index) => {
               return (
                 <th key={index} className="p-2 bg-main text-white sticky top-0">
-                  {capitalize(toTitle(segregation))}
+                  {segregation === "production_id" ? "Batch ID" :capitalize(toTitle(segregation))}
                 </th>
               );
             })}

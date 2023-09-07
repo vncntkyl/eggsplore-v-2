@@ -33,11 +33,8 @@ export default function EggSegregation() {
     show: false,
   });
   const { toTitle, capitalize } = useFunction();
-  const {
-    getCurrentUser,
-    retrieveEggsForSegregation,
-    insertEggSegregation,
-  } = useAuth();
+  const { getCurrentUser, retrieveEggsForSegregation, insertEggSegregation } =
+    useAuth();
 
   const handleInputChange = (label, value) => {
     if (label.includes("date")) {
@@ -167,8 +164,7 @@ export default function EggSegregation() {
                               setEggData((current) => ({
                                 ...current,
                                 unsorted_egg_production: eggProductionList.find(
-                                  (egg) =>
-                                    egg.batch_id === e.target.value
+                                  (egg) => egg.batch_id === e.target.value
                                 ).eggs,
                               }));
                             }}
@@ -262,7 +258,9 @@ export default function EggSegregation() {
           </form>
         </div>
         <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">Egg Segregation Logs</p>
+          <div className="flex flex-col gap-2 p-2">
+            <p className="text-[1.2rem] font-semibold">Egg Segregation Logs</p>
+          </div>
           <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
             <EggSegregationTable refresh={refresh} />
           </div>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, TextInput } from "../../Forms";
 import { AiFillPrinter } from "react-icons/ai";
-import { format } from "date-fns";
+import { format, setWeek } from "date-fns";
 // import CurrentDateTime from "../../Fragments/CurrentDateTime";
 import Modal from "../../Containers/Modal";
 import DashboardCards from "../../Fragments/DashboardCards";
@@ -21,7 +21,8 @@ export default function Dashboard() {
   });
   const [additionalData, setAdditionalData] = useState([]);
   const [eggClassifications, setEggClassifications] = useState([]);
-  const { capitalize, toTitle } = useFunction();
+  const { capitalize, toTitle, toLink } = useFunction();
+  const [inventoryReportData, setInventoryReportData] = useState(null);
   const {
     getFeedsReport,
     getMedicineReport,
@@ -31,7 +32,7 @@ export default function Dashboard() {
     retrieveSalesSummaryReport,
     retrieveEggProductionReport,
     retrieveSalesLocationReport,
-    retrieveWeeklyEggSalesReport,
+    retrieveEggInventoryReport,
   } = useAuth();
 
   const handleClose = () => {
@@ -295,12 +296,12 @@ export default function Dashboard() {
             dateRange.start_date,
             dateRange.end_date
           );
-          delete segregationResponse.eggs;
-
-          const weeklySalesInventory = await retrieveWeeklyEggSalesReport(
+          const inventoryResponse = await retrieveEggInventoryReport(
             dateRange.start_date,
             dateRange.end_date
           );
+          delete segregationResponse.eggs;
+
           const eggsSold = eggSalesReport.reduce((sum, item) => {
             return sum + parseInt(item.total_quantity);
           }, 0);
@@ -319,38 +320,84 @@ export default function Dashboard() {
           const remainingEggs = producedEggs - eggsSold;
 
           const inventorySummary = {
-            "produced_eggs": producedEggs,
-            "segregated_eggs": segregatedEggs,
-            "unsegregated_eggs": unsegregatedEggs,
-            "eggs_sold": eggsSold,
-            "remaining_eggs": remainingEggs,
+            "Produced Eggs": producedEggs,
+            "Segregated Eggs": segregatedEggs,
+            "Unsegregated Eggs": unsegregatedEggs,
+            "Eggs Sold": eggsSold,
+            "Remaining Eggs": remainingEggs,
           };
-          console.log(inventorySummary)
-          let weeklyHeaders = weeklySalesInventory.map(
-            (item) => item.week_number
-          );
-          const quantitiesByWeek = [];
-          let eggTypes = weeklySalesInventory.map((item) => item.egg_type_name);
-          weeklyHeaders = [...new Set(weeklyHeaders.sort((a, b) => a - b))];
-          eggTypes = [...new Set(eggTypes)];
-          const weeklyEggSalesReportHeader = [
-            "Egg Name",
-            ...weeklyHeaders.map((week) => "Week #" + week),
-          ];
-          weeklySalesInventory.forEach((item) => {
-            const { egg_type_name, week_number, quantity } = item;
-            if (!quantitiesByWeek[eggTypes.indexOf(egg_type_name)]) {
-              quantitiesByWeek[eggTypes.indexOf(egg_type_name)] = new Array(
-                weeklyHeaders.length
-              ).fill(0);
+
+          const monthlyInventoryReport = {};
+
+          inventoryResponse.forEach((item) => {
+            const { week, ...rest } = item;
+            const targetDate = setWeek(
+              new Date(new Date().getFullYear(), 0, 1),
+              week
+            );
+            const month = format(new Date(targetDate), "MMMM"); // Assuming 4 weeks per month
+
+            if (!monthlyInventoryReport[month]) {
+              monthlyInventoryReport[month] = [];
             }
-            quantitiesByWeek[eggTypes.indexOf(egg_type_name)][
-              weeklyHeaders.indexOf(week_number)
-            ] = quantity;
+            monthlyInventoryReport[month].push({
+              week: getWeekOfMonth(targetDate),
+              ...rest,
+            });
           });
-          quantitiesByWeek.forEach((quantities, index) => {
-            quantities.unshift(eggTypes[index]);
+
+          Object.keys(monthlyInventoryReport).forEach((month) => {
+            const monthData = [...monthlyInventoryReport[month]];
+            let inventoryHeader = [
+              ...new Set(
+                monthData.map((item) => item.week).sort((a, b) => a - b)
+              ),
+            ];
+            const inventoryReportHeader = [
+              "Category",
+              ...inventoryHeader.map((week) => "Week# " + week),
+            ];
+            const inventoryQuantities = [
+              Object.keys(monthData[0])
+                .filter((key) => key !== "week")
+                .map(() => {
+                  return new Array().fill([]);
+                }),
+            ];
+
+            const categories = Object.keys(monthData[0])
+              .filter((key) => key !== "week")
+              .map((key) => {
+                return capitalize(toTitle(key));
+              });
+
+            categories.forEach((category) => {
+              const categoryRow = [category];
+
+              inventoryHeader.forEach((week) => {
+                const dataForWeek = monthData.find(
+                  (item) => item.week === week
+                );
+                categoryRow.push(dataForWeek[toLink(category)]);
+              });
+
+              inventoryQuantities.push(categoryRow);
+            });
+            inventoryQuantities.shift();
+            console.log(inventoryQuantities);
+            setAdditionalData((current) => {
+              return [
+                ...current,
+                {
+                  headers: inventoryReportHeader,
+                  title: `${month} Breakdown`,
+                  record: inventoryQuantities,
+                },
+              ];
+            });
           });
+          setInventoryReportData(inventorySummary);
+          setReportData(inventorySummary);
         }
         break;
     }
@@ -361,7 +408,11 @@ export default function Dashboard() {
       };
     });
   };
-
+  function getWeekOfMonth(date) {
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const diff = date.getDate() + startOfMonth.getDay() - 1;
+    return Math.ceil(diff / 7);
+  }
   return (
     <>
       <div className="flex flex-row justify-between items-center w-full">
@@ -492,8 +543,8 @@ export default function Dashboard() {
                           select category
                         </option>
                         {[
-                          "egg production",
                           "egg inventory",
+                          "egg production",
                           "maintenance cost",
                           "egg sales performance",
                         ].map((opt, index) => {
@@ -565,21 +616,38 @@ export default function Dashboard() {
                     ) : reportConfig.category !== "" &&
                       reportConfig.type === "pdf" &&
                       reportData ? (
-                      <GenerateReport
-                        closeModal={handleClose}
-                        dateCoverage={dateRange}
-                        additionalData={additionalData}
-                        tableHeader={reportData[0]}
-                        record={reportData.slice(1)}
-                        fileTitle={capitalize(reportConfig.category)}
-                        fileName={`${
-                          reportConfig.filename !== ""
-                            ? reportConfig.filename
-                            : capitalize(toTitle(reportConfig.category))
-                        }`}
-                        title="Export"
-                        className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
-                      />
+                      reportConfig.category === "egg inventory" ? (
+                        <GenerateReport
+                          closeModal={handleClose}
+                          dateCoverage={dateRange}
+                          additionalData={additionalData}
+                          isInventoryReport={inventoryReportData}
+                          fileTitle={capitalize(reportConfig.category)}
+                          fileName={`${
+                            reportConfig.filename !== ""
+                              ? reportConfig.filename
+                              : capitalize(toTitle(reportConfig.category))
+                          }`}
+                          title="Export"
+                          className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                        />
+                      ) : (
+                        <GenerateReport
+                          closeModal={handleClose}
+                          dateCoverage={dateRange}
+                          additionalData={additionalData}
+                          tableHeader={reportData[0]}
+                          record={reportData.slice(1)}
+                          fileTitle={capitalize(reportConfig.category)}
+                          fileName={`${
+                            reportConfig.filename !== ""
+                              ? reportConfig.filename
+                              : capitalize(toTitle(reportConfig.category))
+                          }`}
+                          title="Export"
+                          className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                        />
+                      )
                     ) : (
                       <Button
                         value="Export"

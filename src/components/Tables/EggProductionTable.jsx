@@ -11,6 +11,7 @@ export default function EggProductionTable({
   filter = "all",
   setModal,
   selectEgg,
+  bldgFilter = -1,
 }) {
   const { getCurrentUser, retrieveEggProduction, getBuilding, getUser } =
     useAuth();
@@ -20,6 +21,20 @@ export default function EggProductionTable({
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const showFilteredResults = (obj, user, bldgFilter = -1) => {
+    if (user.user_type !== "admin") {
+      if (bldgFilter !== -1) {
+        return obj.filter(
+          (items) =>
+            items.user_id === user.user_id && items.building_id == bldgFilter
+        );
+      } else {
+        return obj.filter((items) => items.user_id === user.user_id);
+      }
+    } else {
+      return obj;
+    }
+  };
   useEffect(() => {
     const user = JSON.parse(getCurrentUser());
     const setup = async () => {
@@ -43,19 +58,17 @@ export default function EggProductionTable({
         );
       } else {
         setProductionData(
-          response
-            .filter((items) => items.user_id === user.user_id)
-            .map((res) => {
-              return {
-                id: res.egg_production_id,
-                building_id: res.building_id,
-                user_id: res.user_id,
-                egg_tray_count: res.egg_count,
-                defect_egg_trays_count: res.defect_count,
-                date_procured: res.date_produced,
-                date_logged: res.log_date,
-              };
-            })
+          showFilteredResults(response, user, bldgFilter).map((res) => {
+            return {
+              id: res.egg_production_id,
+              building_id: res.building_id,
+              user_id: res.user_id,
+              egg_tray_count: res.egg_count,
+              defect_egg_trays_count: res.defect_count,
+              date_procured: res.date_produced,
+              date_logged: res.log_date,
+            };
+          })
         );
       }
 
@@ -67,7 +80,7 @@ export default function EggProductionTable({
     return () => {
       clearInterval(realtimeData);
     };
-  }, [refresh, filter]);
+  }, [refresh, filter, bldgFilter]);
   return !loading && productionData.length > 0 ? (
     <table className="w-full rounded-md">
       <thead>

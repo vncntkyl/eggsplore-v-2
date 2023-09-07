@@ -35,6 +35,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
             $date_start = $_GET['start'];
             $date_end = $_GET['end'];
             echo json_encode($egg->retrieveSegregatedEggs($date_start, $date_end));
+        } else if ($retrieve_type === "egg_inventory_report") {
+            $date_start = $_GET['start'];
+            $date_end = $_GET['end'];
+            echo json_encode($egg->retrieveInventoryReport($date_start, $date_end));
         }
         break;
     case "POST":
