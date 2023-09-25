@@ -26,15 +26,16 @@ export default function ChickenMaintenance() {
   return (
     <div
       className={classNames(
-        "p-2 flex flex-row bg-white shadow-md rounded-md",
+        "p-2 flex flex-col xl:flex-row bg-white shadow-md rounded-md",
         getPath() === currentPanel && "gap-2"
       )}
     >
       {/* MANAGEMENT MENU */}
       <div
         className={classNames(
-          "flex flex-col bg-white",
-          getPath() === currentPanel ? "w-1/4" : "w-full"
+          "flex xl:flex-col bg-white",
+          currentPanel ? "flex-row" : "flex-col",
+          getPath() === currentPanel ? "w-full xl:w-1/4" : "w-full"
         )}
       >
         {[
@@ -87,7 +88,7 @@ export default function ChickenMaintenance() {
         className={classNames(
           "bg-white animate-fade",
           getPath() === currentPanel
-            ? "w-3/4"
+            ? "w-full xl:w-3/4"
             : "w-[0%] overflow-hidden pointer-events-none"
         )}
       >

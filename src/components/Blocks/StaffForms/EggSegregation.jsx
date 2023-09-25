@@ -141,8 +141,8 @@ export default function EggSegregation() {
               setModalTitle("Confirmation");
             }}
           >
-            <div className="flex flex-row gap-2 bg-default p-2">
-              <div className="flex flex-col gap-2 bg-default p-2 w-1/2">
+            <div className="flex flex-col lg:flex-row gap-2 bg-default p-2">
+              <div className="flex flex-col gap-2 bg-default p-2 lg:w-1/2">
                 {Object.keys(eggData)
                   .splice(0, 7)
                   .map((eggKey, index) => {
@@ -226,7 +226,7 @@ export default function EggSegregation() {
                     );
                   })}
               </div>
-              <div className="flex flex-col gap-2 bg-default p-2 w-1/2">
+              <div className="flex flex-col gap-2 bg-default p-2 lg:w-1/2">
                 {Object.keys(eggData)
                   .splice(7, 15)
                   .map((eggKey, index) => {
@@ -261,7 +261,7 @@ export default function EggSegregation() {
           <div className="flex flex-col gap-2 p-2">
             <p className="text-[1.2rem] font-semibold">Egg Segregation Logs</p>
           </div>
-          <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+          <div className="max-h-[300px] overflow-auto rounded-md overflow-y-auto shadow-md">
             <EggSegregationTable refresh={refresh} />
           </div>
         </div>

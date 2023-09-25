@@ -26,9 +26,9 @@ export default function DashboardCards() {
         return (
           <div
             key={index}
-            className="bg-white shadow-md rounded-md min-w-[33%] flex flex-col items-center p-4 select-none snap-start"
+            className="bg-white shadow-md rounded-md min-w-full md:min-w-[50%] lg:min-w-[33%] flex flex-col items-center p-4 select-none snap-start"
           >
-            <span className="font-semibold">Building {card.number}</span>
+            <span className="font-semibold w-full text-center">Building {card.number}</span>
             <div className="flex flex-row justify-between w-full">
               <div className="flex flex-col w-1/2">
                 <div className="flex flex-col">

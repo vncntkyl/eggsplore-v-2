@@ -67,71 +67,73 @@ export default function ChickenMaintenanceTable({
     };
   }, [refresh, filter, bldgFilter]);
   return !loading && procurementData.length > 0 ? (
-    <table className="w-full rounded-md shadow-md overflow-hidden bg-white">
-      <thead>
-        <tr className="bg-main text-white">
-          {Object.keys(procurementData[0])
-            .filter((k) => k !== "id" && k !== "user_id")
-            .map((procurement, index) => {
-              return (
-                procurement !== "date_logged" && (
-                  <th key={index} className="whitespace-nowrap p-2">
-                    {procurement === "building_id"
-                      ? "Building No."
-                      : capitalize(toTitle(procurement))}
-                  </th>
-                )
-              );
-            })}
-          {currentUser.user_type === "admin" && (
-            <th className="whitespace-nowrap p-2">Action</th>
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {procurementData.map((procurement, index) => {
-          return (
-            <tr key={index} align="center" className="hover:bg-default">
-              <td className="p-2">
-                {
-                  buildings.find(
-                    (building) => building.id == procurement.building_id
-                  ).number
-                }
-              </td>
-              <td className="p-2">{procurement.population}</td>
-              <td className="p-2">{procurement.mortality}</td>
-              <td className="p-2">{procurement.missing}</td>
-              <td className="p-2">{procurement.remaining}</td>
-              <td className="p-2">{procurement.remarks || "--"}</td>
-              <td className="p-2">
-                {format(new Date(procurement.date_procured), "MMM d, yyyy")}
-              </td>
-              {currentUser.user_type === "admin" && (
-                <td align="center" className="p-2">
-                  <div className="flex items-center justify-center gap-1">
-                    <Button
-                      onClick={() => {
-                        setModal("edit chicken information");
-                        setChicken(procurement);
-                      }}
-                      className="bg-yellow p-1 rounded"
-                      value={<HiPencilAlt className="text-white" />}
-                    />
-                  </div>
+    <div className="overflow-x-auto">
+      <table className="w-full rounded-md shadow-md overflow-hidden bg-white">
+        <thead>
+          <tr className="bg-main text-white">
+            {Object.keys(procurementData[0])
+              .filter((k) => k !== "id" && k !== "user_id")
+              .map((procurement, index) => {
+                return (
+                  procurement !== "date_logged" && (
+                    <th key={index} className="whitespace-nowrap p-2">
+                      {procurement === "building_id"
+                        ? "Building No."
+                        : capitalize(toTitle(procurement))}
+                    </th>
+                  )
+                );
+              })}
+            {currentUser.user_type === "admin" && (
+              <th className="whitespace-nowrap p-2">Action</th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {procurementData.map((procurement, index) => {
+            return (
+              <tr key={index} align="center" className="hover:bg-default">
+                <td className="p-2">
+                  {
+                    buildings.find(
+                      (building) => building.id == procurement.building_id
+                    ).number
+                  }
                 </td>
-              )}
-              {/* <td className="p-2">
+                <td className="p-2">{procurement.population}</td>
+                <td className="p-2">{procurement.mortality}</td>
+                <td className="p-2">{procurement.missing}</td>
+                <td className="p-2">{procurement.remaining}</td>
+                <td className="p-2">{procurement.remarks || "--"}</td>
+                <td className="p-2">
+                  {format(new Date(procurement.date_procured), "MMM d, yyyy")}
+                </td>
+                {currentUser.user_type === "admin" && (
+                  <td align="center" className="p-2">
+                    <div className="flex items-center justify-center gap-1">
+                      <Button
+                        onClick={() => {
+                          setModal("edit chicken information");
+                          setChicken(procurement);
+                        }}
+                        className="bg-yellow p-1 rounded"
+                        value={<HiPencilAlt className="text-white" />}
+                      />
+                    </div>
+                  </td>
+                )}
+                {/* <td className="p-2">
                 {format(
                   new Date(procurement.date_logged),
                   "MMM d, yyyy hh:mmaaa"
                 )}
               </td> */}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   ) : (
     <>No chicken information found.</>
   );

@@ -14,6 +14,7 @@ import Loader from "../components/Fragments/Loader";
 export default function Dashboard() {
   const [user, setUser] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sidebar, toggleSidebar] = useState(false);
   const { getUserType, getCurrentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -22,7 +23,11 @@ export default function Dashboard() {
       <div
         className={classNames(
           "pt-navbar",
-          getUserType() === "admin" ? "pl-sidebar" : "xl:px-sidebar-1/2 2xl:px-sidebar"
+          getUserType() === "admin"
+            ? sidebar
+              ? "pl-0 lg:pl-sidebar"
+              : "pl-0 lg:pl-sidebar"
+            : "xl:px-sidebar-1/2 2xl:px-sidebar"
         )}
       >
         {children}
@@ -42,8 +47,22 @@ export default function Dashboard() {
 
   return !loading ? (
     <div className="min-h-screen bg-default">
-      <Navbar isStaff={getUserType() === "staff"} user={user} />
-      {getUserType() === "admin" && <Sidebar />}
+      <Navbar
+        isStaff={getUserType() === "staff"}
+        user={user}
+        toggleSidebar={toggleSidebar}
+      />
+      {getUserType() === "admin" && (
+        <>
+          <Sidebar sidebar={sidebar} toggleSidebar={toggleSidebar} />
+          {sidebar && (
+            <div
+              className="bg-[#0000003b] absolute h-screen w-screen"
+              onClick={() => toggleSidebar(false)}
+            />
+          )}
+        </>
+      )}
       {/* dashboard content */}
       <Body>
         {getUserType() === "admin" ? <AdminDashboard /> : <StaffMenu />}

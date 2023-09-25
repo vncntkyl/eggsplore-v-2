@@ -108,7 +108,7 @@ export default function ChickProcurement() {
 
   return (
     <>
-      <div className="flex flex-col gap-4 items-end px-32">
+      <div className="flex flex-col gap-4 items-end px-0 xl:px-32">
         <Button
           onClick={() => setModalTitle("add new chicks")}
           value={
@@ -122,15 +122,15 @@ export default function ChickProcurement() {
           }
         />
         {/* CHICK PROCUREMENT TABLE */}
-        <div className="w-full">
+        <div className="w-full overflow-auto">
           <table className="w-full rounded-md shadow-md overflow-hidden bg-white">
             <thead>
               <tr className="bg-main text-white">
-                <th>Batch No.</th>
-                <th>No. of New Chicks</th>
-                <th>Supplier</th>
-                <th>Date Procured</th>
-                <th>Action</th>
+                <th className="p-2 whitespace-nowrap">Batch No.</th>
+                <th className="p-2 whitespace-nowrap">No. of New Chicks</th>
+                <th className="p-2 whitespace-nowrap">Supplier</th>
+                <th className="p-2 whitespace-nowrap">Date Procured</th>
+                <th className="p-2 whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody>

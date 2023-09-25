@@ -82,84 +82,90 @@ export default function EggProductionTable({
     };
   }, [refresh, filter, bldgFilter]);
   return !loading && productionData.length > 0 ? (
-    <table className="w-full rounded-md">
-      <thead>
-        <tr>
-          {Object.keys(productionData[0])
-            .filter((k) => k !== "id" && k !== "user_id")
-            .map((production, index) => {
-              return (
-                <th key={index} className="p-2 bg-main text-white sticky top-0">
-                  {production === "building_id"
-                    ? "Building No."
-                    : production.includes("count")
-                    ? capitalize(
-                        production
-                          .split("_")
-                          .filter((word) => word !== "count")
-                          .join(" ")
-                      )
-                    : capitalize(toTitle(production))}
-                </th>
-              );
-            })}
-          {JSON.parse(getCurrentUser()).user_type === "admin" && (
-            <>
-              <th className="p-2 bg-main text-white sticky top-0">Staff</th>
-              <th className="p-2 bg-main text-white sticky top-0">Actions</th>
-            </>
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {productionData.map((production, index) => {
-          return (
-            <tr key={index} align="center">
-              <td className="p-2">
-                {
-                  buildings.find(
-                    (building) => building.id == production.building_id
-                  ).number
-                }
-              </td>
-              <td className="p-2">{production.egg_tray_count}</td>
-              <td className="p-2">{production.defect_egg_trays_count}</td>
-              <td className="p-2">
-                {format(new Date(production.date_procured), "MMM d, yyyy")}
-              </td>
-              {JSON.parse(getCurrentUser()).user_type !== "admin" && (
+    <div className="overflow-auto">
+      <table className="w-full rounded-md">
+        <thead>
+          <tr>
+            {Object.keys(productionData[0])
+              .filter((k) => k !== "id" && k !== "user_id")
+              .map((production, index) => {
+                return (
+                  <th
+                    key={index}
+                    className="p-2 bg-main text-white sticky top-0"
+                  >
+                    {production === "building_id"
+                      ? "Building No."
+                      : production.includes("count")
+                      ? capitalize(
+                          production
+                            .split("_")
+                            .filter((word) => word !== "count")
+                            .join(" ")
+                        )
+                      : capitalize(toTitle(production))}
+                  </th>
+                );
+              })}
+            {JSON.parse(getCurrentUser()).user_type === "admin" && (
+              <>
+                <th className="p-2 bg-main text-white sticky top-0">Staff</th>
+                <th className="p-2 bg-main text-white sticky top-0">Actions</th>
+              </>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {productionData.map((production, index) => {
+            return (
+              <tr key={index} align="center">
                 <td className="p-2">
-                  {format(
-                    new Date(production.date_logged),
-                    "MMMM d, yyyy hh:mmaaa"
-                  )}
+                  {
+                    buildings.find(
+                      (building) => building.id == production.building_id
+                    ).number
+                  }
                 </td>
-              )}
-              {JSON.parse(getCurrentUser()).user_type === "admin" && (
-                <>
+                <td className="p-2">{production.egg_tray_count}</td>
+                <td className="p-2">{production.defect_egg_trays_count}</td>
+                <td className="p-2">
+                  {format(new Date(production.date_procured), "MMM d, yyyy")}
+                </td>
+                {JSON.parse(getCurrentUser()).user_type !== "admin" && (
                   <td className="p-2">
-                    {capitalize(
-                      users.find((user) => user.user_id === production.user_id)
-                        .first_name
+                    {format(
+                      new Date(production.date_logged),
+                      "MMMM d, yyyy hh:mmaaa"
                     )}
                   </td>
-                  <td className="p-2">
-                    <Button
-                      onClick={() => {
-                        selectEgg({ ...production, update: true });
-                        setModal("edit egg production");
-                      }}
-                      className="bg-yellow p-1 rounded"
-                      value={<HiPencilAlt className="text-white" />}
-                    />
-                  </td>
-                </>
-              )}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+                )}
+                {JSON.parse(getCurrentUser()).user_type === "admin" && (
+                  <>
+                    <td className="p-2">
+                      {capitalize(
+                        users.find(
+                          (user) => user.user_id === production.user_id
+                        ).first_name
+                      )}
+                    </td>
+                    <td className="p-2">
+                      <Button
+                        onClick={() => {
+                          selectEgg({ ...production, update: true });
+                          setModal("edit egg production");
+                        }}
+                        className="bg-yellow p-1 rounded"
+                        value={<HiPencilAlt className="text-white" />}
+                      />
+                    </td>
+                  </>
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   ) : (
     <>No egg production information found.</>
   );

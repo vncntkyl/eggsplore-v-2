@@ -34,6 +34,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
   useEffect(() => {
     const setup = async () => {
       const response = await retrieveEggPerformance();
+      console.log(response);
       const classifications = await retrieveEggClasifications();
       setEggClassifications(classifications);
       const sales = await retrieveSalesOverview();
@@ -99,17 +100,17 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
   }, []);
 
   return (
-    <div className="flex flex-row gap-2 justify-between w-full">
-      <div className=" bg-white p-2 w-1/2 flex flex-col gap-2 rounded shadow-md">
+    <div className="flex flex-col lg:flex-row gap-2 justify-between w-full">
+      <div className=" bg-white p-2 w-full lg:w-1/2 flex flex-col gap-2 rounded shadow-md">
         <h1 className="font-semibold">Eggs Inventory Overview</h1>
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 overflow-auto">
           {Object.keys(eggDataSummary).map((key, index) => {
             return (
               <div
                 key={index}
                 className="border-b flex flex-col p-1 px-2 relative group"
               >
-                <span>{`Egg Trays ${capitalize(key)}`}</span>
+                <span className="whitespace-nowrap">{`Egg Trays ${capitalize(key)}`}</span>
                 <span className="text-[2rem] font-semibold">
                   {eggDataSummary[key]}
                 </span>
@@ -127,7 +128,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
             );
           })}
           <div className="border-b flex flex-col p-1 px-2 relative group/link">
-            <p className="flex flex-row gap-1 items-center relative group">
+            <p className="flex flex-row gap-1 items-center relative group whitespace-nowrap">
               Egg Trays Available
               <span>
                 <AiFillInfoCircle />
@@ -150,7 +151,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
             </button>
           </div>
         </div>
-        <ResponsiveContainer width={"100%"} height={350}>
+        <ResponsiveContainer width={"100%"} height={350} className="overflow-auto">
           <LineChart data={eggData}>
             <XAxis dataKey="date" />
             <YAxis domain={[0, "dataMax"]} />
@@ -171,7 +172,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex flex-col w-1/2 gap-2">
+      <div className="flex flex-col w-full lg:w-1/2 gap-2">
         <div className=" bg-white p-2 w-full flex flex-col gap-2 rounded shadow-md">
           <h1 className="font-semibold">Sales Performance</h1>
           <ResponsiveContainer width={"100%"} height={195}>

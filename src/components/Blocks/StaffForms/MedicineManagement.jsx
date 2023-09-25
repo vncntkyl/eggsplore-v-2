@@ -158,7 +158,7 @@ export default function MedicineManagement({ building }) {
               setModalTitle("Confirmation");
             }}
           >
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-col lg:flex-row gap-2">
               <div className="w-full flex flex-col gap-2 bg-default p-2 rounded-md disabled:bg-default-dark">
                 {Object.keys(medicineData)
                   .splice(0, 4)
@@ -365,10 +365,12 @@ export default function MedicineManagement({ building }) {
               </select>
             </div>
           </div>
-          <MedicationIntakeTable
-            refresh={refresh}
-            bldgFilter={buildingFilter}
-          />
+          <div className="overflow-auto">
+            <MedicationIntakeTable
+              refresh={refresh}
+              bldgFilter={buildingFilter}
+            />
+          </div>
         </div>
       </div>
       {modalTitle && (

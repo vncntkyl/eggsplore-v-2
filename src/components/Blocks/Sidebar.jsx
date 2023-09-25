@@ -22,7 +22,7 @@ import { useState } from "react";
 import { useAuth } from "../../context/authContext";
 import { useFunction } from "../../context/FunctionContext";
 
-export default function Sidebar() {
+export default function Sidebar({ sidebar, toggleSidebar }) {
   const { navigate } = useAuth();
   const { toLink } = useFunction();
 
@@ -93,12 +93,17 @@ export default function Sidebar() {
     },
   ]);
   return (
-    <div className="w-sidebar bg-main fixed top-0 left-0 h-screen z-[3]">
+    <div
+      className={classNames(
+        "transition-all  duration-200 w-sidebar bg-main fixed top-0 left-0 h-screen z-[3]",
+        sidebar ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}
+    >
       <div className="h-navbar flex items-center justify-center font-semibold text-white text-[1.25rem] text-center px-2">
         Edwin and Lina Poultry Farm
       </div>
       <div className="w-5/6 mx-auto border-2 border-tertiary" />
-      <div className="pl-7 py-2 flex flex-col gap-4">
+      <div className="px-4 lg:pr-0 lg:pl-7 py-2 flex flex-col gap-4">
         {sideMenu.map((item, index) => {
           return (
             <Button
@@ -122,10 +127,11 @@ export default function Sidebar() {
                 });
                 setSideMenu(tempMenu);
                 navigate(`/${toLink(item.title)}`);
+                toggleSidebar(false);
               }}
               important
               className={classNames(
-                " transition-all font-semibold flex flex-row items-center gap-4 rounded-tl-full rounded-bl-full p-2 hover:text-main hover:bg-default",
+                " transition-all font-semibold flex flex-row items-center gap-4 rounded-md lg:rounded-tl-full lg:rounded-bl-full p-2 hover:text-main hover:bg-default",
                 !item.isActive
                   ? "bg-transparent text-white"
                   : "text-main bg-default"

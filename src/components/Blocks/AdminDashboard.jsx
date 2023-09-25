@@ -18,7 +18,7 @@ export default function AdminDashboard() {
     }
   }, []);
   return (
-    <div className="p-4 body flex flex-col gap-2 mx-12">
+    <div className="p-4 body flex flex-col gap-2 lg:mx-12">
       <Breadcrumb />
       <Routes>
         <Route path="/*" element={<Dashboard />} />

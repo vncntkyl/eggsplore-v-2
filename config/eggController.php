@@ -114,12 +114,12 @@ class Egg extends Controller
                 SUM(quantity) AS 'sold'
             FROM
                 ep_sales_items AS sit
-            LEFT JOIN ep_sales_invoice AS SIN
+            LEFT JOIN ep_sales_invoice AS sin
             ON
                 sit.sales_id = sin.sales_id
             GROUP BY
                 WEEK(DATE)
-        ) AS SIN
+        ) AS sin
         ON
             Weeks.week = sin.week
         ORDER BY
@@ -556,14 +556,14 @@ class Egg extends Controller
                 SUM(quantity) AS 'sold'
             FROM
                 ep_sales_items AS sit
-            LEFT JOIN ep_sales_invoice AS SIN
+            LEFT JOIN ep_sales_invoice AS sin
             ON
                 sit.sales_id = sin.sales_id
             WHERE
                 sin.date >= :start_date AND sin.date <= :end_date
             GROUP BY
                 WEEK(sin.date)
-        ) AS SIN
+        ) AS sin
         ON
             ep_weeks.week = sin.week
         LEFT JOIN(

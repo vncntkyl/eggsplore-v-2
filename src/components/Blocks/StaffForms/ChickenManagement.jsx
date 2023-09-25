@@ -152,7 +152,7 @@ export default function ChickenManagement({ building }) {
               setModalTitle("Confirmation");
             }}
           >
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-col lg:flex-row gap-2">
               <div className="w-full flex flex-col gap-2 bg-default p-2 rounded-md">
                 {Object.keys(chickenData)
                   .slice(0, 4)

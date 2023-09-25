@@ -10,8 +10,9 @@ import { useFunction } from "../../context/FunctionContext";
 import UserDropdown from "../Containers/UserDropdown";
 import { Alert, Modal } from "../Containers";
 import { useAuth } from "../../context/authContext";
+import { GiHamburgerMenu } from "react-icons/gi";
 
-export default function Navbar({ isStaff, user }) {
+export default function Navbar({ isStaff, user, toggleSidebar }) {
   const { capitalize } = useFunction();
   const [modal, setModal] = useState(null);
   const [alert, toggleAlert] = useState({
@@ -62,9 +63,9 @@ export default function Navbar({ isStaff, user }) {
 
   const UserToggle = () => {
     return (
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row gap-2 items-center w-full">
         <img src={avatar_1} alt="" className="w-[40px] h-[40px]" />
-        <div className="text-black">
+        <div className="text-black hidden lg:block">
           {capitalize(user.first_name + " " + user.last_name)}
         </div>
         <BsChevronDown
@@ -81,7 +82,7 @@ export default function Navbar({ isStaff, user }) {
       <div
         className={classNames(
           "fixed top-0 h-navbar bg-white w-full shadow-md z-[2]",
-          !isStaff && "pl-sidebar"
+          !isStaff && "pl-0 lg:pl-sidebar"
         )}
       >
         <div
@@ -89,7 +90,7 @@ export default function Navbar({ isStaff, user }) {
             "h-navbar flex flex-row items-center  px-4",
             isStaff
               ? "xl:px-sidebar-1/2 2xl:px-sidebar justify-between"
-              : "justify-end"
+              : "justify-between"
           )}
         >
           {isStaff && (
@@ -99,17 +100,26 @@ export default function Navbar({ isStaff, user }) {
           )}
           {/* NOTIFICATION CONTAINER */}
           {!isStaff && (
-            <div className="relative">
+            <>
               <Button
-                type="button"
-                value={<NotificationBell />}
-                onClick={() => toggleNotification((prev) => !prev)}
-                className="p-2 items-center justify-end"
+                value={<GiHamburgerMenu className="text-main text-xl lg:hidden" />}
+                className="mr-auto"
+                onClick={() => toggleSidebar(true)}
               />
-              {notification && (
-                <NotificationDropdown toggleNotification={toggleNotification} />
-              )}
-            </div>
+              <div className="relative">
+                <Button
+                  type="button"
+                  value={<NotificationBell />}
+                  onClick={() => toggleNotification((prev) => !prev)}
+                  className="p-0 lg:p-2 items-center justify-end"
+                />
+                {notification && (
+                  <NotificationDropdown
+                    toggleNotification={toggleNotification}
+                  />
+                )}
+              </div>
+            </>
           )}
           <span className="h-2/3 border-2" />
           {/* USER PANEL CONTAINER */}
@@ -118,7 +128,7 @@ export default function Navbar({ isStaff, user }) {
               type="button"
               value={<UserToggle />}
               onClick={() => toggleUserPanel((prev) => !prev)}
-              className="p-2"
+              className="p-2 w-full"
             />
             {userPanel && (
               <UserDropdown setModal={setModal} closePanel={toggleUserPanel} />
@@ -130,6 +140,7 @@ export default function Navbar({ isStaff, user }) {
         <Modal
           title={capitalize(modal)}
           onClose={() => setModal(null)}
+          className={"w-full mx-1 max-w-[400px]"}
           content={
             <>
               <form onSubmit={changePassword}>

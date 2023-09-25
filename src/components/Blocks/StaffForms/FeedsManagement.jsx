@@ -156,7 +156,7 @@ export default function FeedsManagement({ building }) {
               setModalTitle("Confirmation");
             }}
           >
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-col lg:flex-row gap-2">
               <div className="w-full flex flex-col gap-2 bg-default p-2 rounded-md disabled:bg-default-dark">
                 {Object.keys(feedsData)
                   .splice(0, 4)
@@ -350,7 +350,10 @@ export default function FeedsManagement({ building }) {
               </select>
             </div>
           </div>
+          <div className="overflow-auto">
+
           <FeedsConsumptionTable bldgFilter={buildingFilter} />
+          </div>
         </div>
       </div>
       {modalTitle && (

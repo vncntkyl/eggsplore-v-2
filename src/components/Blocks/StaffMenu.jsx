@@ -47,12 +47,12 @@ export default function StaffMenu() {
     }
   }, []);
   return (
-    <div className="p-2 pt-4 body flex flex-col gap-4">
+    <div className="p-2 pt-4 body flex flex-col gap-4 max-w-full">
       <div className="flex flex-row items-center justify-between">
         <h1 className="text-black font-bold text-[1.2rem]">Menu</h1>
         <BuildingDropdown current={currentBldg} setCurrent={setCurrentBldg} />
       </div>
-      <div className="flex flex-col lg:flex-row gap-2">
+      <div className="flex flex-row gap-2 overflow-auto">
         {menu.map((item, index) => {
           return (
             <Button
@@ -72,13 +72,13 @@ export default function StaffMenu() {
                   <img
                     src={item.img}
                     className={classNames(
-                      "max-w-[100px]",
+                      "hidden lg:block max-w-[100px]",
                       activeForm && "w-[50px]"
                     )}
                   />
                   <p
                     className={classNames(
-                      "font-semibold transition-all",
+                      "font-semibold transition-all whitespace-nowrap lg:whitespace-pre-wrap",
                       activeForm ? "text-[1rem]" : "text-[1.1rem]",
                       activeForm
                         ? activeForm === item.title
@@ -89,7 +89,14 @@ export default function StaffMenu() {
                   >
                     {item.title}
                   </p>
-                  <p className={activeForm && "hidden"}>{item.helperText}</p>
+                  <p
+                    className={classNames(
+                      "hidden lg:block",
+                      activeForm && "hidden lg:hidden"
+                    )}
+                  >
+                    {item.helperText}
+                  </p>
                 </>
               }
             />
