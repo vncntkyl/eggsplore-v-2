@@ -72,7 +72,7 @@ export default function EggSales() {
           rangeAndMonthOnly
         />
       </div>
-      <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+      <div className="max-h-[300px] overflow-auto rounded-md overflow-y-auto shadow-md">
         <EggSalesTable
           setEggSalesInformation={setEggSalesInformation}
           setModal={setModalTitle}

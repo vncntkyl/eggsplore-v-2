@@ -216,8 +216,8 @@ export default function Financials() {
 
   return (
     <>
-      <div className="flex flex-col gap-4 px-48">
-        <div className="flex flex-row justify-between items-center w-full">
+      <div className="flex flex-col gap-4 xl:px-48">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center w-full">
           <p className="font-semibold">Income Statement</p>
           <Button
             onClick={() => setModalTitle("create income statement")}

@@ -245,7 +245,7 @@ export default function SalesInvoice() {
       setSalesInvoice((current) => ({ ...current, invoice_no: newInvoice }));
     };
     setup();
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
 
     const getItems = async () => {
       if (
@@ -265,20 +265,21 @@ export default function SalesInvoice() {
   return (
     <>
       <div>
-        <div className="flex flex-row items-center justify-start p-2 gap-2">
-          <p className="whitespace-nowrap">Date Filter: </p>
-          <DatePicker
-            dateRange={dateRange}
-            setModalTitle={setModalTitle}
-            selectDateFilter={selectDateFilter}
-            selectedFilter={selectedFilter}
-            setRange={setRange}
-            rangeAndMonthOnly
-          />
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between p-2 gap-2 overflow-auto">
+          <div className="flex flex-row items-center gap-2 w-full ">
+            <p className="whitespace-nowrap">Date Filter: </p>
+            <DatePicker
+              dateRange={dateRange}
+              setModalTitle={setModalTitle}
+              selectDateFilter={selectDateFilter}
+              selectedFilter={selectedFilter}
+              setRange={setRange}
+            />
+          </div>
           <Button
             onClick={() => setModalTitle("create sales invoice")}
             value={
-              <div className="flex items-center gap-1 px-1">
+              <div className="flex items-center gap-1 px-1 w-fit">
                 <FaFileInvoice />
                 <span className="whitespace-nowrap">Create Sales Invoice</span>
               </div>
@@ -289,7 +290,7 @@ export default function SalesInvoice() {
           />
         </div>
         <div className="w-full px-1">
-          <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+          <div className="max-h-[300px] overflow-auto rounded-md overflow-y-auto shadow-md">
             <SalesInvoiceTable
               setModal={setModalTitle}
               refresh={refresh}

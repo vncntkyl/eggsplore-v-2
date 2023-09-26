@@ -16,7 +16,7 @@ export default function EggSalesTable({ setEggSalesInformation, setModal }) {
       setEggSalesData(response);
     };
     setup();
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
 
     return () => {
       clearInterval(realtimeData);
@@ -28,7 +28,7 @@ export default function EggSalesTable({ setEggSalesInformation, setModal }) {
         <tr>
           {Object.keys(eggSalesData[0]).map((key, index) => {
             return (
-              <th key={index} className="p-2 bg-main text-white sticky top-0">
+              <th key={index} className="p-2 bg-main text-white whitespace-nowrap sticky top-0">
                 {key === "sold" ? "Egg Trays Sold" : key === "date" ? "Week" :capitalize(toTitle(key))}
               </th>
             );

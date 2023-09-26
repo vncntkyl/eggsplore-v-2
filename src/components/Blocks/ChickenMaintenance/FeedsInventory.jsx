@@ -138,7 +138,7 @@ export default function FeedsInventory() {
       const feedsList = await getFeeds();
       setFeedsList(feedsList);
     };
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
     return () => {
       clearInterval(realtimeData);
     };

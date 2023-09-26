@@ -33,9 +33,10 @@ export default function ChickenMaintenance() {
       {/* MANAGEMENT MENU */}
       <div
         className={classNames(
-          "flex xl:flex-col bg-white",
-          currentPanel ? "flex-row" : "flex-col",
-          getPath() === currentPanel ? "w-full xl:w-1/4" : "w-full"
+          "flex bg-white overflow-auto whitespace-nowrap",
+          getPath() === currentPanel
+            ? "hidden w-full flex-row xl:flex xl:w-1/4 xl:flex-col"
+            : "w-full flex-col"
         )}
       >
         {[

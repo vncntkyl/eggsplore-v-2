@@ -75,7 +75,7 @@ export default function EggProductionTable({
       setLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
 
     return () => {
       clearInterval(realtimeData);
@@ -85,7 +85,7 @@ export default function EggProductionTable({
     <div className="overflow-auto">
       <table className="w-full rounded-md">
         <thead>
-          <tr>
+          <tr className=" sticky top-0">
             {Object.keys(productionData[0])
               .filter((k) => k !== "id" && k !== "user_id")
               .map((production, index) => {

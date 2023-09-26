@@ -17,13 +17,13 @@ export default function Breadcrumb() {
           <div key={index} className="flex flex-row items-center gap-1">
             {index !== crumbs.length - 1 ? (
               <>
-                <Link to={path} className="underline text-[1.075rem] text-black">
+                <Link to={path} className="underline text-xs lg:text-[1.075rem] text-black">
                   {capitalize(toTitle(crumb))}
                 </Link>
-                <GrNext />
+                <GrNext className="text-sm"/>
               </>
             ) : (
-              <><span className="text-[1.25rem] text-main">{capitalize(toTitle(crumb))}</span></>
+              <><span className="text-xs lg:text-[1.25rem] text-main">{capitalize(toTitle(crumb))}</span></>
             )}
           </div>
         );

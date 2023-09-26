@@ -217,21 +217,23 @@ export default function EggDeliveryMonitoring() {
   }, [modalTitle]);
   return (
     <>
-      <div className="flex flex-col gap-4 items-end px-32">
+      <div className="flex flex-col gap-4 items-end lg:px-32">
         <div className="bg-white w-full rounded-md flex flex-col gap-2 pb-2">
-          <div className="flex flex-row items-center justify-start p-2 gap-2">
-            <p className="whitespace-nowrap">Date Filter: </p>
-            <DatePicker
-              dateRange={dateRange}
-              setModalTitle={setModalTitle}
-              selectDateFilter={selectDateFilter}
-              selectedFilter={selectedFilter}
-              setRange={setRange}
-            />
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between p-2 gap-2">
+            <div className="flex flex-row items-center gap-2 w-full ">
+              <p className="whitespace-nowrap">Date Filter: </p>
+              <DatePicker
+                dateRange={dateRange}
+                setModalTitle={setModalTitle}
+                selectDateFilter={selectDateFilter}
+                selectedFilter={selectedFilter}
+                setRange={setRange}
+              />
+            </div>
             <Button
               onClick={() => setModalTitle("add delivery information")}
               value={
-                <div className="flex items-center gap-1 px-1">
+                <div className="flex items-center gap-1 px-1 w-fit">
                   <AiFillPlusCircle />
                   <span className="whitespace-nowrap">
                     Add Delivery Information
@@ -244,7 +246,7 @@ export default function EggDeliveryMonitoring() {
             />
           </div>
           <div className="w-full px-2">
-            <div className="max-h-[500px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+            <div className="max-h-[500px] overflow-auto rounded-md overflow-y-auto shadow-md">
               <EggsDeliveryMonitoringTable
                 refresh={refresh}
                 setModal={setModalTitle}

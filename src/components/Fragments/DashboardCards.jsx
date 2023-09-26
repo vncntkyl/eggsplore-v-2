@@ -14,7 +14,7 @@ export default function DashboardCards() {
       setEggSummary(eggs);
     };
     setup();
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
 
     return () => {
       clearInterval(realtimeData);

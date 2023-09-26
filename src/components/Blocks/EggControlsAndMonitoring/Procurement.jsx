@@ -124,7 +124,7 @@ export default function Procurement() {
       setEggTypes(response);
     };
     setup();
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
 
     return () => {
       clearInterval(realtimeData);
@@ -137,16 +137,18 @@ export default function Procurement() {
           Egg Procurement
         </span>
         <div>
-          <div className="flex flex-row items-center justify-start p-2 gap-2">
-            <p className="whitespace-nowrap">Date Filter: </p>
-            <DatePicker
-              dateRange={dateRange}
-              setModalTitle={setModalTitle}
-              selectDateFilter={selectDateFilter}
-              selectedFilter={selectedFilter}
-              setRange={setRange}
-              rangeAndMonthOnly
-            />
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between p-2 gap-2">
+            <div className="flex flex-row gap-2 items-center">
+              <p className="whitespace-nowrap">Date Filter: </p>
+              <DatePicker
+                dateRange={dateRange}
+                setModalTitle={setModalTitle}
+                selectDateFilter={selectDateFilter}
+                selectedFilter={selectedFilter}
+                setRange={setRange}
+                rangeAndMonthOnly
+              />
+            </div>
             <Button
               onClick={() => setModalTitle("add procured egg")}
               value={
@@ -161,7 +163,7 @@ export default function Procurement() {
             />
           </div>
           <div className="w-full px-2">
-            <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+            <div className="max-h-[300px] overflow-auto rounded-md overflow-y-auto shadow-md">
               <EggProcurementTable
                 procurementHeaders={procurementInformation}
                 refresh={refresh}

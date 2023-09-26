@@ -74,7 +74,7 @@ export default function MedicationIntake() {
       setBuildings(buildingResponse);
     };
     setup();
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
 
     return () => {
       clearInterval(realtimeData);
@@ -82,12 +82,14 @@ export default function MedicationIntake() {
   }, [refresh]);
   return (
     <>
-      <MedicationIntakeTable
-        refresh={refresh}
-        setIntake={setIntake}
-        setModal={setModalTitle}
-        setMedicineQuantity={setMedicineQuantity}
-      />
+      <div className="overflow-auto">
+        <MedicationIntakeTable
+          refresh={refresh}
+          setIntake={setIntake}
+          setModal={setModalTitle}
+          setMedicineQuantity={setMedicineQuantity}
+        />
+      </div>
       {modalTitle && (
         <Modal
           className="w-[500px] max-w-lg"

@@ -23,15 +23,15 @@ export default function Sales() {
   return (
     <div
       className={classNames(
-        "p-2 flex flex-row bg-white shadow-md rounded-md",
+        "p-2 flex flex-col xl:flex-row bg-white shadow-md rounded-md",
         getPath() === currentPanel && "gap-2"
       )}
     >
       {/* MANAGEMENT MENU */}
       <div
         className={classNames(
-          "flex flex-col bg-white",
-          getPath() === currentPanel ? "w-1/4" : "w-full"
+          "flex bg-white overflow-auto whitespace-nowrap",
+          getPath() === currentPanel ? "hidden w-full flex-row xl:flex xl:w-1/4 xl:flex-col" : "w-full flex-col"
         )}
       >
         {["egg_sales", "sales_invoice"].map((link, index) => {
@@ -79,7 +79,7 @@ export default function Sales() {
         className={classNames(
           "bg-white animate-fade",
           getPath() === currentPanel
-            ? "w-3/4"
+            ? "w-full xl:w-3/4"
             : "w-[0%] overflow-hidden pointer-events-none"
         )}
       >

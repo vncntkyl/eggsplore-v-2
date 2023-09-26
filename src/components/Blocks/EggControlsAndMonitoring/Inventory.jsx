@@ -32,7 +32,7 @@ export default function Inventory() {
           />
         </div>
         <div className="w-full px-2">
-            <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+            <div className="max-h-[300px] overflow-auto rounded-md overflow-y-auto shadow-md">
               <EggInventoryTable
                 inventoryHeaders={inventoryItem}
                 refresh={refresh}

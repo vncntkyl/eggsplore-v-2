@@ -75,7 +75,7 @@ export default function FeedsConsumption() {
       setBuildings(buildingResponse);
     };
     setup();
-    const realtimeData = setInterval(setup, 1000);
+    const realtimeData = setInterval(setup, 5000);
 
     return () => {
       clearInterval(realtimeData);
@@ -83,12 +83,14 @@ export default function FeedsConsumption() {
   }, [refresh]);
   return (
     <>
-      <FeedsConsumptionTable
-        refresh={refresh}
-        setConsumption={setConsumption}
-        setModal={setModalTitle}
-        setFeedsQuantity={setFeedsQuantity}
-      />
+      <div className="overflow-auto">
+        <FeedsConsumptionTable
+          refresh={refresh}
+          setConsumption={setConsumption}
+          setModal={setModalTitle}
+          setFeedsQuantity={setFeedsQuantity}
+        />
+      </div>
       {modalTitle && (
         <Modal
           className="w-[500px] max-w-lg"
@@ -127,9 +129,7 @@ export default function FeedsConsumption() {
                               <option
                                 key={index}
                                 value={feeds.id}
-                                selected={
-                                  feeds.id === selectedConsumed[label]
-                                }
+                                selected={feeds.id === selectedConsumed[label]}
                               >
                                 {capitalize(feeds.name)}
                               </option>
