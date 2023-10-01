@@ -146,7 +146,7 @@ export default function FeedsInventory() {
   return (
     <>
       <div>
-        <div className="w-full flex flex-row-reverse items-center justify-end">
+        <div className="w-full flex flex-col md:flex-row-reverse md:items-center justify-end gap-2 p-1">
           <Button
             onClick={() => setModalTitle("add feeds")}
             value={
@@ -156,7 +156,7 @@ export default function FeedsInventory() {
               </div>
             }
             className={
-              "whitespace-nowrap bg-main text-white p-1 px-2 rounded-full text-[.9rem] transition-all hover:bg-tertiary hover:text-main"
+              "whitespace-nowrap w-fit bg-main text-white p-1 px-2 rounded-full text-[.9rem] transition-all hover:bg-tertiary hover:text-main"
             }
           />
           <div className="w-full overflow-x-auto flex flex-row items-center justify-start p-2 gap-2">
@@ -185,7 +185,7 @@ export default function FeedsInventory() {
       </div>
       {modalTitle && (
         <Modal
-          className={modalTitle === "view feeds information" ? "max-w-lg" : ""}
+          className={modalTitle === "view feeds information" ? "max-w-lg" : "w-[95%] max-w-lg"}
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
           content={
@@ -196,7 +196,7 @@ export default function FeedsInventory() {
                   className="flex flex-col gap-2"
                 >
                   <span>Select the date range to display the records.</span>
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-col md:flex-row md:justify-center gap-2">
                     {Object.keys(dateRange).map((label, index) => {
                       return (
                         <TextInput

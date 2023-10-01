@@ -309,6 +309,7 @@ export default function SalesInvoice() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
+          className="w-[95%] max-w-[500px]"
           content={
             modalTitle === "date range picker" ? (
               <>
@@ -317,7 +318,7 @@ export default function SalesInvoice() {
                   className="flex flex-col gap-2"
                 >
                   <span>Select the date range to display the records.</span>
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-col md:justify-center md:flex-row gap-2">
                     {Object.keys(dateRange).map((label, index) => {
                       return (
                         <TextInput
@@ -436,7 +437,7 @@ export default function SalesInvoice() {
                       ? handleSubmit
                       : handleUpdate
                   }
-                  className="flex flex-col gap-2 min-w-[400px]"
+                  className="flex flex-col gap-2 w-full "
                 >
                   <div>
                     {Object.keys(salesInvoice)
@@ -531,7 +532,7 @@ export default function SalesInvoice() {
                       })}
                   </div>
                   <hr />
-                  <div>
+                  <div className="overflow-x-auto">
                     <SalesItemsTable
                       items={
                         modalTitle === "edit sales invoice" ? salesItems : items

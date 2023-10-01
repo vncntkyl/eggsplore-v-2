@@ -217,9 +217,9 @@ export default function EggDeliveryMonitoring() {
   }, [modalTitle]);
   return (
     <>
-      <div className="flex flex-col gap-4 items-end lg:px-32">
+      <div className="flex flex-col gap-4 items-end 3xl:px-32">
         <div className="bg-white w-full rounded-md flex flex-col gap-2 pb-2">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between p-2 gap-2">
+          <div className="flex flex-col 2xl:flex-row items-start 2xl:items-center justify-between p-2 gap-2">
             <div className="flex flex-row items-center gap-2 w-full ">
               <p className="whitespace-nowrap">Date Filter: </p>
               <DatePicker
@@ -264,6 +264,7 @@ export default function EggDeliveryMonitoring() {
       {modalTitle && (
         <Modal
           title={capitalize(modalTitle)}
+          className="w-[95%] max-w-[750px] overflow-x-auto"
           onClose={() => handleClose()}
           content={
             modalTitle === "date range picker" ? (
@@ -273,7 +274,7 @@ export default function EggDeliveryMonitoring() {
                   className="flex flex-col gap-2"
                 >
                   <span>Select the date range to display the records.</span>
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-col md:flex-row md:justify-center gap-2">
                     {Object.keys(dateRange).map((label, index) => {
                       return (
                         <TextInput

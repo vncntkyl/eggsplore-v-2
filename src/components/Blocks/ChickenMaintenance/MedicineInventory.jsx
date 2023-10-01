@@ -148,7 +148,7 @@ export default function MedicineInventory() {
   return (
     <>
       <div>
-        <div className="w-full flex flex-row-reverse items-center justify-end">
+        <div className="w-full flex flex-col md:flex-row-reverse md:items-center md:justify-end">
           <Button
             onClick={() => setModalTitle("add medicine")}
             value={
@@ -158,7 +158,7 @@ export default function MedicineInventory() {
               </div>
             }
             className={
-              "whitespace-nowrap bg-main text-white p-1 px-2 rounded-full text-[.9rem] transition-all hover:bg-tertiary hover:text-main"
+              "whitespace-nowrap bg-main text-white p-1 px-2 rounded-full text-[.9rem] transition-all w-fit hover:bg-tertiary hover:text-main"
             }
           />
           <div className="w-full overflow-x-auto flex flex-row items-center justify-start p-2 gap-2">
@@ -187,9 +187,7 @@ export default function MedicineInventory() {
       </div>
       {modalTitle && (
         <Modal
-          className={
-            modalTitle === "view medicine information" ? "max-w-lg" : ""
-          }
+          className={"w-[95%] max-w-lg"}
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
           content={
@@ -200,7 +198,7 @@ export default function MedicineInventory() {
                   className="flex flex-col gap-2"
                 >
                   <span>Select the date range to display the records.</span>
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-col md:flex-row gap-2 justify-center">
                     {Object.keys(dateRange).map((label, index) => {
                       return (
                         <TextInput

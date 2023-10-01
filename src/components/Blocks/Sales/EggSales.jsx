@@ -81,6 +81,7 @@ export default function EggSales() {
       {modalTitle && (
         <Modal
           title={capitalize(modalTitle)}
+          className="w-[95%] max-w-[500px]"
           onClose={() => handleClose()}
           content={
             modalTitle === "date range picker" ? (
@@ -90,7 +91,7 @@ export default function EggSales() {
                   className="flex flex-col gap-2"
                 >
                   <span>Select the date range to display the records.</span>
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-col md:justify-center md:flex-row gap-2">
                     {Object.keys(dateRange).map((label, index) => {
                       return (
                         <TextInput
@@ -170,8 +171,12 @@ export default function EggSales() {
                           </td>
                         </tr>
                         <tr>
-                          <td align="left" className="p-2 px-8">Total</td>
-                          <td align="left" className="p-2 px-8">{total.quantity}</td>
+                          <td align="left" className="p-2 px-8">
+                            Total
+                          </td>
+                          <td align="left" className="p-2 px-8">
+                            {total.quantity}
+                          </td>
                           <td align="left" className="p-2 px-8">
                             {Intl.NumberFormat("en-PH", {
                               style: "currency",

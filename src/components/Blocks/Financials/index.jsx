@@ -240,7 +240,7 @@ export default function Financials() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
-          className="min-w-[550px]"
+          className="w-[97%] max-w-[550px]"
           content={
             <>
               <form className="w-full">

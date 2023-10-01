@@ -446,8 +446,8 @@ export default function Dashboard() {
           onClose={() => handleClose()}
           className={
             modalTitle === "egg classifications"
-              ? "min-w-[300px]"
-              : "min-w-[550px]"
+              ? "w-full max-w-[300px]"
+              : "w-[95%] max-w-[550px]"
           }
           content={
             modalTitle === "egg classifications" ? (
