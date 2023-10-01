@@ -119,6 +119,7 @@ export default function ChickenPopulation() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
+          className="w-[95%] max-w-[500px]"
           content={
             modalTitle !== "edit chicken information" ? (
               <>
@@ -127,7 +128,7 @@ export default function ChickenPopulation() {
                   className="flex flex-col gap-2"
                 >
                   <span>Select the date range to display the records.</span>
-                  <div className="flex flex-row gap-2">
+                  <div className="flex flex-col md:flex-row md:justify-center gap-2">
                     {Object.keys(dateRange).map((label, index) => {
                       return (
                         <TextInput

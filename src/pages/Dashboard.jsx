@@ -57,7 +57,7 @@ export default function Dashboard() {
           <Sidebar sidebar={sidebar} toggleSidebar={toggleSidebar} />
           {sidebar && (
             <div
-              className="bg-[#0000003b] absolute h-screen w-screen"
+              className="bg-[#0000003b] fixed h-screen w-screen z-[2]"
               onClick={() => toggleSidebar(false)}
             />
           )}

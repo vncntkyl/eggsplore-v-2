@@ -93,7 +93,7 @@ export default function FeedsConsumption() {
       </div>
       {modalTitle && (
         <Modal
-          className="w-[500px] max-w-lg"
+          className="w-[95%] max-w-lg"
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
           content={

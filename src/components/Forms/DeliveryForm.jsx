@@ -67,7 +67,7 @@ export default function DeliveryForm({
   };
   return (
     <form
-      className="flex flex-col gap-2"
+      className="flex flex-col gap-2 min-w-[500px] overflow-x-auto"
       onSubmit={
         modalTitle === "add delivery information"
           ? handleRegistration
