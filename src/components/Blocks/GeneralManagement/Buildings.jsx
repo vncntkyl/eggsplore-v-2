@@ -67,7 +67,7 @@ export default function Buildings() {
         show: true,
       });
     }
-    doRefresh((count) => count = count + 1);
+    doRefresh((count) => (count = count + 1));
   };
   const handleDelete = async () => {
     const response = await deleteBuilding(selectedBuilding.id);
@@ -83,12 +83,11 @@ export default function Buildings() {
       toggleAlert({
         type: "warning",
         title: "Deletion Error",
-        message:
-          "An error has occured. Please try again.",
+        message: "An error has occured. Please try again.",
         show: true,
       });
     }
-    doRefresh((count) => count = count + 1);
+    doRefresh((count) => (count = count + 1));
   };
 
   const handleClose = () => {
@@ -119,7 +118,9 @@ export default function Buildings() {
   return (
     <>
       <div>
-        <p className="font-semibold text-[1.1rem] mb-1 text-main">Building Management</p>
+        <p className="font-semibold text-[1.1rem] mb-1 text-main">
+          Building Management
+        </p>
         <div className="flex flex-row items-center justify-between">
           <Button
             onClick={() => setModalTitle("add building")}
@@ -189,6 +190,7 @@ export default function Buildings() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
+          className="w-[95%] max-w-[300px]"
           content={
             ["add building", "edit building"].includes(modalTitle) ? (
               <>
@@ -247,7 +249,7 @@ export default function Buildings() {
                 <p>
                   Are you sure to remove{" "}
                   <span className="font-semibold">
-                    {capitalize(selectedBuilding.number)}?
+                    Building #{selectedBuilding.number}?
                   </span>
                 </p>
                 <div className="flex items-center justify-end gap-2">

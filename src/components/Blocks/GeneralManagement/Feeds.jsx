@@ -184,9 +184,9 @@ export default function Feeds() {
       </div>
       {modalTitle && (
         <Modal
-        
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
+          className="w-[95%] max-w-[450px]"
           content={
             ["add feeds", "edit feeds"].includes(modalTitle) ? (
               <>

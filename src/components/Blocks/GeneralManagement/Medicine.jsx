@@ -142,7 +142,7 @@ export default function Medicine() {
             }
           />
         </div>
-        <div className="py-2">
+        <div className="py-2 overflow-x-auto">
           <table className="w-full rounded-md shadow-md overflow-hidden">
             <thead>
               <tr className="bg-main text-white">
@@ -174,7 +174,7 @@ export default function Medicine() {
                               medicine_name: med.medicine_name,
                               dosage_instructions: med.dosage_instructions,
                               usage_indication: med.usage_indication,
-                              update: true
+                              update: true,
                             });
                             setModalTitle("edit medicine");
                           }}
@@ -202,6 +202,7 @@ export default function Medicine() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
+          className={["add medicine", "edit medicine"].includes(modalTitle) ? "w-[95%] max-w-[750px]" : "w-[95%] max-w-[300px]"}
           content={
             ["add medicine", "edit medicine"].includes(modalTitle) ? (
               <>

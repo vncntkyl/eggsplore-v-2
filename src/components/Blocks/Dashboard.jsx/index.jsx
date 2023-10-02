@@ -390,7 +390,7 @@ export default function Dashboard() {
                 ...current,
                 {
                   headers: inventoryReportHeader,
-                  title: `${month} Breakdown`,
+                  title: month,
                   record: inventoryQuantities,
                 },
               ];

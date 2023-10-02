@@ -207,7 +207,7 @@ export default function Users() {
   return (
     <>
       <div>
-        <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
           <Toggle
             option_1="admin"
             option_2="staff"
@@ -222,12 +222,12 @@ export default function Users() {
               </div>
             }
             className={
-              "bg-main text-white p-1 px-2 rounded-full text-[.9rem] transition-all hover:bg-tertiary hover:text-main"
+              "bg-main text-white p-1 px-2 rounded-full text-[.9rem] w-fit transition-all hover:bg-tertiary hover:text-main"
             }
           />
         </div>
         {/* USER TABLE */}
-        <div className="py-2">
+        <div className="py-2 overflow-x-auto">
           <table className="w-full rounded-md shadow-md overflow-hidden">
             <thead>
               <tr className="bg-main text-white">
@@ -322,6 +322,7 @@ export default function Users() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
+          className="w-[95%] max-w-[500px]"
           content={
             ["register user", "edit user"].includes(modalTitle) ? (
               <>
@@ -362,7 +363,7 @@ export default function Users() {
                           }}
                         />
                       ) : (
-                        <div className="flex flex-row gap-2 items-center justify-between relative max--h-[30px] p-1">
+                        <div className="flex flex-row gap-2 items-center justify-between relative max-h-[30px] p-1">
                           <span>Buildings</span>
                           <Button
                             value={
