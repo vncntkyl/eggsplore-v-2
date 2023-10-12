@@ -139,7 +139,7 @@ export default function Dashboard() {
             return [
               {
                 headers: ["Month", "Medicine Name", "Amount"],
-                title: "Medicine Expenses Breakdown",
+                title: "Medicine Expenses",
                 record: medicineReport.map(
                   (
                     { month, medicine_name, medicine_expense },
@@ -176,7 +176,7 @@ export default function Dashboard() {
               },
               {
                 headers: ["Month", "Feeds Name", "Amount"],
-                title: "Feeds Expenses Breakdown",
+                title: "Feeds Expenses",
                 record: feedsReport.map(
                   ({ month, name, feeds_expense }, index, array) => {
                     const previousMonth =
@@ -255,7 +255,7 @@ export default function Dashboard() {
             return [
               {
                 headers: ["Egg Category", "Quantity", "Amount"],
-                title: "Egg Category Sales Breakdown",
+                title: "Egg Category Sales",
                 record: eggSalesReport.map(
                   ({ egg_type_name, total_quantity, total_amount }) => [
                     capitalize(toTitle(egg_type_name)),
@@ -266,7 +266,7 @@ export default function Dashboard() {
               },
               {
                 headers: ["Location", "Amount"],
-                title: "Regional Sales Breakdown",
+                title: "Regional Sales",
                 record: salesLocationReport.map(({ location, amount }) => [
                   capitalize(location),
                   formatCurrency(amount),

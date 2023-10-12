@@ -34,7 +34,6 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
   useEffect(() => {
     const setup = async () => {
       const response = await retrieveEggPerformance();
-      console.log(response);
       const classifications = await retrieveEggClasifications();
       setEggClassifications(classifications);
       const sales = await retrieveSalesOverview();

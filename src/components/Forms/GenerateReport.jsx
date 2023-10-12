@@ -23,7 +23,7 @@ export default function GenerateReport({
   const { capitalize } = useFunction();
   const generateAdditionalData = (doc, margin, height) => {
     if (additionalData && additionalData.length > 0) {
-      additionalData.map((adtData) => {
+      const newContent = additionalData.map((adtData) => {
         doc.autoTable({
           startY: doc.autoTable.previous.finalY + 17,
           styles: { halign: "center" },
@@ -35,7 +35,7 @@ export default function GenerateReport({
             margin = data.settings.margin.left;
             doc.setFontSize(11);
 
-            doc.text(adtData.title, 15, doc.autoTable.previous.finalY + 10, {
+            doc.text(adtData.title, 15, doc.autoTable.previous.finalY + 12, {
               align: "left",
               baseline: "top",
             });
@@ -44,12 +44,13 @@ export default function GenerateReport({
           },
         });
       });
+      return newContent;
     }
   };
   const generate = () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
 
-    const doc = new jsPDF({ orientation: "portrait", format: "a4" });
+    let doc = new jsPDF({ orientation: "portrait", format: "a4" });
 
     const width =
       doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
@@ -57,7 +58,7 @@ export default function GenerateReport({
       doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
     let margin;
     doc.autoTable({
-      startY: 37,
+      startY: fileTitle === "Egg Production" ? 50 : 46,
       styles: { halign: "center" },
       headStyles: { fillColor: [185, 86, 70] },
       margin: { top: 30 },
@@ -66,16 +67,10 @@ export default function GenerateReport({
       didDrawPage: (data) => {
         margin = data.settings.margin.left;
 
-        doc.text("Edwin and Lina Poultry Farm", width / 2, 10, {
-          align: "center",
-          baseline: "top",
-        });
-
-        doc.setFontSize(12);
-        doc.text(fileTitle + " Report", width / 2, 20, { align: "center" });
-
+        doc = generateHeader(doc, width, fileTitle + " Report");
+        doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
-        doc.text("Date Coverage: ", 15, 25, {
+        doc.text("Date Coverage: ", 15, 40, {
           align: "left",
           baseline: "top",
         });
@@ -84,7 +79,7 @@ export default function GenerateReport({
             " - " +
             format(new Date(dateCoverage.end_date), "MMMM d, yyyy"),
           15 + doc.getTextDimensions("Date Coverage: ").w,
-          25,
+          40,
           {
             align: "left",
             baseline: "top",
@@ -99,7 +94,7 @@ export default function GenerateReport({
                 );
               }, 0),
             15,
-            31,
+            45,
             { align: "left", baseline: "top" }
           );
         }
@@ -522,32 +517,14 @@ export default function GenerateReport({
   const generateInventoryReport = () => {
     const inventorySummary = { ...isInventoryReport };
     const user = JSON.parse(localStorage.getItem("currentUser"));
-    const doc = new jsPDF({ orientation: "portrait", format: "a4" });
+    let doc = new jsPDF({ orientation: "portrait", format: "a4" });
 
     const width =
       doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
     const height =
       doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-    doc.text("Edwin and Lina Poultry Farm", width / 2, 10, {
-      align: "center",
-      baseline: "top",
-    });
-
-    doc.setFontSize(12);
-    doc.text(
-      "Recto Ave., Brgy. Lumil, San Jose, Batangas 4227",
-      width / 2,
-      20,
-      {
-        align: "center",
-      }
-    );
-    doc.text("+63917-108-7342", width / 2, 28, {
-      align: "center",
-    });
-    doc.text("Eggs Inventory Report", width / 2, 32, {
-      align: "center",
-    });
+    doc = generateHeader(doc, width, "Eggs Inventory Report");
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
     let date = "";
 
@@ -562,11 +539,11 @@ export default function GenerateReport({
         " - " +
         format(new Date(dateCoverage.end_date), "MMMM yyyy");
     }
-    doc.text(date, width / 2, 36, {
+    doc.text(date, width / 2, 39, {
       align: "center",
     });
     doc.setFontSize(11);
-    doc.text("Date Coverage: ", 15, 40, {
+    doc.text("Date Coverage: ", 15, 42, {
       align: "left",
       baseline: "top",
     });
@@ -575,7 +552,7 @@ export default function GenerateReport({
         " - " +
         format(new Date(dateCoverage.end_date), "MMMM d, yyyy"),
       15 + doc.getTextDimensions("Date Coverage: ").w,
-      40,
+      42,
       {
         align: "left",
         baseline: "top",
@@ -583,12 +560,12 @@ export default function GenerateReport({
     );
 
     doc.setFont("helvetica", "bold");
-    doc.text("INVENTORY SUMMARY (in trays)", 15, 45, {
+    doc.text("INVENTORY SUMMARY (in trays)", 15, 49, {
       align: "left",
       baseline: "top",
     });
-    doc.line(15, 43, width - 15, 43);
-    let startY = 45;
+    doc.line(15, 47, width - 15, 47);
+    let startY = 49;
     let lineHeight = 7;
 
     Object.keys(inventorySummary).map((category) => {
@@ -616,9 +593,9 @@ export default function GenerateReport({
       align: "left",
       baseline: "top",
     });
-    doc.autoTable({ startY: startY + 5 });
     if (additionalData.length > 0) {
       doc.setFont("helvetica", "normal");
+      doc.autoTable.previous.finalY = startY + 5;
       generateAdditionalData(doc, 15, height, width);
       const lastPage = doc.internal.getNumberOfPages();
       const currentDate = toDate(new Date());
@@ -628,14 +605,15 @@ export default function GenerateReport({
       doc.setPage(lastPage + 1);
       doc.setFontSize(11);
 
-      // doc.text("Generated by: ", 15, height - 40, {
+      startY = doc.autoTable.previous.finalY;
+      // doc.text("Generated by: ", 15, startY + 40, {
       //   align: "left",
       //   baseline: "bottom",
       // });
       // doc.text(
       //   `${capitalize(user.first_name)} ${capitalize(user.last_name)}`,
       //   15,
-      //   height - 25,
+      //   startY + 25,
       //   {
       //     align: "left",
       //     baseline: "bottom",
@@ -653,8 +631,35 @@ export default function GenerateReport({
       const str = "Page " + doc.internal.getNumberOfPages();
       doc.text(str, 15, height - 10);
     }
-
     doc.save(fileName);
+    doc.close();
+    closeModal();
+  };
+
+  const generateHeader = (doc, width, title) => {
+    const center = width / 2;
+    doc.setFont("helvetica", "bold");
+    doc.text("Edwin and Lina Poultry Farm", center, 10, {
+      align: "center",
+      baseline: "top",
+    });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text("Recto Ave., Brgy. Lumil, San Jose, Batangas 4227", center, 19, {
+      align: "center",
+    });
+    doc.text("+639171087342", center, 24, {
+      align: "center",
+    });
+    doc.text("contact@edwinlinafarm.com", center, 28, {
+      align: "center",
+    });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text(title, center, 34, {
+      align: "center",
+    });
+    return doc;
   };
   return (
     <>
