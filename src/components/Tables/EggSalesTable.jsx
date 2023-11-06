@@ -16,11 +16,7 @@ export default function EggSalesTable({ setEggSalesInformation, setModal }) {
       setEggSalesData(response);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, []);
   return eggSalesData.length > 0 ? (
     <table className="w-full rounded-md">

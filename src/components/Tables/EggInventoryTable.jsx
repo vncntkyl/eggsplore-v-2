@@ -38,11 +38,7 @@ export default function EggInventoryTable({
       setLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh, filter]);
 
   return !loading && inventoryLogs ? (

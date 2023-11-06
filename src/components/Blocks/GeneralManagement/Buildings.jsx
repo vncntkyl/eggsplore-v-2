@@ -109,11 +109,7 @@ export default function Buildings() {
       setBuildings(response);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh]);
 
   return (

@@ -12,11 +12,7 @@ export default function BuildingDropdown({ current, setCurrent }) {
       setBuildings(response);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, []);
   return (
     <div className="flex flex-row gap-2 items-center">

@@ -22,7 +22,9 @@ class User extends Controller
     {
         try {
             $this->setStatement("INSERT INTO ep_users (first_name, middle_name, last_name, username, password, user_type, status) VALUES(?,?,?,?,?,?,?)");
-            return $this->statement->execute([$userdata->first_name, $userdata->middle_name, $userdata->last_name, $userdata->username, $userdata->password, $userdata->user_type, $userdata->status]);
+            if ($this->statement->execute([$userdata->first_name, $userdata->middle_name, $userdata->last_name, $userdata->username, $userdata->password, $userdata->user_type, $userdata->status])) {
+                return $this->connection->lastInsertId();
+            }
         } catch (PDOException $e) {
             $this->getError($e);
         }

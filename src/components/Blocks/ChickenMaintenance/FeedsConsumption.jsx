@@ -75,11 +75,7 @@ export default function FeedsConsumption() {
       setBuildings(buildingResponse);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh]);
   return (
     <>

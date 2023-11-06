@@ -75,11 +75,7 @@ export default function EggProductionTable({
       setLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh, filter, bldgFilter]);
   return !loading && productionData.length > 0 ? (
     <div className="overflow-auto">

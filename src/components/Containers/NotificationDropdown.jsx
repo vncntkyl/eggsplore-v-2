@@ -76,11 +76,7 @@ export default function NotificationDropdown({ toggleNotification }) {
       setNotifications(notification);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, []);
 
   return (

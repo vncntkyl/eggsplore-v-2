@@ -60,11 +60,7 @@ export default function ChickenMaintenanceTable({
       setLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh, filter, bldgFilter]);
   return !loading && procurementData.length > 0 ? (
     <div className="overflow-x-auto">

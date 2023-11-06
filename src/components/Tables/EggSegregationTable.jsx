@@ -19,11 +19,7 @@ export default function EggSegregationTable() {
       setLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, []);
   return !loading && segregationLogs.length !== 0 ? (
     <table className="w-full rounded-md">

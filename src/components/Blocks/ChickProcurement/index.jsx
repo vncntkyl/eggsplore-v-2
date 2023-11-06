@@ -99,11 +99,7 @@ export default function ChickProcurement() {
     };
 
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh]);
 
   return (

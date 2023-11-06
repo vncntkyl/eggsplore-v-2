@@ -45,11 +45,7 @@ export default function MonthlyIncomeStatement() {
       setIncome(response);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, []);
   return (
     income && (

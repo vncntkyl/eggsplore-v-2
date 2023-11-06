@@ -74,11 +74,7 @@ export default function MedicationIntakeTable({
       setLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh, bldgFilter]);
   return !loading && medicationIntake.length > 0 ? (
     <table className="w-full rounded-md shadow-md overflow-hidden">

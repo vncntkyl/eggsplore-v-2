@@ -14,11 +14,7 @@ export default function DashboardCards() {
       setEggSummary(eggs);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, []);
   return (
     <div className="flex flex-row gap-2 overflow-x-auto snap-x snap-mandatory py-1 scroll-smooth scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-main scrollbar-track-default">

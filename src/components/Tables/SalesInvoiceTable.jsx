@@ -27,11 +27,7 @@ export default function SalesInvoiceTable({
       setLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, [refresh, filter]);
 
   return !loading && salesInvoiceLogs.length > 0 ? (

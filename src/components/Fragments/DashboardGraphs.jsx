@@ -92,11 +92,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
       );
     };
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
+   
   }, []);
 
   return (

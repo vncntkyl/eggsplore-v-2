@@ -73,6 +73,8 @@ export default function Users() {
       buildings = compareBuildings(userBuildings, selectedBuildings);
     }
 
+    console.log(newUser, buildings);
+
     const response = await updateUser(
       JSON.stringify(newUser),
       JSON.stringify(buildings),
@@ -100,8 +102,14 @@ export default function Users() {
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
-    const user = { ...newUser, user_type: activePanel, status: 1 };
+    const user = {
+      ...newUser,
+      user_type: activePanel,
+      status: 1,
+      buildings: selectedBuildings,
+    };
     const response = await registerUser(user);
+    console.log(response);
     setModalTitle(null);
     if (response === 1) {
       toggleAlert({
@@ -169,15 +177,26 @@ export default function Users() {
   const handleCheckboxChange = (e, item) => {
     const isChecked = e.target.checked;
     if (isChecked) {
-      setSelectedBuildings([
-        ...selectedBuildings,
-        {
-          user_id: selectedUser.user_id,
-          building_id: item.id,
-          number: item.number,
-          capacity: item.capacity,
-        },
-      ]);
+      if (selectedUser) {
+        setSelectedBuildings([
+          ...selectedBuildings,
+          {
+            user_id: selectedUser.user_id,
+            building_id: item.id,
+            number: item.number,
+            capacity: item.capacity,
+          },
+        ]);
+      } else {
+        setSelectedBuildings([
+          ...selectedBuildings,
+          {
+            building_id: item.id,
+            number: item.number,
+            capacity: item.capacity,
+          },
+        ]);
+      }
     } else {
       setSelectedBuildings(
         selectedBuildings.filter(
@@ -197,11 +216,6 @@ export default function Users() {
     };
 
     setup();
-    const realtimeData = setInterval(setup, 5000);
-
-    return () => {
-      clearInterval(realtimeData);
-    };
   }, [refresh]);
 
   return (
