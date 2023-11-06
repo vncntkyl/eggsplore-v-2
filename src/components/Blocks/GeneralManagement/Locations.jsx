@@ -182,6 +182,7 @@ export default function Locations() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
+          className="w-[95%] max-w-[300px]"
           content={
             ["add location", "edit location"].includes(modalTitle) ? (
               <>

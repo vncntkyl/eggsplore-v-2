@@ -16,7 +16,7 @@ export default function Modal({
       ></div>
       <div
         className={classNames(
-          "fixed top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] bg-white rounded-md shadow-lg w-fit overflow-hidden z-[22] animate-modal-slide-down",
+          "fixed top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] bg-white rounded-md shadow-lg overflow-hidden z-[22] animate-modal-slide-down",
           className
         )}
       >

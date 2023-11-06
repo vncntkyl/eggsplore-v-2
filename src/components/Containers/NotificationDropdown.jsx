@@ -81,7 +81,7 @@ export default function NotificationDropdown({ toggleNotification }) {
 
   return (
     notifications.length > 0 && (
-      <div className="absolute top-full right-0 w-sidebar bg-white rounded-md shadow-md animate-slide-down">
+      <div className="absolute top-full right-[-100px] xs:right-0 w-sidebar bg-white rounded-md shadow-md animate-slide-down">
         <h1 className="font-semibold text-[1.1rem] text-main border-b-2 p-2">
           Notifications
         </h1>

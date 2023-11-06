@@ -144,24 +144,24 @@ export default function Navbar({ isStaff, user, toggleSidebar }) {
           content={
             <>
               <form onSubmit={changePassword}>
-                <div className="flex gap-2 p-1 items-center justify-between">
+                <div className="flex flex-col md:flex-row gap-2 p-1 items-start md:items-center justify-between">
                   <label
                     htmlFor="currentPassword"
-                    className="whitespace-nowrap text-start"
+                    className="whitespace-nowrap text-left md:text-start"
                   >
                     Enter current password
                   </label>
                   <input
                     type="password"
                     id="currentPassword"
-                    className="outline-none border-none p-1 bg-default rounded px-2"
+                    className="outline-none border-none p-1 w-full md:w-1/2 bg-default rounded px-2"
                     ref={currentPasswordRef}
                   />
                 </div>
-                <div className="flex gap-2 p-1 items-center justify-between">
+                <div className="flex flex-col md:flex-row gap-2 p-1 items-start md:items-center justify-between">
                   <label
                     htmlFor="newPassword"
-                    className="whitespace-nowrap text-start"
+                    className="whitespace-nowrap text-left md:text-start"
                   >
                     Enter new password
                   </label>
@@ -171,20 +171,20 @@ export default function Navbar({ isStaff, user, toggleSidebar }) {
                     onChange={(e) => {
                       setNewPassword(e.target.value);
                     }}
-                    className="outline-none border-none p-1 bg-default rounded px-2"
+                    className="outline-none border-none p-1 w-full md:w-1/2 bg-default rounded px-2"
                   />
                 </div>
-                <div className="flex gap-2 p-1 items-center justify-between">
+                <div className="flex flex-col md:flex-row gap-2 p-1 items-start md:items-center justify-between">
                   <label
                     htmlFor="confirmPassword"
-                    className="whitespace-nowrap text-start"
+                    className="whitespace-nowrap text-left md:text-start"
                   >
                     Confirm new password
                   </label>
                   <input
                     type="password"
                     id="confirmPassword"
-                    className="outline-none border-none p-1 bg-default rounded px-2"
+                    className="outline-none border-none p-1 w-full md:w-1/2 bg-default rounded px-2"
                     onChange={(e) => {
                       setConfirmPassword(e.target.value);
                       if (e.target.value === newPassword) {
