@@ -90,10 +90,9 @@ export default function EggProduction({ building }) {
       );
       setBuildings(filters);
       setCurrentBuilding(response.find((res) => res.id === building));
-
       setEggData({
         date: format(new Date(), "yyyy-MM-dd"),
-        building_number: response.number,
+        building_number: response.find((res) => res.id === building).number,
         egg_tray_count: 0,
         defect_egg_trays_count: 0,
       });
@@ -101,129 +100,134 @@ export default function EggProduction({ building }) {
     setup();
   }, [building]);
   return (
-    <>
-      <div className="p-2 flex flex-col gap-2 w-full animate-fade">
-        <div className="w-full">
-          <p className="text-[1.2rem] font-semibold">Egg Production</p>
-          <form
-            className="flex flex-col gap-2 bg-default p-2 rounded-md"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setModalTitle("Confirmation");
-            }}
-          >
-            {Object.keys(eggData).map((eggKey, index) => {
-              return eggKey === "building_number" ? (
-                <>
-                  <TextInput
-                    type="hidden"
-                    value={currentBuilding.id}
-                    id="building_id"
-                  />
+    currentBuilding && (
+      <>
+        <div className="p-2 flex flex-col gap-2 w-full animate-fade">
+          <div className="w-full">
+            <p className="text-[1.2rem] font-semibold">Egg Production</p>
+            <form
+              className="flex flex-col gap-2 bg-default p-2 rounded-md"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setModalTitle("Confirmation");
+              }}
+            >
+              {Object.keys(eggData).map((eggKey, index) => {
+                return eggKey === "building_number" ? (
+                  <>
+                    <TextInput
+                      type="hidden"
+                      value={currentBuilding.id}
+                      id="building_id"
+                    />
+                    <TextInput
+                      id={eggKey}
+                      key={index}
+                      withLabel={capitalize(toTitle(eggKey)) + ":"}
+                      value={currentBuilding.number}
+                      type="number"
+                      disabled={true}
+                      orientation="row"
+                      classes="p-1 items-center "
+                      labelClasses="whitespace-nowrap w-full text-start"
+                      inputClasses="w-full rounded px-2"
+                    />
+                  </>
+                ) : (
                   <TextInput
                     id={eggKey}
                     key={index}
                     withLabel={capitalize(toTitle(eggKey)) + ":"}
-                    value={currentBuilding.number}
-                    type="number"
-                    disabled={true}
+                    value={eggData[eggKey]}
+                    type={eggKey === "date" ? "date" : "number"}
                     orientation="row"
                     classes="p-1 items-center "
                     labelClasses="whitespace-nowrap w-full text-start"
                     inputClasses="w-full rounded px-2"
+                    onChange={(e) =>
+                      setEggData((data) => ({
+                        ...data,
+                        [eggKey]:
+                          eggKey === "egg_tray_count"
+                            ? parseInt(e.target.value)
+                            : e.target.value,
+                      }))
+                    }
                   />
-                </>
-              ) : (
-                <TextInput
-                  id={eggKey}
-                  key={index}
-                  withLabel={capitalize(toTitle(eggKey)) + ":"}
-                  value={eggData[eggKey]}
-                  type={eggKey === "date" ? "date" : "number"}
-                  orientation="row"
-                  classes="p-1 items-center "
-                  labelClasses="whitespace-nowrap w-full text-start"
-                  inputClasses="w-full rounded px-2"
-                  onChange={(e) =>
-                    setEggData((data) => ({
-                      ...data,
-                      [eggKey]:
-                        eggKey === "egg_tray_count"
-                          ? parseInt(e.target.value)
-                          : e.target.value,
-                    }))
-                  }
-                />
-              );
-            })}
-            <Button
-              type="submit"
-              value="Submit"
-              className="bg-tertiary p-1 px-2 w-fit rounded-md hover:bg-main hover:text-white transition-all"
-            />
-          </form>
-        </div>
-        <div className="w-full">
-          <div className="flex flex-col gap-2 p-2">
-            <p className="text-[1.2rem] font-semibold">Egg Production Logs</p>
-            <div className="flex items-center gap-2">
-              <label htmlFor="bldg_filter">Show Building Logs:</label>
-              <select
-                id="bldg_filter"
-                className="bg-default px-2 p-1"
-                onChange={(e) => {
-                  setBuildingFilter(parseInt(e.target.value));
-                }}
-              >
-                <option value="-1" selected>
-                  All
-                </option>
-                {buildings.map((ub, index) => {
-                  return (
-                    <option key={index} value={ub.building_id}>
-                      Building {ub.number}
-                    </option>
-                  );
-                })}
-              </select>
+                );
+              })}
+              <Button
+                type="submit"
+                value="Submit"
+                className="bg-tertiary p-1 px-2 w-fit rounded-md hover:bg-main hover:text-white transition-all"
+              />
+            </form>
+          </div>
+          <div className="w-full">
+            <div className="flex flex-col gap-2 p-2">
+              <p className="text-[1.2rem] font-semibold">Egg Production Logs</p>
+              <div className="flex items-center gap-2">
+                <label htmlFor="bldg_filter">Show Building Logs:</label>
+                <select
+                  id="bldg_filter"
+                  className="bg-default px-2 p-1"
+                  onChange={(e) => {
+                    setBuildingFilter(parseInt(e.target.value));
+                  }}
+                >
+                  <option value="-1" selected>
+                    All
+                  </option>
+                  {buildings.map((ub, index) => {
+                    return (
+                      <option key={index} value={ub.building_id}>
+                        Building {ub.number}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            </div>
+            <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
+              <EggProductionTable
+                refresh={refresh}
+                bldgFilter={buildingFilter}
+              />
             </div>
           </div>
-          <div className="max-h-[300px] overflow-hidden rounded-md overflow-y-auto shadow-md">
-            <EggProductionTable refresh={refresh} bldgFilter={buildingFilter} />
-          </div>
         </div>
-      </div>
-      {modalTitle && (
-        <Modal
-          title={capitalize(modalTitle)}
-          onClose={() => handleClose()}
-          content={
-            <>
-              <p>Are you sure to submit this information?</p>
-              <div className="flex items-center justify-end gap-2">
-                <Button
-                  value="Confirm"
-                  onClick={() => handleSubmit()}
-                  className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
-                />
-                <Button
-                  value="Cancel"
-                  onClick={() => handleClose()}
-                  className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
-                />
-              </div>
-            </>
-          }
-        />
-      )}
-      {alert.show && (
-        <Alert
-          type={alert.type}
-          message={alert.message}
-          title={alert.title}
-          onClose={() => handleClose()}
-        />
-      )}
-    </>
+        {modalTitle && (
+          <Modal
+            title={capitalize(modalTitle)}
+            onClose={() => handleClose()}
+            content={
+              <>
+                <p>Are you sure to submit this information?</p>
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    value="Confirm"
+                    onClick={() => handleSubmit()}
+                    className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                  />
+                  <Button
+                    value="Cancel"
+                    onClick={() => handleClose()}
+                    className="bg-gray-200 text-gray-700 p-1 px-2 rounded-md"
+                  />
+                </div>
+              </>
+            }
+          />
+        )}
+        {alert.show && (
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            title={alert.title}
+            onClose={() => handleClose()}
+          />
+        )}
+      </>
+    )
   );
 }

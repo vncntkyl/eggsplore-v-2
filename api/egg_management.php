@@ -56,6 +56,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             case "procure_egg":
                 $procurement_data = json_decode($_POST['procurement_data']);
                 echo $egg->procureBrownEgg($procurement_data) ? 1 : 0;
+                break;
         }
         // if ($method === "add") {
         //     $name = $_POST['feeds_name'];
