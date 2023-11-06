@@ -92,7 +92,9 @@ export default function EggProduction({ building }) {
       setCurrentBuilding(response.find((res) => res.id === building));
       setEggData({
         date: format(new Date(), "yyyy-MM-dd"),
-        building_number: response.find((res) => res.id === building).number,
+        building_number: response.find((res) => res.id === building)
+          ? response.find((res) => res.id === building).number
+          : 1,
         egg_tray_count: 0,
         defect_egg_trays_count: 0,
       });
