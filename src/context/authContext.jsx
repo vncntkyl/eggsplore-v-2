@@ -107,6 +107,20 @@ export function AuthProvider({ children }) {
       return e.message;
     }
   };
+  const resetPassword = async (old, updated, id) => {
+    try {
+      const fd = new FormData();
+      fd.append("resetPassword", true);
+      fd.append("newPassword", updated);
+      fd.append("userId", id);
+      const response = await axios.post(url.manageUserURL, fd);
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
   const getCurrentUser = () => {
     return localStorage.getItem("currentUser");
   };
@@ -131,6 +145,18 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const checkEmail = async (email) => {
+    try {
+      const data = new FormData();
+      data.append("checkEmail", email);
+      const emailResponse = await axios.post(url.manageUserURL, data);
+      if (emailResponse.status === 200) {
+        return emailResponse.data;
+      }
+    } catch (e) {
+      return e.message;
+    }
+  };
   //BUILDING MANAGEMENT
   const getBuilding = async (id = null, user_id = null) => {
     try {
@@ -372,6 +398,45 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const checkPasswordStrength = (password) => {
+    // Define regex patterns for each requirement
+    const uppercaseRegex = /[A-Z]/;
+    const lowercaseRegex = /[a-z]/;
+    const numberRegex = /\d/;
+    const symbolRegex = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/;
+
+    // Check each requirement
+    const hasUppercase = uppercaseRegex.test(password);
+    const hasLowercase = lowercaseRegex.test(password);
+    const hasNumber = numberRegex.test(password);
+    const hasSymbol = symbolRegex.test(password);
+    const isLengthValid = password.length >= 8;
+
+    // Generate prompts based on requirements
+    const prompts = [];
+
+    if (!hasUppercase) {
+      prompts.push("Include at least one uppercase letter.");
+    }
+
+    if (!hasLowercase) {
+      prompts.push("Include at least one lowercase letter.");
+    }
+
+    if (!hasNumber) {
+      prompts.push("Include at least one number.");
+    }
+
+    if (!hasSymbol) {
+      prompts.push("Include at least one symbol.");
+    }
+
+    if (!isLengthValid) {
+      prompts.push("Ensure the password is at least 8 characters long.");
+    }
+
+    return prompts;
+  };
   useEffect(() => {
     if (localStorage.getItem("currentUser")) {
       setCurrentUser(JSON.parse(localStorage.getItem("currentUser")));
@@ -389,6 +454,7 @@ export function AuthProvider({ children }) {
     signInUser,
     deleteUser,
     updateUser,
+    checkEmail,
     getLocation,
     addLocation,
     getBuilding,
@@ -399,6 +465,7 @@ export function AuthProvider({ children }) {
     updateFeeds,
     deleteFeeds,
     registerUser,
+    resetPassword,
     updatePassword,
     updateLocation,
     deleteLocation,
@@ -409,6 +476,7 @@ export function AuthProvider({ children }) {
     getCurrentUser,
     setCurrentUser,
     getNotifications,
+    checkPasswordStrength,
     ...salesManagement,
     ...feedsManagement,
     ...poultryManagement,

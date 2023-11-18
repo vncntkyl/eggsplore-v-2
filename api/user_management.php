@@ -2,10 +2,12 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: *");
+require "../config/authController.php";
 require "../config/userController.php";
 require "../config/buildingController.php";
 $user = new User();
 $bldg = new Building();
+$auth = new Controller();
 
 if (isset($_GET['getUser'])) {
     $param = $_GET['getUser'];
@@ -29,6 +31,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newPassword = $_POST['newPassword'];
         $userId = $_POST['userId'];
         echo $user->updatePassword($currentPassword, $newPassword, $userId) ? 1 : 0;
+    } else if (isset($_POST['checkEmail'])) {
+        if ($user = $user->checkEmail($_POST['checkEmail'])) {
+            $randomCode = rand(100000, 999999);
+            $message = "Did you request for a password reset? Please enter this OTP to proceed to your next step. OTP: <strong>" . $randomCode . "<strong>";
+            $name = ucwords($user->first_name) . " " . ucwords($user->last_name);
+            if ($auth->sendMail("Forgot Password OTP", $message, $_POST['checkEmail'], $name)) {
+                $user->code = $randomCode;
+                echo json_encode($user);
+            } else {
+                echo "Email Error";
+            }
+        } else {
+            echo "Sorry, the email address you have entered is not registered to our system.";
+        }
+    } else if (isset($_POST['resetPassword'])) {
+        echo $user->resetPassword($_POST['newPassword'], $_POST['userId']) ? 1 : 0;
     } else {
         $userdata = json_decode($_POST['userdata']);
         $user_id = intval($_POST['user_id']);

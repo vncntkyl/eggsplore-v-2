@@ -1,5 +1,13 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 require 'db-config.php';
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
 class Controller
 {
     public $connection;
@@ -33,5 +41,34 @@ class Controller
         echo "Error code: " . $e->getCode();
         echo "File: " . $e->getFile();
         echo "Line: " . $e->getLine();
+    }
+    function sendMail($subject, $message, $receipientEmail = MAIL_USERNAME, $receipientName = MAIL_NAME, $iCal = null)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            //Server settings
+            $mail->isSMTP();                                            //Send using SMTP
+            $mail->Host       = 'smtp.hostinger.com';                       //Set the SMTP server to send through
+            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+            $mail->Username   = MAIL_USERNAME;                          //SMTP username
+            $mail->Password   = MAIL_PASSWORD;                          //SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+            $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+            //Recipients
+            $mail->setFrom(MAIL_USERNAME, MAIL_NAME);
+            $mail->addAddress($receipientEmail, $receipientName);       //Add a recipient
+
+            // //Content
+            $mail->isHTML(true);                                     //Set email format to HTML
+            $mail->Subject = $subject;
+            $mail->Body    = $message;
+
+            $mail->send();
+            return 1;
+        } catch (Exception $e) {
+            return "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
     }
 }

@@ -5,7 +5,7 @@ import { Button, TextInput } from "../components/Forms";
 import { useFunction } from "../context/FunctionContext";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Alert from "../components/Containers/Alert";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const { capitalize, saveItem } = useFunction();
@@ -69,6 +69,9 @@ export default function Login() {
                   />
                 );
               })}
+              <Link to="/password_recovery" className="text-white ml-auto pr-4 hover:text-main hover:underline">
+                Forgot Password?
+              </Link>
             </div>
             <Button
               type="submit"
