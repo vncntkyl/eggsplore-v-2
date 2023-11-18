@@ -50,8 +50,12 @@ export default function EggProductionTable({
               id: res.egg_production_id,
               building_id: res.building_id,
               user_id: res.user_id,
-              egg_tray_count: res.egg_count,
-              defect_egg_trays_count: res.defect_count,
+              egg: res.egg_count,
+              egg_tray: res.egg_tray_count,
+              soft_shell: res.soft_shell_count,
+              soft_shell_tray: res.soft_shell_tray_count,
+              crack: res.crack_count,
+              crack_tray: res.crack_tray_count,
               date_procured: res.date_produced,
             };
           })
@@ -63,8 +67,12 @@ export default function EggProductionTable({
               id: res.egg_production_id,
               building_id: res.building_id,
               user_id: res.user_id,
-              egg_tray_count: res.egg_count,
-              defect_egg_trays_count: res.defect_count,
+              egg: res.egg_count,
+              egg_tray: res.egg_tray_count,
+              soft_shell: res.soft_shell_count,
+              soft_shell_tray: res.soft_shell_tray_count,
+              crack: res.crack_count,
+              crack_tray: res.crack_tray_count,
               date_procured: res.date_produced,
               date_logged: res.log_date,
             };
@@ -75,7 +83,6 @@ export default function EggProductionTable({
       setLoading(false);
     };
     setup();
-   
   }, [refresh, filter, bldgFilter]);
   return !loading && productionData.length > 0 ? (
     <div className="overflow-auto">
@@ -122,8 +129,12 @@ export default function EggProductionTable({
                     ).number
                   }
                 </td>
-                <td className="p-2">{production.egg_tray_count}</td>
-                <td className="p-2">{production.defect_egg_trays_count}</td>
+                <td className="p-2">{production.egg}</td>
+                <td className="p-2">{production.egg_tray}</td>
+                <td className="p-2">{production.soft_shell}</td>
+                <td className="p-2">{production.soft_shell_tray}</td>
+                <td className="p-2">{production.crack}</td>
+                <td className="p-2">{production.crack_tray}</td>
                 <td className="p-2">
                   {format(new Date(production.date_procured), "MMM d, yyyy")}
                 </td>

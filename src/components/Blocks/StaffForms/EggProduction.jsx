@@ -16,8 +16,13 @@ export default function EggProduction({ building }) {
   const [eggData, setEggData] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
     building_number: 0,
-    egg_tray_count: 0,
-    defect_egg_trays_count: 0,
+    egg: 0,
+    egg_tray: 0,
+    soft_shell: 0,
+    soft_shell_tray: 0,
+    crack: 0,
+    crack_tray: 0,
+    extra_egg: 0,
   });
   const [alert, toggleAlert] = useState({
     type: "success",
@@ -33,11 +38,11 @@ export default function EggProduction({ building }) {
     setModalTitle(null);
     const building_id = document.querySelector("#building_id");
     const id = parseInt(building_id.value);
-
+    const eggs = { ...eggData };
+    delete eggs.building_number;
     const data = {
       date: eggData.date,
-      count: eggData.egg_tray_count,
-      defect: eggData.defect_egg_trays_count,
+      ...eggs,
       building: id,
       staff: JSON.parse(getCurrentUser()).user_id,
       log_date: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
@@ -56,6 +61,7 @@ export default function EggProduction({ building }) {
           show: true,
         });
       } else {
+        console.log(response);
         toggleAlert({
           type: "warning",
           title: "Procurement Error",
@@ -76,8 +82,13 @@ export default function EggProduction({ building }) {
     setEggData({
       date: format(new Date(), "yyyy-MM-dd"),
       building_number: building,
-      egg_tray_count: 0,
-      defect_egg_trays_count: 0,
+      egg: 0,
+      egg_tray: 0,
+      soft_shell: 0,
+      soft_shell_tray: 0,
+      crack: 0,
+      crack_tray: 0,
+      extra_egg: 0,
     });
   };
 
@@ -95,8 +106,12 @@ export default function EggProduction({ building }) {
         building_number: response.find((res) => res.id === building)
           ? response.find((res) => res.id === building).number
           : 1,
-        egg_tray_count: 0,
-        defect_egg_trays_count: 0,
+        egg: 0,
+        egg_tray: 0,
+        soft_shell: 0,
+        soft_shell_tray: 0,
+        crack: 0,
+        crack_tray: 0,
       });
     };
     setup();
@@ -135,13 +150,13 @@ export default function EggProduction({ building }) {
                       inputClasses="w-full rounded px-2"
                     />
                   </>
-                ) : (
+                ) : eggKey === "date" ? (
                   <TextInput
                     id={eggKey}
                     key={index}
                     withLabel={capitalize(toTitle(eggKey)) + ":"}
                     value={eggData[eggKey]}
-                    type={eggKey === "date" ? "date" : "number"}
+                    type="date"
                     orientation="row"
                     classes="p-1 items-center "
                     labelClasses="whitespace-nowrap w-full text-start"
@@ -149,13 +164,48 @@ export default function EggProduction({ building }) {
                     onChange={(e) =>
                       setEggData((data) => ({
                         ...data,
-                        [eggKey]:
-                          eggKey === "egg_tray_count"
-                            ? parseInt(e.target.value)
-                            : e.target.value,
+                        [eggKey]: e.target.value,
                       }))
                     }
                   />
+                ) : (
+                  <></>
+                );
+              })}
+              <p className="w-1/2 ml-auto flex flex-row items-center">
+                <span className="w-1/2 text-center">Trays</span>
+                <span className="w-1/2 text-center">Pieces</span>
+              </p>
+              {[
+                ["egg_tray", "egg"],
+                ["soft_shell_tray", "soft_shell"],
+                ["crack_tray", "crack"],
+              ].map((label, index) => {
+                return (
+                  <div key={index} className="flex flex-row items-center">
+                    <p className="w-1/2">{capitalize(toTitle(label[1]))}</p>
+                    <div className="flex flex-row w-1/2">
+                      {label.map((key, idx) => {
+                        return (
+                          <TextInput
+                            key={idx}
+                            value={eggData[key]}
+                            type="number"
+                            orientation="row"
+                            classes="w-1/2 p-1 items-center"
+                            labelClasses="whitespace-nowrap w-full text-start"
+                            inputClasses="w-full rounded px-2"
+                            onChange={(e) =>
+                              setEggData((data) => ({
+                                ...data,
+                                [key]: parseInt(e.target.value),
+                              }))
+                            }
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
               <Button

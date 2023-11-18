@@ -21,9 +21,21 @@ class Egg extends Controller
 
             SET @latest_batch_number = COALESCE(@latest_batch_number, CONCAT(@current_date, '-', @building_number, '-00'));
             SET @next_batch_number = CONCAT(@current_date, '-', @building_number, '-', LPAD(SUBSTRING(@latest_batch_number, 10) + 1, 2, '0'));
-            INSERT INTO ep_egg_production (date_produced, batch_id, egg_count, defect_count, building_id, user_id, log_date) VALUES (?,@next_batch_number, ?,?,?,?,?)
+            INSERT INTO ep_egg_production (date_produced, batch_id, egg_count,egg_tray_count, soft_shell_count,soft_shell_tray_count, crack_count, crack_tray_count, building_id, user_id, log_date) 
+            VALUES (?,@next_batch_number, ?,?,?,?,?,?,?,?,?)
             ");
-            return $this->statement->execute([$egg_data->date, $egg_data->count, $egg_data->defect, $egg_data->building, $egg_data->staff, $egg_data->log_date]);
+            return $this->statement->execute([
+                $egg_data->date,
+                $egg_data->egg,
+                $egg_data->egg_tray,
+                $egg_data->soft_shell,
+                $egg_data->soft_shell_tray,
+                $egg_data->crack,
+                $egg_data->crack_tray,
+                $egg_data->building,
+                $egg_data->staff,
+                $egg_data->log_date
+            ]);
         } catch (PDOException $e) {
             $this->getError($e);
         }
@@ -35,7 +47,8 @@ class Egg extends Controller
             bldg.id,
             ep.batch_id,
             bldg.number,
-            ep.egg_count
+            COALESCE(ep.egg_count, 0) + COALESCE(ep.egg_tray_count, 0) + COALESCE(ep.soft_shell_count, 0) +
+            COALESCE(ep.soft_shell_tray_count, 0) + COALESCE(ep.crack_count, 0) + COALESCE(ep.crack_tray_count, 0) AS egg_count
         FROM
             ep_building AS bldg
         LEFT JOIN ep_egg_production AS ep
@@ -80,7 +93,8 @@ class Egg extends Controller
                 SELECT
                     YEAR(date_produced) AS 'year',
                     WEEK(date_produced) AS 'week',
-                    SUM(egg_count) AS 'egg_count'
+                    COALESCE(egg_count, 0) + COALESCE(egg_tray_count, 0) + COALESCE(soft_shell_count, 0) +
+            COALESCE(soft_shell_tray_count, 0) + COALESCE(crack_count, 0) + COALESCE(crack_tray_count, 0) AS egg_count
                 FROM
                     ep_egg_production
                 GROUP BY
@@ -131,6 +145,7 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
+    // not done yet //
     function retrieveEggProductionReport($start, $end)
     {
         try {
@@ -152,6 +167,7 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
+    // not done yet //
     function retrieveEggProductionAndSalesReport($start, $end)
     {
         try {
@@ -256,6 +272,7 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
+    //not done yet //
     function updateEggProduction($egg_count, $defect_count, $production_id)
     {
         try {
@@ -271,19 +288,31 @@ class Egg extends Controller
     {
         try {
             $this->setStatement("SELECT
-            ep.batch_id,
-            (ep.egg_count - COALESCE(ep.defect_count, 0)) AS eggs,
-            ep.date_produced
+            COALESCE(ep.total_egg_pieces, 0) - COALESCE(seg.total_egg_pieces, 0) AS egg_pieces,
+            COALESCE(ep.total_egg_trays, 0) - COALESCE(seg.total_egg_trays, 0) AS egg_trays
         FROM
-            ep_egg_production AS ep
-        LEFT JOIN
-            ep_egg_segregation AS es ON ep.batch_id = es.production_id
-        WHERE
-            es.production_id IS NULL
-        ORDER BY
-            ep.log_date DESC");
+            (
+                SELECT
+                    SUM(COALESCE(egg_count, 0)) AS total_egg_pieces,
+                    SUM(COALESCE(egg_tray_count, 0)) AS total_egg_trays
+                FROM
+                    ep_egg_production
+            ) AS ep
+        CROSS JOIN
+            (
+                SELECT
+                    SUM(COALESCE(no_weight, 0) + COALESCE(pewee, 0) + COALESCE(pullet, 0) +
+                        COALESCE(brown, 0) + COALESCE(small, 0) + COALESCE(medium, 0) +
+                        COALESCE(large, 0) + COALESCE(extra_large, 0) + COALESCE(jumbo, 0)) AS total_egg_pieces,
+                    SUM(COALESCE(no_weight_tray, 0) + COALESCE(pewee_tray, 0) + COALESCE(pullet_tray, 0) +
+                        COALESCE(brown_tray, 0) + COALESCE(small_tray, 0) + COALESCE(medium_tray, 0) +
+                        COALESCE(large_tray, 0) + COALESCE(extra_large_tray, 0) + COALESCE(jumbo_tray, 0)) AS total_egg_trays
+                FROM
+                    ep_egg_segregation
+            ) AS seg;
+        ");
             $this->statement->execute([]);
-            return $this->statement->fetchAll();
+            return $this->statement->fetch();
         } catch (PDOException $e) {
             $this->getError($e);
         }

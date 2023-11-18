@@ -9,22 +9,20 @@ import EggSegregationTable from "../../Tables/EggSegregationTable";
 export default function EggSegregation() {
   const [refresh, doRefresh] = useState(0);
   const [modalTitle, setModalTitle] = useState(null);
-  const [eggProductionList, setEggProductionList] = useState([]);
+  const [eggsData, setEggsData] = useState([]);
   const [selectedProduction, setSelectedProduction] = useState(null);
   const [eggData, setEggData] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
     unsorted_egg_production: 0,
-    no_weight: 0,
-    pewee: 0,
-    pullet: 0,
-    brown: 0,
-    small: 0,
-    medium: 0,
-    large: 0,
-    extra_large: 0,
-    jumbo: 0,
-    crack: 0,
-    soft_shell: 0,
+    no_weight: [0, 0],
+    pewee: [0, 0],
+    pullet: [0, 0],
+    brown: [0, 0],
+    small: [0, 0],
+    medium: [0, 0],
+    large: [0, 0],
+    extra_large: [0, 0],
+    jumbo: [0, 0],
   });
   const [alert, toggleAlert] = useState({
     type: "success",
@@ -36,36 +34,41 @@ export default function EggSegregation() {
   const { getCurrentUser, retrieveEggsForSegregation, insertEggSegregation } =
     useAuth();
 
-  const handleInputChange = (label, value) => {
+  const handleInputChange = (label, value, index) => {
     if (label.includes("date")) {
       setEggData((data) => ({
         ...data,
         [label]: value,
       }));
     }
-    if (label === "unsorted_egg_production") {
-      setEggData((data) => ({
-        ...data,
-        [label]: parseInt(value),
-      }));
-    }
 
-    const updatedEggData = { ...eggData, [label]: parseInt(value) };
+    if (index !== null) {
+      let updatedEggData = {};
+      const type = [...eggData[label]];
+      type[index] = parseInt(value);
+      updatedEggData = { ...eggData, [label]: type };
 
-    let total = 0;
-    Object.keys(updatedEggData)
-      .filter(
-        (key) =>
-          !["unsorted_egg_production", "building_number", "date"].includes(key)
-      )
-      .forEach((type) => {
-        total += updatedEggData[type];
-      });
-
-    if (total <= updatedEggData.unsorted_egg_production) {
-      setEggData(updatedEggData);
-    } else {
-      console.log("STAHPPPP");
+      let totalPieces = 0;
+      let totalTrays = 0;
+      Object.keys(updatedEggData)
+        .filter(
+          (key) =>
+            !["unsorted_egg_production", "building_number", "date"].includes(
+              key
+            )
+        )
+        .forEach((type) => {
+          totalPieces += parseInt(updatedEggData[type][1]);
+          totalTrays += parseInt(updatedEggData[type][0]);
+        });
+      if (
+        totalPieces <= eggsData.egg_pieces &&
+        totalTrays <= eggsData.egg_trays
+      ) {
+        setEggData(updatedEggData);
+      } else {
+        console.log("STAHPPPP");
+      }
     }
   };
 
@@ -106,25 +109,22 @@ export default function EggSegregation() {
     setEggData({
       date: format(new Date(), "yyyy-MM-dd"),
       unsorted_egg_production: 0,
-      no_weight: 0,
-      pewee: 0,
-      pullet: 0,
-      brown: 0,
-      small: 0,
-      medium: 0,
-      large: 0,
-      extra_large: 0,
-      jumbo: 0,
-      crack: 0,
-      soft_shell: 0,
+      no_weight: [0, 0],
+      pewee: [0, 0],
+      pullet: [0, 0],
+      brown: [0, 0],
+      small: [0, 0],
+      medium: [0, 0],
+      large: [0, 0],
+      extra_large: [0, 0],
+      jumbo: [0, 0],
     });
   };
 
   useEffect(() => {
-    const user = JSON.parse(getCurrentUser());
     const setup = async () => {
-      const eggListResponse = await retrieveEggsForSegregation(user.user_id);
-      setEggProductionList(eggListResponse);
+      const eggListResponse = await retrieveEggsForSegregation();
+      setEggsData(eggListResponse);
     };
     setup();
   }, [refresh]);
@@ -144,78 +144,35 @@ export default function EggSegregation() {
             <div className="flex flex-col lg:flex-row gap-2 bg-default p-2">
               <div className="flex flex-col gap-2 bg-default p-2 lg:w-1/2">
                 {Object.keys(eggData)
-                  .splice(0, 7)
+                  .splice(0, 2)
                   .map((eggKey, index) => {
                     return eggKey === "unsorted_egg_production" ? (
                       <div key={index} className="flex flex-col gap-2">
-                        <div className="flex gap-2 p-1 items-center">
-                          <label
-                            htmlFor={eggKey}
-                            className="whitespace-nowrap w-full text-start"
-                          >
-                            Egg Production Details
-                          </label>
-                          <select
-                            id={eggKey}
-                            className="w-full rounded px-2 outline-none border-none p-1"
-                            onChange={(e) => {
-                              setSelectedProduction(e.target.value);
-
-                              setEggData((current) => ({
-                                ...current,
-                                unsorted_egg_production: eggProductionList.find(
-                                  (egg) => egg.batch_id === e.target.value
-                                ).eggs,
-                              }));
-                            }}
-                          >
-                            <option
-                              value=""
-                              selected={!selectedProduction}
-                              disabled
-                            >
-                              Select production batch
-                            </option>
-                            {eggProductionList.map((egg, index) => {
-                              return (
-                                <option
-                                  key={index}
-                                  value={egg.batch_id}
-                                  selected={egg.batch_id === eggData[eggKey]}
-                                >
-                                  {`Batch #${egg.batch_id}`}
-                                </option>
-                              );
-                            })}
-                          </select>
+                        <div className="flex flex-row items-center justify-between">
+                          <span className="w-1/2 p-1">
+                            Available Egg Trays:{" "}
+                          </span>
+                          <span className="w-1/2 p-1 px-2">
+                            {eggsData.egg_trays}
+                          </span>
                         </div>
                         <div className="flex flex-row items-center justify-between">
-                          <span className="w-1/2 p-1">Egg Trays: </span>
+                          <span className="w-1/2 p-1">
+                            Available Egg Pieces
+                          </span>
                           <span className="w-1/2 p-1 px-2">
-                            {eggData.unsorted_egg_production != 0
-                              ? eggProductionList.find(
-                                  (egg) =>
-                                    egg.eggs === eggData.unsorted_egg_production
-                                )
-                                ? eggProductionList.find(
-                                    (egg) =>
-                                      egg.eggs ===
-                                      eggData.unsorted_egg_production
-                                  ).eggs
-                                : 0
-                              : 0}
+                            {eggsData.egg_pieces}
                           </span>
                         </div>
                       </div>
-                    ) : (
+                    ) : eggKey.includes("date") ? (
                       <TextInput
                         id={eggKey}
                         key={index}
                         withLabel={capitalize(toTitle(eggKey)) + ":"}
                         value={eggData[eggKey]}
-                        type={eggKey.includes("date") ? "date" : "number"}
+                        type="date"
                         orientation="row"
-                        disabled={!selectedProduction}
                         classes="p-1 items-center "
                         labelClasses="whitespace-nowrap w-full text-start"
                         inputClasses="w-full rounded px-2 disabled:bg-default-dark"
@@ -223,29 +180,92 @@ export default function EggSegregation() {
                           handleInputChange(eggKey, e.target.value)
                         }
                       />
+                    ) : (
+                      <></>
+                    );
+                  })}
+                <p className="w-1/2 ml-auto flex flex-row items-center">
+                  <span className="w-1/2 text-center">Trays</span>
+                  <span className="w-1/2 text-center">Pieces</span>
+                </p>
+                {Object.keys(eggData)
+                  .splice(2, 5)
+                  .map((eggKey, index) => {
+                    return (
+                      <div key={index} className="flex flex-row w-full">
+                        <span className="w-1/2">
+                          {capitalize(toTitle(eggKey)) + ":"}
+                        </span>
+                        <div className="w-1/2 flex flex-row">
+                          <TextInput
+                            id={eggKey}
+                            value={eggData[eggKey][0]}
+                            type="number"
+                            orientation="row"
+                            classes="p-1 items-center w-1/2"
+                            labelClasses="whitespace-nowrap w-full text-start"
+                            inputClasses="w-full rounded px-2 disabled:bg-default-dark"
+                            onChange={(e) =>
+                              handleInputChange(eggKey, e.target.value, 0)
+                            }
+                          />
+                          <TextInput
+                            id={eggKey}
+                            value={eggData[eggKey][1]}
+                            type="number"
+                            orientation="row"
+                            classes="p-1 items-center w-1/2"
+                            labelClasses="whitespace-nowrap w-full text-start"
+                            inputClasses="w-full rounded px-2 disabled:bg-default-dark"
+                            onChange={(e) =>
+                              handleInputChange(eggKey, e.target.value, 1)
+                            }
+                          />
+                        </div>
+                      </div>
                     );
                   })}
               </div>
               <div className="flex flex-col gap-2 bg-default p-2 lg:w-1/2">
+                <p className="w-1/2 ml-auto flex flex-row items-center">
+                  <span className="w-1/2 text-center">Trays</span>
+                  <span className="w-1/2 text-center">Pieces</span>
+                </p>
                 {Object.keys(eggData)
                   .splice(7, 15)
                   .map((eggKey, index) => {
                     return (
-                      <TextInput
-                        id={eggKey}
-                        key={index}
-                        withLabel={capitalize(toTitle(eggKey)) + ":"}
-                        value={eggData[eggKey]}
-                        type={eggKey.includes("date") ? "date" : "number"}
-                        disabled={!selectedProduction}
-                        orientation="row"
-                        classes="p-1 items-center "
-                        labelClasses="whitespace-nowrap w-full text-start"
-                        inputClasses="w-full rounded px-2 disabled:bg-default-dark"
-                        onChange={(e) =>
-                          handleInputChange(eggKey, e.target.value)
-                        }
-                      />
+                      <div key={index} className="flex flex-row w-full">
+                        <span className="w-1/2">
+                          {capitalize(toTitle(eggKey)) + ":"}
+                        </span>
+                        <div className="w-1/2 flex flex-row">
+                          <TextInput
+                            id={eggKey}
+                            value={eggData[eggKey][0]}
+                            type="number"
+                            orientation="row"
+                            classes="p-1 items-center w-1/2"
+                            labelClasses="whitespace-nowrap w-full text-start"
+                            inputClasses="w-full rounded px-2 disabled:bg-default-dark"
+                            onChange={(e) =>
+                              handleInputChange(eggKey, e.target.value, 0)
+                            }
+                          />
+                          <TextInput
+                            id={eggKey}
+                            value={eggData[eggKey][1]}
+                            type="number"
+                            orientation="row"
+                            classes="p-1 items-center w-1/2"
+                            labelClasses="whitespace-nowrap w-full text-start"
+                            inputClasses="w-full rounded px-2 disabled:bg-default-dark"
+                            onChange={(e) =>
+                              handleInputChange(eggKey, e.target.value, 1)
+                            }
+                          />
+                        </div>
+                      </div>
                     );
                   })}
               </div>
