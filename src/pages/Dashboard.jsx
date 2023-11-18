@@ -45,6 +45,7 @@ export default function Dashboard() {
     }
   }, [localStorage]);
 
+
   return !loading ? (
     <div className="min-h-screen bg-default">
       <Navbar
@@ -63,7 +64,6 @@ export default function Dashboard() {
           )}
         </>
       )}
-      {/* dashboard content */}
       <Body>
         {getUserType() === "admin" ? <AdminDashboard /> : <StaffMenu />}
       </Body>

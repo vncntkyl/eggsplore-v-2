@@ -9,9 +9,13 @@ export default function UserDropdown({ setModal, closePanel }) {
   const { setCurrentUser } = useAuth();
   const handleLogout = () => {
     const notifications = localStorage.getItem("notifications");
+    const dateChecked = localStorage.getItem("date-checked");
     localStorage.clear();
     if (notifications !== null) {
       localStorage.setItem("notifications", notifications);
+    }
+    if (dateChecked) {
+      localStorage.setItem("date-checked", dateChecked);
     }
     setCurrentUser([]);
     navigate("/login");
