@@ -366,7 +366,8 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
-    function retrieveWeeklyEggSalesReport($start_date, $end_date){
+    function retrieveWeeklyEggSalesReport($start_date, $end_date)
+    {
         try {
             $this->setStatement("SELECT
             et.egg_type_name,
@@ -386,6 +387,26 @@ class Sales extends Controller
             et.egg_type_name,
             WEEK(sin.date);");
             $this->statement->execute([$start_date, $end_date]);
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveBestSellingType()
+    {
+        try {
+            $this->setStatement("SELECT *, COUNT(*) as items_sold FROM ep_sales_items GROUP BY item_name ORDER BY quantity DESC;");
+            $this->statement->execute();
+            return $this->statement->fetchAll();
+        } catch (PDOException $e) {
+            $this->getError($e);
+        }
+    }
+    function retrieveMostBoughtLocation()
+    {
+        try {
+            $this->setStatement("SELECT *, COUNT(*) as times_bought FROM `ep_sales_invoice` GROUP BY location ORDER BY times_bought DESC;");
+            $this->statement->execute();
             return $this->statement->fetchAll();
         } catch (PDOException $e) {
             $this->getError($e);

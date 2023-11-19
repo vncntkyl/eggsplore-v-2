@@ -75,11 +75,11 @@ export default function EggSegregation() {
   const handleSubmit = async () => {
     setModalTitle(null);
     const data = { ...eggData };
-    data.production_id = selectedProduction;
     data.user_id = parseInt(JSON.parse(getCurrentUser()).user_id);
     data.log_date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     try {
       const response = await insertEggSegregation(data);
+      console.log(response);
       if (response === 1) {
         toggleAlert({
           type: "success",

@@ -7,7 +7,7 @@ export default function EggSegregationTable() {
   const [segregationLogs, setSegregationLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { retrieveSegregationLogs, getCurrentUser,  } = useAuth();
+  const { retrieveSegregationLogs, getCurrentUser } = useAuth();
   const { capitalize, toTitle } = useFunction();
   useEffect(() => {
     const setup = async () => {
@@ -19,7 +19,6 @@ export default function EggSegregationTable() {
       setLoading(false);
     };
     setup();
-   
   }, []);
   return !loading && segregationLogs.length !== 0 ? (
     <table className="w-full rounded-md">
@@ -30,7 +29,9 @@ export default function EggSegregationTable() {
             .map((segregation, index) => {
               return (
                 <th key={index} className="p-2 bg-main text-white sticky top-0">
-                  {segregation === "production_id" ? "Batch ID" :capitalize(toTitle(segregation))}
+                  {segregation === "production_id"
+                    ? "Batch ID"
+                    : capitalize(toTitle(segregation))}
                 </th>
               );
             })}
@@ -40,9 +41,6 @@ export default function EggSegregationTable() {
         {segregationLogs.map((type, key) => {
           return (
             <tr key={key}>
-              <td className="p-2" align="center">
-                {type.production_id}
-              </td>
               <td className="p-2" align="center">
                 {type.no_weight}
               </td>
@@ -71,13 +69,34 @@ export default function EggSegregationTable() {
                 {type.jumbo}
               </td>
               <td className="p-2" align="center">
-                {type.crack}
+                {type.no_weight_tray}
               </td>
               <td className="p-2" align="center">
-                {type.soft_shell}
+                {type.pewee_tray}
               </td>
               <td className="p-2" align="center">
-                {format(new Date(type.log_date), "MMMM d, yyyy hh:mmaaa")}
+                {type.pullet_tray}
+              </td>
+              <td className="p-2" align="center">
+                {type.brown_tray}
+              </td>
+              <td className="p-2" align="center">
+                {type.small_tray}
+              </td>
+              <td className="p-2" align="center">
+                {type.medium_tray}
+              </td>
+              <td className="p-2" align="center">
+                {type.large_tray}
+              </td>
+              <td className="p-2" align="center">
+                {type.extra_large_tray}
+              </td>
+              <td className="p-2" align="center">
+                {type.jumbo_tray}
+              </td>
+              <td className="p-2" align="center">
+                {format(new Date(type.log_date), "MMM d, yyyy")}
               </td>
             </tr>
           );

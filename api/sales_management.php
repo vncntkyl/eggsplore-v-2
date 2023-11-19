@@ -55,6 +55,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
             case "weekly_egg_sales_report":
                 echo json_encode($sales->retrieveWeeklyEggSalesReport($_GET['start'], $_GET['end']));
                 break;
+            case "best_selling_egg":
+                echo json_encode($sales->retrieveBestSellingType());
+                break;
+            case "best_selling_location":
+                echo json_encode($sales->retrieveMostBoughtLocation());
+                break;
         }
         break;
     case "POST":

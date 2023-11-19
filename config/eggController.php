@@ -24,7 +24,7 @@ class Egg extends Controller
             INSERT INTO ep_egg_production (date_produced, batch_id, egg_count,egg_tray_count, soft_shell_count,soft_shell_tray_count, crack_count, crack_tray_count, building_id, user_id, log_date) 
             VALUES (?,@next_batch_number, ?,?,?,?,?,?,?,?,?)
             ");
-            return $this->statement->execute([
+            if ($this->statement->execute([
                 $egg_data->date,
                 $egg_data->egg,
                 $egg_data->egg_tray,
@@ -35,7 +35,30 @@ class Egg extends Controller
                 $egg_data->building,
                 $egg_data->staff,
                 $egg_data->log_date
-            ]);
+            ])) {
+                $status = array();
+                unset($egg_data->date);
+                unset($egg_data->egg);
+                unset($egg_data->egg_tray);
+                unset($egg_data->building);
+                unset($egg_data->staff);
+                unset($egg_data->log_date);
+                $objectVars = get_object_vars($egg_data);
+                foreach ($objectVars as $key => $value) {
+                    if (strpos($key, "tray") !== false) {
+                        $type = str_replace("tray", "", $key);
+                        $this->updateEggClassifications(intval($value) * 30, str_replace('_', ' ', $type)) ? array_push($status, 1) : array_push($status, 0);
+                    } else {
+                        $this->updateEggClassifications(intval($value), str_replace('_', ' ', $key)) ? array_push($status, 1) : array_push($status, 0);
+                    }
+                }
+
+                if (in_array(0, $status)) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
         } catch (PDOException $e) {
             $this->getError($e);
         }
@@ -93,8 +116,8 @@ class Egg extends Controller
                 SELECT
                     YEAR(date_produced) AS 'year',
                     WEEK(date_produced) AS 'week',
-                    COALESCE(egg_count, 0) + COALESCE(egg_tray_count, 0) + COALESCE(soft_shell_count, 0) +
-            COALESCE(soft_shell_tray_count, 0) + COALESCE(crack_count, 0) + COALESCE(crack_tray_count, 0) AS egg_count
+                    COALESCE(egg_count, 0) + COALESCE(egg_tray_count * 30, 0) + COALESCE(soft_shell_count, 0) +
+            COALESCE(soft_shell_tray_count * 30, 0) + COALESCE(crack_count, 0) + COALESCE(crack_tray_count * 30, 0) AS egg_count
                 FROM
                     ep_egg_production
                 GROUP BY
@@ -145,14 +168,13 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
-    // not done yet //
     function retrieveEggProductionReport($start, $end)
     {
         try {
             $this->setStatement("SELECT
             b.number AS building_no,
-            COALESCE(SUM(ep.egg_count), 0) AS produced_eggs,
-            COALESCE(SUM(ep.defect_count), 0) AS defect_eggs
+            COALESCE(SUM(ep.egg_count) + SUM(ep.egg_tray_count) * 30, 0) AS produced_eggs,
+            COALESCE(SUM(ep.soft_shell_count) + SUM(ep.soft_shell_tray_count) * 30 + SUM(ep.crack_count) + SUM(ep.crack_tray_count) * 30, 0) AS defect_eggs
         FROM
             ep_building AS b
         LEFT JOIN
@@ -167,7 +189,6 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
-    // not done yet //
     function retrieveEggProductionAndSalesReport($start, $end)
     {
         try {
@@ -197,7 +218,8 @@ class Egg extends Controller
                         SELECT
                             YEAR(date_produced) AS 'year',
                             MONTH(date_produced) AS 'month',
-                            SUM(egg_count) AS 'egg_count'
+                            COALESCE(SUM(egg_count), 0) + COALESCE(SUM(egg_tray_count * 30), 0) + COALESCE(SUM(soft_shell_count), 0) +
+            COALESCE(SUM(soft_shell_tray_count * 30), 0) + COALESCE(SUM(crack_count), 0) + COALESCE(SUM(crack_tray_count * 30), 0) AS 'egg_count'
                         FROM
                             ep_egg_production
                             WHERE date_produced >= :start_date AND date_produced <= :end_date
@@ -272,7 +294,7 @@ class Egg extends Controller
             $this->getError($e);
         }
     }
-    //not done yet //
+    //WIP
     function updateEggProduction($egg_count, $defect_count, $production_id)
     {
         try {
@@ -340,21 +362,30 @@ class Egg extends Controller
     function segregateEggProduction($data)
     {
         try {
-            $this->setStatement("INSERT INTO ep_egg_segregation (production_id, no_weight, pewee, pullet, brown, small, medium, large, extra_large, jumbo, crack, soft_shell, user_id, log_date)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            $this->setStatement("INSERT INTO ep_egg_segregation 
+            (no_weight, pewee, pullet, brown, small, medium, large, extra_large, jumbo,
+            no_weight_tray, pewee_tray, pullet_tray, brown_tray, small_tray, medium_tray,
+             large_tray, extra_large_tray, jumbo_tray, user_id, log_date)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             if ($this->statement->execute([
-                $data->production_id,
-                $data->no_weight,
-                $data->pewee,
-                $data->pullet,
-                $data->brown,
-                $data->small,
-                $data->medium,
-                $data->large,
-                $data->extra_large,
-                $data->jumbo,
-                $data->crack,
-                $data->soft_shell,
+                $data->no_weight[1],
+                $data->pewee[1],
+                $data->pullet[1],
+                $data->brown[1],
+                $data->small[1],
+                $data->medium[1],
+                $data->large[1],
+                $data->extra_large[1],
+                $data->jumbo[1],
+                $data->no_weight[0],
+                $data->pewee[0],
+                $data->pullet[0],
+                $data->brown[0],
+                $data->small[0],
+                $data->medium[0],
+                $data->large[0],
+                $data->extra_large[0],
+                $data->jumbo[0],
                 $data->user_id,
                 $data->log_date,
             ])) {
@@ -362,10 +393,18 @@ class Egg extends Controller
                 unset($data->production_id);
                 unset($data->user_id);
                 unset($data->log_date);
+                unset($data->date);
+                unset($data->unsorted_egg_production);
 
                 $objectVars = get_object_vars($data);
                 foreach ($objectVars as $key => $value) {
-                    $this->updateEggClassifications($value, str_replace('_', ' ', $key)) ? array_push($status, 1) : array_push($status, 0);
+                    foreach ($value as $index => $type) {
+                        if ($index === 0) {
+                            $this->updateEggClassifications($type * 30, str_replace('_', ' ', $key)) ? array_push($status, 1) : array_push($status, 0);
+                        } else {
+                            $this->updateEggClassifications($type, str_replace('_', ' ', $key)) ? array_push($status, 1) : array_push($status, 0);
+                        }
+                    }
                 }
 
                 if (in_array(0, $status)) {
@@ -463,7 +502,9 @@ class Egg extends Controller
             production_eggs.week,
              COALESCE(production_eggs.total_eggs, 0) + COALESCE(procurement_eggs.total_eggs, 0) AS total_combined_eggs
         FROM (
-            SELECT WEEK(log_date) AS week, (SUM(egg_count) + SUM(defect_count)) AS total_eggs
+            SELECT WEEK(log_date) AS week,  COALESCE(SUM(egg_count) + SUM(egg_tray_count) * 30, 0) + 
+            COALESCE(SUM(soft_shell_count) + SUM(soft_shell_tray_count) * 30 + SUM(crack_count) + 
+            SUM(crack_tray_count) * 30, 0) AS total_eggs
             FROM ep_egg_production
             GROUP BY WEEK(log_date)
         ) AS production_eggs
@@ -482,21 +523,25 @@ class Egg extends Controller
     {
         try {
             $this->setStatement("SELECT
-            COALESCE(SUM(ep.egg_count) + SUM(ep.defect_count),0) as eggs,
-            COALESCE(SUM(es.no_weight),0) AS no_weight, 
-            COALESCE(SUM(es.pewee),0) AS pewee,
-            COALESCE(SUM(es.pullet),0) AS pullet,
-            COALESCE(SUM(es.brown),0) AS brown,
-            COALESCE(SUM(es.small),0) AS small,
-            COALESCE(SUM(es.medium),0) AS 'medium',
-            COALESCE(SUM(es.large),0) AS large,
-            COALESCE(SUM(es.extra_large),0) AS extra_large,
-            COALESCE(SUM(es.jumbo),0) AS jumbo,
-            COALESCE(SUM(es.crack),0) AS crack,
-            COALESCE(SUM(es.soft_shell),0) AS soft_shell
-            FROM ep_egg_production AS ep
-            LEFT JOIN ep_egg_segregation AS es ON es.production_id = ep.batch_id 
-            WHERE DATE(ep.date_produced) >= DATE(:start_date) AND DATE(ep.date_produced) <= DATE(:end_date)");
+            COALESCE(SUM(ep.egg_count) + (SUM(ep.egg_tray_count) * 30), 0) AS eggs,
+            COALESCE(SUM(es.no_weight) + (SUM(es.no_weight_tray) * 30), 0) AS no_weight,
+            COALESCE(SUM(es.pewee) + (SUM(es.pewee_tray ) * 30), 0) AS pewee,
+            COALESCE(SUM(es.pullet) + (SUM(es.pullet_tray) * 30), 0) AS pullet,
+            COALESCE(SUM(es.brown) + (SUM(es.brown_tray) * 30), 0) AS brown,
+            COALESCE(SUM(es.small) + (SUM(es.small_tray) * 30), 0) AS small,
+            COALESCE(SUM(es.medium) + (SUM(es.medium_tray) * 30), 0) AS medium,
+            COALESCE(SUM(es.large) + (SUM(es.large_tray) * 30), 0) AS large,
+            COALESCE(SUM(es.extra_large) + (SUM(es.extra_large_tray) * 30), 0) AS extra_large,
+            COALESCE(SUM(es.jumbo) + (SUM(es.jumbo_tray) * 30), 0) AS jumbo,
+            COALESCE(SUM(ep.crack_count) + (SUM(ep.crack_tray_count) * 30), 0) AS crack,
+            COALESCE(SUM(ep.soft_shell_count) + (SUM(ep.soft_shell_tray_count) * 30), 0) AS soft_shell
+        FROM
+            ep_egg_production AS ep
+        CROSS JOIN
+            ep_egg_segregation AS es
+        WHERE
+            DATE(ep.date_produced) >= DATE(:start_date) AND DATE(ep.date_produced) <= DATE(:end_date);
+        ");
             $this->statement->execute([":start_date" => $start, ":end_date" => $end]);
             return $this->statement->fetch();
         } catch (PDOException $e) {
@@ -549,7 +594,7 @@ class Egg extends Controller
                 SELECT
                     YEAR(date_produced) AS 'year',
                     WEEK(date_produced) AS 'week',
-                    SUM(egg_count) AS 'egg_count'
+                    SUM(egg_count) + (SUM(egg_tray_count) * 30) + SUM(soft_shell_count) + (SUM(soft_shell_tray_count) * 30) + SUM(crack_count) + (SUM(crack_tray_count) * 30) AS 'egg_count'
                 FROM
                     ep_egg_production
                 WHERE
@@ -598,17 +643,15 @@ class Egg extends Controller
         LEFT JOIN(
             SELECT
                 WEEK(es.log_date) AS 'week',
-                COALESCE(SUM(es.no_weight),
-                0) + COALESCE(SUM(es.pewee),
-                0) + COALESCE(SUM(es.pullet),
-                0) + COALESCE(SUM(es.brown),
-                0) + COALESCE(SUM(es.small),
-                0) + COALESCE(SUM(es.medium),
-                0) + COALESCE(SUM(es.large),
-                0) + COALESCE(SUM(es.extra_large),
-                0) + COALESCE(SUM(es.jumbo),
-                0) + COALESCE(SUM(es.crack),
-                0) + COALESCE(SUM(es.soft_shell),
+                COALESCE(SUM(es.no_weight) + (SUM(es.no_weight_tray) * 30),
+                0) + COALESCE(SUM(es.pewee)+ (SUM(es.pewee_tray) * 30),
+                0) + COALESCE(SUM(es.pullet)+ (SUM(es.pullet_tray) * 30),
+                0) + COALESCE(SUM(es.brown)+ (SUM(es.brown_tray) * 30),
+                0) + COALESCE(SUM(es.small)+ (SUM(es.small_tray) * 30),
+                0) + COALESCE(SUM(es.medium)+ (SUM(es.medium_tray) * 30),
+                0) + COALESCE(SUM(es.large)+ (SUM(es.large_tray) * 30),
+                0) + COALESCE(SUM(es.extra_large)+ (SUM(es.extra_large_tray) * 30),
+                0) + COALESCE(SUM(es.jumbo)+ (SUM(es.jumbo_tray) * 30),
                 0) AS total
             FROM
                 ep_egg_segregation AS es
