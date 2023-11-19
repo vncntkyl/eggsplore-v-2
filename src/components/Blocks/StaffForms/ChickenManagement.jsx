@@ -254,6 +254,7 @@ export default function ChickenManagement({ building }) {
                 id="bldg_filter"
                 className="bg-default px-2 p-1"
                 onChange={(e) => {
+                  console.log(e.target.value);
                   setBuildingFilter(parseInt(e.target.value));
                 }}
               >
@@ -272,6 +273,7 @@ export default function ChickenManagement({ building }) {
           </div>
           <ChickenMaintenanceTable
             refresh={refresh}
+            filter="all"
             bldgFilter={buildingFilter}
           />
         </div>

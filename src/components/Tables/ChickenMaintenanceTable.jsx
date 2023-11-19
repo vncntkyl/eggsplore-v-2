@@ -20,7 +20,7 @@ export default function ChickenMaintenanceTable({
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const showFilteredResults = (obj, user, bldgFilter = -1) => {
+  const showFilteredResults = (obj, user, bldgFilter) => {
     if (user.user_type !== "admin") {
       if (bldgFilter !== -1) {
         return obj.filter(
@@ -31,7 +31,12 @@ export default function ChickenMaintenanceTable({
         return obj.filter((items) => items.staff_id === user.user_id);
       }
     } else {
-      return obj;
+      console.log(bldgFilter);
+      if (bldgFilter !== -1) {
+        return obj.filter((items) => items.building_id == bldgFilter);
+      } else {
+        return obj;
+      }
     }
   };
 
@@ -43,6 +48,7 @@ export default function ChickenMaintenanceTable({
       setCurrentUser(user);
 
       const response = await retrieveProduction("ep_chicken", filter);
+      console.log(showFilteredResults(response, user, bldgFilter));
       setProcurementData(
         showFilteredResults(response, user, bldgFilter).map((res) => ({
           id: res.chicken_id,
@@ -60,10 +66,9 @@ export default function ChickenMaintenanceTable({
       setLoading(false);
     };
     setup();
-   
   }, [refresh, filter, bldgFilter]);
   return !loading && procurementData.length > 0 ? (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto max-h-[500px]">
       <table className="w-full rounded-md shadow-md overflow-hidden bg-white">
         <thead>
           <tr className="bg-main text-white">

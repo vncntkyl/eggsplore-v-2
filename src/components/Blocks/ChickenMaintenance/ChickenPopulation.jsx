@@ -1,28 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFunction } from "../../../context/FunctionContext";
 import { useAuth } from "../../../context/authContext";
 import { BigTextInput, Button, TextInput } from "../../Forms";
-import { AiFillCalendar } from "react-icons/ai";
-import classNames from "classnames";
+// import { AiFillCalendar } from "react-icons/ai";
+// import classNames from "classnames";
 import { Alert, Modal } from "../../Containers";
-import { format } from "date-fns";
+// import { format } from "date-fns";
 import ChickenMaintenanceTable from "../../Tables/ChickenMaintenanceTable";
 import DatePicker from "../../Fragments/DatePicker";
 
 export default function ChickenPopulation() {
   const [refresh, doRefresh] = useState(0);
   const [selectedChicken, setChicken] = useState(null);
+  const [buildings, setBuildings] = useState(null);
   const [alert, toggleAlert] = useState({
     type: "success",
     title: "",
     message: "",
     show: false,
   });
+  const [bldg, setBldg] = useState(-1);
   const [selectedFilter, selectDateFilter] = useState("all");
   const [modalTitle, setModalTitle] = useState(null);
   const [dateRange, setRange] = useState({ start_date: "", end_date: "" });
   const { capitalize, toTitle } = useFunction();
-  const { updateChickenPopulation } = useAuth();
+  const { updateChickenPopulation, getBuilding } = useAuth();
 
   const handleClose = () => {
     setModalTitle(null);
@@ -89,6 +91,14 @@ export default function ChickenPopulation() {
     });
     setModalTitle(null);
   };
+
+  useEffect(() => {
+    const setup = async () => {
+      const response = await getBuilding();
+      setBuildings(response);
+    };
+    setup();
+  }, []);
   return (
     <>
       <div>
@@ -102,11 +112,32 @@ export default function ChickenPopulation() {
             setRange={setRange}
           />
         </div>
+        {buildings && (
+          <div className="p-1">
+            Filter Building:
+            <select onChange={(e) => setBldg(e.target.value)}>
+              {buildings.map((bldg) => {
+                return (
+                  <option
+                    className="p-1 px-2 outline-none"
+                    key={bldg.id}
+                    value={bldg.id}
+                    selected={bldg === bldg.id}
+                  >
+                    {bldg.number}
+                  </option>
+                );
+              })}
+            </select>
+            {bldg}
+          </div>
+        )}
         <div className="w-full overflow-x-auto shadow-md">
           <ChickenMaintenanceTable
             refresh={refresh}
             setModal={setModalTitle}
             setChicken={setChicken}
+            bldgFilter={bldg}
             filter={
               selectedFilter === "range" && dateRange.end_date != ""
                 ? dateRange

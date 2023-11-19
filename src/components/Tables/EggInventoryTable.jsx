@@ -56,7 +56,7 @@ export default function EggInventoryTable({
                 </th>
               );
             })}
-          <th className="p-2 bg-main text-white sticky top-0">Actions</th>
+          {/* <th className="p-2 bg-main text-white sticky top-0">Actions</th> */}
         </tr>
       </thead>
       <tbody>
@@ -75,7 +75,7 @@ export default function EggInventoryTable({
               <td className="p-2" align="center">
                 {item.remaining_eggs}
               </td>
-              <td className="p-2" align="center">
+              {/* <td className="p-2" align="center">
                 <Button
                   onClick={() => {
                     setInventory({
@@ -92,7 +92,7 @@ export default function EggInventoryTable({
                   className="bg-yellow p-1 rounded"
                   value={<HiPencilAlt className="text-white" />}
                 />
-              </td>
+              </td> */}
             </tr>
           );
         })}
