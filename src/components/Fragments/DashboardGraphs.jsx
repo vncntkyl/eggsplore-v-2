@@ -36,7 +36,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
     retrieveBestSellingEgg,
     retrieveBestSellingLocation,
   } = useAuth();
-  const { capitalize, toTitle } = useFunction();
+  const { capitalize, toTitle, generateHexWithSameBrightness } = useFunction();
 
   useEffect(() => {
     const setup = async () => {
@@ -104,13 +104,11 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
           return {
             name: capitalize(toTitle(type.item_name)),
             value: type.quantity,
+            color: generateHexWithSameBrightness(255,0,0),
           };
         })
       );
-      const locationSize = bestSellingLocation.reduce(
-        (sum, value) => sum + parseInt(value.times_bought),
-        0
-      );
+
       setBestSellingLoc(
         bestSellingLocation.map((location) => {
           return {
@@ -245,9 +243,9 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
                 label
                 fill="#B95446"
               >
-                {/* {bestSellingEggs.map((entry, index) => (
+                {bestSellingEggs.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
-                ))} */}
+                ))}
               </Pie>
               <Legend verticalAlign="top" />
             </PieChart>

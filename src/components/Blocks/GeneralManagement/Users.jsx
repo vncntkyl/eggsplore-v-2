@@ -23,6 +23,7 @@ export default function Users() {
     first_name: "",
     middle_name: "",
     last_name: "",
+    email_address: "",
     building_no: [],
     username: "",
     password: "",
@@ -142,6 +143,7 @@ export default function Users() {
       first_name: "",
       middle_name: "",
       last_name: "",
+      email_address: "",
       building_no: "",
       username: "",
       password: "",
@@ -249,12 +251,14 @@ export default function Users() {
                   <>
                     <th>Name</th>
                     <th>Username</th>
+                    <th>Email Address</th>
                     <th>Action</th>
                   </>
                 ) : (
                   <>
                     <th>Name</th>
                     <th>Username</th>
+                    <th>Email Address</th>
                     <th>Building Designation</th>
                     <th>Actions</th>
                   </>
@@ -272,6 +276,9 @@ export default function Users() {
                       </td>
                       <td align="center" className="p-2">
                         {user.username}
+                      </td>
+                      <td align="center" className="p-2">
+                        {user.email_address}
                       </td>
                       {activePanel === "staff" && (
                         <td align="center" className="p-2">
@@ -301,6 +308,7 @@ export default function Users() {
                                   first_name: user.first_name,
                                   middle_name: user.middle_name,
                                   last_name: user.last_name,
+                                  email_address: user.email_address,
                                   building_no: [
                                     ...userBuildings.filter(
                                       (ub) => ub.user_id === user.user_id

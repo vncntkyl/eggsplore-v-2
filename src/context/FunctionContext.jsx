@@ -27,12 +27,14 @@ export function FunctionProvider({ children }) {
     let tempString = path.substring(1);
     return tempString.split("/");
   }
-  function getPath(){
+  function getPath() {
     return window.location.pathname;
   }
 
-  function getFullName(user){
-    return `${user.first_name} ${user.middle_name.substring(0,1)}. ${user.last_name}`
+  function getFullName(user) {
+    return `${user.first_name} ${user.middle_name.substring(0, 1)}. ${
+      user.last_name
+    }`;
   }
   //SESSION FUNCTIONS
   function saveItem(key, value) {
@@ -41,8 +43,22 @@ export function FunctionProvider({ children }) {
   function getItem(key) {
     return localStorage.getItem(key);
   }
+  function generateHexWithSameBrightness() {
+    // Generate random values for red, green, and blue components
+    const randomRed = Math.floor(Math.random() * 256);
+    const randomGreen = Math.floor(Math.random() * 256);
+    const randomBlue = Math.floor(Math.random() * 256);
+
+    // Convert the random RGB values to hex
+    const hexCode = `#${randomRed.toString(16).padStart(2, "0")}${randomGreen
+      .toString(16)
+      .padStart(2, "0")}${randomBlue.toString(16).padStart(2, "0")}`;
+
+    return hexCode;
+  }
 
   const value = {
+    generateHexWithSameBrightness,
     createBreadCrumb,
     getFullName,
     capitalize,
