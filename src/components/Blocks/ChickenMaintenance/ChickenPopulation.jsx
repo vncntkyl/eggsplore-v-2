@@ -114,22 +114,21 @@ export default function ChickenPopulation() {
         </div>
         {buildings && (
           <div className="p-1">
-            Filter Building:
-            <select onChange={(e) => setBldg(e.target.value)}>
+            Filter Building: 
+            <select onChange={(e) => setBldg(e.target.value)} className="p-1 px-2 bg-default outline-none rounded">
               {buildings.map((bldg) => {
                 return (
                   <option
-                    className="p-1 px-2 outline-none"
+                    className=" "
                     key={bldg.id}
                     value={bldg.id}
                     selected={bldg === bldg.id}
                   >
-                    {bldg.number}
+                    {"Building " + bldg.number}
                   </option>
                 );
               })}
             </select>
-            {bldg}
           </div>
         )}
         <div className="w-full overflow-x-auto shadow-md">

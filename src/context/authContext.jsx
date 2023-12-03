@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { developmentURLs as url } from "./config";
+import { buildURLs as url } from "./config";
 import { values as poultryManagement } from "./PoultryContext";
 import { values as medicineManagement } from "./MedicineContext";
 import { values as feedsManagement } from "./FeedsContext";

@@ -152,7 +152,9 @@ export default function EggProductionTable({
                       {capitalize(
                         users.find(
                           (user) => user.user_id === production.user_id
-                        ).first_name
+                        )?users.find(
+                          (user) => user.user_id === production.user_id
+                        ).first_name : "---"
                       )}
                     </td>
                     <td className="p-2">

@@ -1,4 +1,4 @@
-import { developmentURLs as url } from "./config";
+import { buildURLs as url } from "./config";
 import axios from "axios";
 
 const retrieveSalesInvoice = async (dateFilter) => {
