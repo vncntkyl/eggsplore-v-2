@@ -119,6 +119,20 @@ const getMedicineReport = async (start, end) => {
     console.log(e.message);
   }
 };
+const getMedicineDisposed = async () => {
+  try {
+    const response = await axios.get(url.manageMedicineURL, {
+      params: {
+        medicineDisposed: true,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 export const values = {
   getMedicineReport,
   getMedicineQuantity,
@@ -128,4 +142,5 @@ export const values = {
   addMedicineInventory,
   updateMedicationIntake,
   updateMedicineInventory,
+  getMedicineDisposed,
 };

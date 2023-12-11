@@ -108,6 +108,20 @@ const getFeedsReport = async (start_date, end_date) => {
     console.log(e.message);
   }
 };
+const retrieveFeedsDisposed = async () => {
+  try {
+    const response = await axios.get(url.manageFeedsURL, {
+      params: {
+        feedsDisposed: true,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+};
 const addFeedsInventory = async (newInventory) => {
   try {
     const feedsData = new FormData();
@@ -174,4 +188,5 @@ export const values = {
   getMaintenanceReport,
   getFeedsAndMedicineOverview,
   getFeedsAndMedicineSummary,
+  retrieveFeedsDisposed,
 };

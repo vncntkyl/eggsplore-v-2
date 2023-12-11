@@ -105,6 +105,7 @@ export default function EggDeliveryMonitoring() {
         deliveryInformation.target_arrival
       );
     }
+    console.log(response);
     setModalTitle(null);
     if (response === 1) {
       toggleAlert({
@@ -158,6 +159,10 @@ export default function EggDeliveryMonitoring() {
       ...deliveryInformation,
       log_date: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
     };
+    if (selectedInvoices.length === 0) {
+      window.alert("Please select a sales invoice to proceed.");
+      return;
+    }
     const response = await insertDeliveryInformation(
       delivery,
       selectedInvoices.map((invoice) => invoice.sales_id)
@@ -360,7 +365,7 @@ export default function EggDeliveryMonitoring() {
                 <div className="flex items-center justify-end gap-2">
                   <Button
                     type="submit"
-                    value="Show Records"
+                    value="Proceed"
                     className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
                   />
                   <Button

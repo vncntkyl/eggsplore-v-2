@@ -63,7 +63,6 @@ export default function SalesItemsTable({
                           className="bg-default rounded p-1 px-2 w-full disabled:text-gray-500"
                           onChange={(e) => {
                             const egg = label.item || label.item_name;
-                            console.log(e.target.value, e.target.id, key);
                             if (selectedEggs.includes(egg)) {
                               const eggs = [...selectedEggs];
                               eggs.splice(eggs.indexOf(egg), 1);
@@ -130,7 +129,7 @@ export default function SalesItemsTable({
                               eggList.find(
                                 (egg) => egg.egg_type_name === label.item_name
                               ).egg_type_total_count
-                            : label.item_name &&
+                            : label.item &&
                               eggList.find(
                                 (egg) => egg.egg_type_name === label.item
                               ).egg_type_total_count
@@ -175,10 +174,10 @@ export default function SalesItemsTable({
                           className="bg-red-light p-1 rounded"
                           value={<FaMinusSquare className="text-white" />}
                           onClick={() => {
-                            if(edit){
-                              deleteItem(key, label.item_name)
-                            }else{
-                              deleteItem(key, label.item)
+                            if (edit) {
+                              deleteItem(key, label.item_name);
+                            } else {
+                              deleteItem(key, label.item);
                             }
                           }}
                         />

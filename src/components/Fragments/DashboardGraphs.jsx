@@ -27,7 +27,10 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
   const [eggTypesTotal, setEggTypesTotal] = useState([]);
   const [bestSellingEggs, setBestSellingEggs] = useState([]);
   const [bestSellingLoc, setBestSellingLoc] = useState([]);
-
+  const [mortalityRate, setMortalityRate] = useState([]);
+  const [mortality, setMortality] = useState([]);
+  const [disposed, setDisposed] = useState([]);
+  const [eggRatio, setEggRatio] = useState([]);
   const {
     retrieveEggPerformance,
     retrieveEggClasifications,
@@ -35,6 +38,10 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
     getFeedsAndMedicineSummary,
     retrieveBestSellingEgg,
     retrieveBestSellingLocation,
+    retrieveChickenMortality,
+    retrieveFeedsDisposed,
+    getMedicineDisposed,
+    getBuilding,
   } = useAuth();
   const { capitalize, toTitle, generateHexWithSameBrightness } = useFunction();
 
@@ -47,6 +54,10 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
       const maintenanceCost = await getFeedsAndMedicineSummary();
       const bestSellingEgg = await retrieveBestSellingEgg();
       const bestSellingLocation = await retrieveBestSellingLocation();
+      const mortalityResponse = await retrieveChickenMortality();
+      const feedsDisposed = await retrieveFeedsDisposed();
+      const medicineDisposed = await getMedicineDisposed();
+      const buildings = await getBuilding();
       setMaintenance(
         maintenanceCost.map((item) => {
           return {
@@ -104,7 +115,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
           return {
             name: capitalize(toTitle(type.item_name)),
             value: type.quantity,
-            color: generateHexWithSameBrightness(255,0,0),
+            color: generateHexWithSameBrightness(255, 0, 0),
           };
         })
       );
@@ -116,6 +127,45 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
             "Times Bought": location.times_bought,
           };
         })
+      );
+      setMortalityRate(
+        buildings.map((bldg) => {
+          return {
+            building_no: bldg.number,
+            Count: mortalityResponse.find((rate) => rate.number == bldg.number)
+              ? mortalityResponse.find((rate) => rate.number == bldg.number)
+                  .average_mortality_count
+              : 0,
+          };
+        })
+      );
+      const sum = mortalityResponse.reduce((total, item) => {
+        return total + parseFloat(item.mortality_rate);
+      }, 0);
+      setMortality(sum / mortalityResponse.length);
+      setDisposed(
+        feedsDisposed.map((item, index) => {
+          return {
+            feeds: item.disposed,
+            medicine: medicineDisposed[index].disposed,
+            month: format(new Date(item.month), "MMM"),
+          };
+        })
+      );
+
+      // const eggSum = classifications.reduce((sum, egg) => {
+      //   return (sum += parseInt(egg.egg_type_total_count));
+      // }, 0);
+      setEggRatio(
+        classifications
+          .sort((a, b) => {
+            return b.egg_type_total_count - a.egg_type_total_count;
+          })
+          .map((egg) => ({
+            name: capitalize(toTitle(egg.egg_type_name)),
+            value: egg.egg_type_total_count,
+            color: generateHexWithSameBrightness(255, 0, 0),
+          }))
       );
     };
     setup();
@@ -230,8 +280,61 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
       </div>
       <div className="flex flex-col lg:flex-row gap-2 justify-between w-full">
         <div className=" bg-white p-2 w-full lg:w-1/2 flex flex-col gap-2 rounded shadow-md">
-          <h1 className="font-semibold">Best Selling Type of Egg</h1>
+          <h1 className="font-semibold">
+            Feeds and Medicine Disposal Analytics
+          </h1>
+          <ResponsiveContainer width={"100%"} height={400}>
+            <BarChart data={disposed}>
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="feeds" fill="#19d137" />
+              <Bar dataKey="medicine" fill="#d9a81f" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className=" bg-white p-2 w-full lg:w-1/2 flex flex-col gap-2 rounded shadow-md">
+          <h1 className="font-semibold">Chicken Mortality Analysis</h1>
+          <div className="border-b-[1px]">
+            <p className="flex flex-row gap-1 items-center relative group whitespace-nowrap">
+              Mortality Rate
+            </p>
+            <span className="text-[2rem] font-semibold">
+              {mortality.toString().substring(0, 4)}%
+            </span>
+          </div>
+          <h1>Mortality Rate per Building</h1>
           <ResponsiveContainer width={"100%"} height={300}>
+            <BarChart data={mortalityRate}>
+              <XAxis dataKey="building_no" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="Count" fill="#a22735" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      <div className="flex flex-col lg:flex-row gap-2 justify-between w-full">
+        <div className=" bg-white p-2 w-full lg:w-1/2 flex flex-col gap-2 rounded shadow-md">
+          <h1 className="font-semibold">Egg Sizes</h1>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={eggRatio} layout="vertical">
+              <XAxis type="number" />
+              <YAxis dataKey="name" type="category" />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" fill="#29d8a7" />
+              {eggRatio.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className=" bg-white p-2 w-full lg:w-1/2 flex flex-col gap-2 rounded shadow-md">
+          <h1 className="font-semibold">Best Selling Type of Egg</h1>
+          <ResponsiveContainer width={"100%"} height={350}>
             <PieChart>
               <Pie
                 data={bestSellingEggs}
@@ -251,19 +354,18 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className=" bg-white p-2 w-full lg:w-1/2 flex flex-col gap-2 rounded shadow-md">
-          <h1 className="font-semibold">Top-Selling Location</h1>
-          <ResponsiveContainer width={"100%"} height={300}>
-            <BarChart data={bestSellingLoc}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Times Bought" fill="#f93446" />
-            </BarChart>
-          </ResponsiveContainer>
-          {console.log(bestSellingLoc)}
-        </div>
+      </div>
+      <div className=" bg-white p-2 w-full lg:w-full flex flex-col gap-2 rounded shadow-md">
+        <h1 className="font-semibold">Top-Selling Location</h1>
+        <ResponsiveContainer width={"100%"} height={300}>
+          <BarChart data={bestSellingLoc}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Times Bought" fill="#fa3446" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </>
   );

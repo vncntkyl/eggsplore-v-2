@@ -73,6 +73,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
                         $delivery_status = "delayed";
                     }
                     echo $delivery->update_delivery_status("status", $delivery_status, $delivery_data->delivery_id) ? 1 : 0;
+                } else {
+                    echo 1;
                 }
             }
         }

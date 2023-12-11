@@ -344,6 +344,18 @@ const updateChickenPopulation = async (chickendata) => {
   }
 };
 
+const retrieveChickenMortality = async () => {
+  try {
+    const response = await axios.get(url.manageChickenURL, {
+      params: { retrieveMortality: true },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 export const values = {
   getSegregatedEggs,
   retrieveProduction,
@@ -367,4 +379,5 @@ export const values = {
   retrieveEggsForSegregation,
   retrieveEggInventoryReport,
   retrieveEggProductionReport,
+  retrieveChickenMortality,
 };

@@ -153,6 +153,9 @@ class Sales extends Controller
             $this->getError($e);
         }
     }
+    function returnInvoiceItems(){
+        
+    }
     function retrieveInvoiceItems($sales_id = null)
     {
         try {

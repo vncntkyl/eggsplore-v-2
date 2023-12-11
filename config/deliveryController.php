@@ -61,7 +61,43 @@ class Delivery extends Controller
     {
         try {
             $this->setStatement("UPDATE ep_delivery_monitoring SET " . $column . " = ? WHERE dispatch_id = ?");
-            return $this->statement->execute([$value, $id]);
+            if ($this->statement->execute([$value, $id])) {
+                if ($column === "status" && $value === "cancelled") {
+                    $this->setStatement("SELECT * FROM ep_delivery_monitoring WHERE dispatch_id = ?");
+                    $this->statement->execute([$id]);
+                    $delivery = $this->statement->fetch();
+                    $sales = new Sales();
+                    $deliveryInvoices = $sales->retrieveInvoicesForDelivery($delivery->delivery_id);
+
+                    $status = array();
+                    foreach ($deliveryInvoices as $value) {
+                        $this->setStatement("SELECT * FROM ep_sales_items WHERE sales_id = ?");
+                        $this->statement->execute([$value->sales_id]);
+                        $result = $this->statement->fetchAll();
+                        foreach ($result as $item) {
+                            $this->setStatement("BEGIN;
+                            SET @egg_count = (SELECT et.egg_type_total_count as count FROM ep_egg_types as et WHERE et.egg_type_name = :name);                            
+                            UPDATE ep_egg_types SET egg_type_total_count = @egg_count + :count WHERE egg_type_name = :name;
+                            COMMIT;");
+                            if ($this->statement->execute([":name" => $item->item_name, ":count" => $item->quantity])) {
+                                // $this->setStatement("DELETE FROM ep_sales_invoice WHERE sales_id = ?");
+                                // if ($this->statement->execute([$value->sales_id])) {
+                                //     array_push($status, 1);
+                                // } else {
+                                //     array_push($status, 0);
+                                // }
+                                array_push($status, 1);
+                            } else {
+                                array_push($status, 0);
+                            }
+                        }
+                        // $this->setStatement("DELETE FROM ep_sales_items WHERE sales_id = ?");
+                    }
+                    return !in_array(0, $status);
+                } else {
+                    return 1;
+                }
+            }
         } catch (PDOException $e) {
             $this->getError($e);
         }

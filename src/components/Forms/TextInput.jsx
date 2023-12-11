@@ -20,6 +20,7 @@ export default function TextInput({
   max,
   min = 0,
   wfull = "w-full",
+  important = false,
 }) {
   return (
     <div className={classNames("flex gap-2", `flex-${orientation}`, classes)}>
@@ -36,6 +37,7 @@ export default function TextInput({
         min={type === "date" ? min : 0}
         max={max}
         step={step}
+        required={important}
         placeholder={textHint}
         disabled={disabled}
         ref={inputRef}

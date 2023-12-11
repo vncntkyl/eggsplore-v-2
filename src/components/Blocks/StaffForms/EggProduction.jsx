@@ -126,7 +126,7 @@ export default function EggProduction({ building }) {
               className="flex flex-col gap-2 bg-default p-2 rounded-md"
               onSubmit={(e) => {
                 e.preventDefault();
-                setModalTitle("Confirmation");
+                // setModalTitle("Confirmation");
               }}
             >
               {Object.keys(eggData).map((eggKey, index) => {
@@ -145,6 +145,7 @@ export default function EggProduction({ building }) {
                       type="number"
                       disabled={true}
                       orientation="row"
+                      
                       classes="p-1 items-center "
                       labelClasses="whitespace-nowrap w-full text-start"
                       inputClasses="w-full rounded px-2"
@@ -157,6 +158,7 @@ export default function EggProduction({ building }) {
                     withLabel={capitalize(toTitle(eggKey)) + ":"}
                     value={eggData[eggKey]}
                     type="date"
+                    important
                     orientation="row"
                     classes="p-1 items-center "
                     labelClasses="whitespace-nowrap w-full text-start"
@@ -191,6 +193,7 @@ export default function EggProduction({ building }) {
                             key={idx}
                             value={eggData[key]}
                             type="number"
+                            important
                             orientation="row"
                             classes="w-1/2 p-1 items-center"
                             labelClasses="whitespace-nowrap w-full text-start"
