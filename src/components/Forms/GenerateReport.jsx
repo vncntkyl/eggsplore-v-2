@@ -139,11 +139,18 @@ export default function GenerateReport({
     closeModal();
   };
   const formatCurrency = (amount) => {
+    let currency = "PHP ";
+    let money = amount;
+    if (parseFloat(amount) < 0) {
+      currency = "PHP -";
+      money = parseFloat(amount) * -1;
+    }
+    console.log(money);
     const peso = Intl.NumberFormat("en-PH", {
       style: "currency",
       currency: "PHP",
-    }).format(amount);
-    return "PHP " + peso.substring(1);
+    }).format(money);
+    return currency + peso.substring(1);
   };
   const generateSalesInvoice = () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -335,154 +342,169 @@ export default function GenerateReport({
         baseline: "top",
       }
     );
-    doc.text("Labor", 30, 58, {
+    doc.text("Brown Eggs Expenses", 30, 58, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(incomeStatement.labor), width - 15, 58, {
+    doc.text(
+      incomeStatement.brown_egg_expenses
+        ? formatCurrency(incomeStatement.brown_egg_expenses)
+        : formatCurrency(0),
+      width - 15,
+      58,
+      {
+        align: "right",
+        baseline: "top",
+      }
+    );
+    doc.text("Labor", 30, 65, {
+      align: "left",
+      baseline: "top",
+    });
+    doc.text(formatCurrency(incomeStatement.labor), width - 15, 65, {
       align: "right",
       baseline: "top",
     });
-    doc.text("Other Direct", 30, 65, {
+    doc.text("Other Direct", 30, 72, {
       align: "left",
       baseline: "top",
     });
     doc.text(
       formatCurrency(incomeStatement.other_direct_cost),
       width - 15,
-      65,
+      72,
       {
         align: "right",
         baseline: "top",
       }
     );
-    doc.text("Total Cost of Goods Sold", 30, 72, {
+    doc.text("Total Cost of Goods Sold", 30, 79, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(totalGoodsCost), width - 15, 72, {
+    doc.text(formatCurrency(totalGoodsCost), width - 15, 79, {
       align: "right",
       baseline: "top",
     });
     doc.setLineWidth(0.5);
-    doc.line(15, 79, width - 15, 79);
+    doc.line(15, 88, width - 15, 88);
     doc.setFont("helvetica", "bold");
-    doc.text("Gross Profit", 15, 83, {
+    doc.text("Gross Profit", 15, 92, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(grossProfit), width - 15, 83, {
+    doc.text(formatCurrency(grossProfit), width - 15, 92, {
       align: "right",
       baseline: "top",
     });
-    doc.line(15, 90, width - 15, 90);
+    doc.line(15, 99, width - 15, 99);
 
-    doc.text("Operating Expenses", 15, 93, {
+    doc.text("Operating Expenses", 15, 106, {
       align: "left",
       baseline: "top",
     });
     doc.setFont("helvetica", "normal");
-    doc.text("Transportation and Logistics", 30, 100, {
+    doc.text("Transportation and Logistics", 30, 113, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(incomeStatement.expenses), width - 15, 100, {
+    doc.text(formatCurrency(incomeStatement.expenses), width - 15, 113, {
       align: "right",
       baseline: "top",
     });
-    doc.text("Rent And Utilities", 30, 107, {
+    doc.text("Rent And Utilities", 30, 120, {
       align: "left",
       baseline: "top",
     });
     doc.text(
       formatCurrency(incomeStatement.rent_and_utilities),
       width - 15,
-      107,
+      120,
       {
         align: "right",
         baseline: "top",
       }
     );
-    doc.text("Insurance", 30, 114, {
+    doc.text("Insurance", 30, 127, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(incomeStatement.insurance), width - 15, 114, {
+    doc.text(formatCurrency(incomeStatement.insurance), width - 15, 127, {
       align: "right",
       baseline: "top",
     });
-    doc.text("Repairs And Maintenance", 30, 121, {
+    doc.text("Repairs And Maintenance", 30, 134, {
       align: "left",
       baseline: "top",
     });
     doc.text(
       formatCurrency(incomeStatement.repairs_and_maintenance),
       width - 15,
-      121,
+      134,
       {
         align: "right",
         baseline: "top",
       }
     );
-    doc.text("Salaries And Wages", 30, 128, {
+    doc.text("Salaries And Wages", 30, 141, {
       align: "left",
       baseline: "top",
     });
     doc.text(
       formatCurrency(incomeStatement.salaries_and_wages),
       width - 15,
-      128,
+      141,
       {
         align: "right",
         baseline: "top",
       }
     );
-    doc.text("Other Operating Expenses", 30, 135, {
+    doc.text("Other Operating Expenses", 30, 148, {
       align: "left",
       baseline: "top",
     });
     doc.text(
       formatCurrency(incomeStatement.other_operating_expenses),
       width - 15,
-      135,
+      148,
       {
         align: "right",
         baseline: "top",
       }
     );
-    doc.text("Total Operating Cost", 30, 142, {
+    doc.text("Total Operating Cost", 30, 155, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(totalOperatingCost), width - 15, 142, {
+    doc.text(formatCurrency(totalOperatingCost), width - 15, 155, {
       align: "right",
       baseline: "top",
     });
 
-    doc.line(15, 149, width - 15, 149);
+    doc.line(15, 162, width - 15, 162);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Net Income Before Taxes", 15, 153, {
+    doc.text("Net Income Before Taxes", 15, 166, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(netIncomeBeforeTaxes), width - 15, 153, {
+    doc.text(formatCurrency(netIncomeBeforeTaxes), width - 15, 166, {
       align: "right",
       baseline: "top",
     });
-    doc.text("Taxes", 15, 160, {
+    doc.text("Taxes", 15, 173, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(taxes), width - 15, 160, {
+    doc.text(formatCurrency(taxes), width - 15, 173, {
       align: "right",
       baseline: "top",
     });
-    doc.text("Net Income", 15, 167, {
+    doc.text("Net Income", 15, 180, {
       align: "left",
       baseline: "top",
     });
-    doc.text(formatCurrency(netIncome), width - 15, 167, {
+    doc.text(formatCurrency(netIncome), width - 15, 180, {
       align: "right",
       baseline: "top",
     });

@@ -23,6 +23,7 @@ export default function Financials() {
   const [salesData, setSalesData] = useState({
     egg_sales: 0,
     medicine_and_feeds_cost: 0,
+    brown_egg_expenses: 0,
     labor: 0,
     other_direct_cost: 0,
     total_cost_of_goods_sold: 0,
@@ -60,32 +61,34 @@ export default function Financials() {
       incomeStatement[amount] = formatValues(incomeStatement[amount]);
     });
 
-    const response = await createIncomeStatement(
-      incomeStatement,
-      dateRange,
-      format(new Date(), "yyyy-MM-dd HH:mm:ss")
-    );
-    setModalTitle(null);
-    setRange({
-      start_date: "",
-      end_date: "",
-    });
-    if (response === 1) {
-      toggleAlert({
-        type: "success",
-        title: "Income Statement Creation Success",
-        message: "You have successfully created new income statement.",
-        show: true,
-      });
-    } else {
-      toggleAlert({
-        type: "warning",
-        title: "Income Statement Creation Error",
-        message:
-          "There has been an error on creating income statement. Please try again.",
-        show: true,
-      });
-    }
+    
+
+    // const response = await createIncomeStatement(
+    //   incomeStatement,
+    //   dateRange,
+    //   format(new Date(), "yyyy-MM-dd HH:mm:ss")
+    // );
+    // setModalTitle(null);
+    // setRange({
+    //   start_date: "",
+    //   end_date: "",
+    // });
+    // if (response === 1) {
+    //   toggleAlert({
+    //     type: "success",
+    //     title: "Income Statement Creation Success",
+    //     message: "You have successfully created new income statement.",
+    //     show: true,
+    //   });
+    // } else {
+    //   toggleAlert({
+    //     type: "warning",
+    //     title: "Income Statement Creation Error",
+    //     message:
+    //       "There has been an error on creating income statement. Please try again.",
+    //     show: true,
+    //   });
+    // }
   };
   const handleClose = () => {
     setDateModal(null);
@@ -99,6 +102,7 @@ export default function Financials() {
     setSalesData({
       egg_sales: 0,
       medicine_and_feeds_cost: 0,
+      brown_egg_expenses: 0,
       labor: 0,
       other_direct_cost: 0,
       total_cost_of_goods_sold: 0,
@@ -127,12 +131,14 @@ export default function Financials() {
       end_date: endDate,
     });
     const response = await retrieveSalesFromRange(startDate, endDate);
+    console.log(response);
     setSalesData((current) => {
       return {
         ...current,
         egg_sales: response.egg_sales,
         medicine_and_feeds_cost: response.medicine_and_feeds_cost,
         expenses: response.expenses,
+        brown_egg_expenses: response.brown_egg_expenses,
       };
     });
     setDateModal(null);
@@ -286,6 +292,10 @@ export default function Financials() {
                     <DefaultField
                       id="feeds_and_medicine"
                       value={salesData.medicine_and_feeds_cost}
+                    />
+                    <DefaultField
+                      id="brown_egg_expenses"
+                      value={salesData.brown_egg_expenses}
                     />
                     {["labor", "other_direct_cost"].map((label, index) => {
                       return (

@@ -20,6 +20,7 @@ export default function Procurement() {
   const [dateRange, setRange] = useState({ start_date: "", end_date: "" });
   const [selectedType, setType] = useState("brown");
   const [eggTypes, setEggTypes] = useState();
+  const [brownEggExpenses, totalBrownEggExpense] = useState(0);
   const [procurementInformation, setProcurementInformation] = useState({
     date_procured: format(new Date(), "yyyy-MM-dd"),
     egg_type: "Brown Egg",
@@ -30,6 +31,7 @@ export default function Procurement() {
   const { capitalize, toTitle } = useFunction();
   const {
     retrieveEggClasifications,
+    retrieveEggProcurement,
     insertEggProcurement,
     updateEggProcurement,
   } = useAuth();
@@ -122,9 +124,14 @@ export default function Procurement() {
     const setup = async () => {
       const response = await retrieveEggClasifications();
       setEggTypes(response);
+      const procurement = await retrieveEggProcurement();
+      totalBrownEggExpense(
+        procurement.reduce((sum, item) => {
+          return (sum += parseFloat(item.amount));
+        }, 0)
+      );
     };
     setup();
-   
   }, [refresh]);
   return (
     <>
@@ -159,6 +166,15 @@ export default function Procurement() {
             />
           </div>
           <div className="w-full px-2">
+            <div className="flex flex-row gap-1 py-1">
+              <p className="font-semibold">Total Expenses: </p>
+              <p>
+                {Intl.NumberFormat("en-PH", {
+                  style: "currency",
+                  currency: "PHP",
+                }).format(brownEggExpenses)}
+              </p>
+            </div>
             <div className="max-h-[300px] overflow-auto rounded-md overflow-y-auto shadow-md">
               <EggProcurementTable
                 procurementHeaders={procurementInformation}

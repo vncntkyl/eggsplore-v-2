@@ -42,10 +42,10 @@ export default function MonthlyIncomeStatement() {
   useEffect(() => {
     const setup = async () => {
       const response = await retrieveIncome();
+      console.log(response)
       setIncome(response);
     };
     setup();
-   
   }, []);
   return (
     income && (
@@ -72,6 +72,7 @@ export default function MonthlyIncomeStatement() {
           <div className="flex flex-col gap-2">
             {[
               "feeds_and_medicine",
+              "brown_egg_expenses",
               "labor",
               "other_direct_cost",
               "total_cost_of_goods_sold",
