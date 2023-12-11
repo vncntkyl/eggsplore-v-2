@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import {
   Bar,
@@ -31,6 +32,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
   const [mortality, setMortality] = useState([]);
   const [disposed, setDisposed] = useState([]);
   const [eggRatio, setEggRatio] = useState([]);
+  const [mortalityView, setMortalityView] = useState("building");
   const {
     retrieveEggPerformance,
     retrieveEggClasifications,
@@ -38,6 +40,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
     getFeedsAndMedicineSummary,
     retrieveBestSellingEgg,
     retrieveBestSellingLocation,
+    retrieveChickenMonthlyMortality,
     retrieveChickenMortality,
     retrieveFeedsDisposed,
     getMedicineDisposed,
@@ -54,10 +57,8 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
       const maintenanceCost = await getFeedsAndMedicineSummary();
       const bestSellingEgg = await retrieveBestSellingEgg();
       const bestSellingLocation = await retrieveBestSellingLocation();
-      const mortalityResponse = await retrieveChickenMortality();
       const feedsDisposed = await retrieveFeedsDisposed();
       const medicineDisposed = await getMedicineDisposed();
-      const buildings = await getBuilding();
       setMaintenance(
         maintenanceCost.map((item) => {
           return {
@@ -119,7 +120,22 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
           };
         })
       );
-
+      setDisposed(
+        feedsDisposed.map((item, index) => {
+          const medicine = medicineDisposed[index];
+          return {
+            feeds:
+              item.consumed > 0
+                ? ((item.disposed / item.consumed) * 100).toFixed(2)
+                : 0,
+            medicine:
+              medicine.intake > 0
+                ? ((medicine.disposed / medicine.intake) * 100).toFixed(2)
+                : 0,
+            month: format(new Date(item.month), "MMM"),
+          };
+        })
+      );
       setBestSellingLoc(
         bestSellingLocation.map((location) => {
           return {
@@ -128,34 +144,10 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
           };
         })
       );
-      setMortalityRate(
-        buildings.map((bldg) => {
-          return {
-            building_no: bldg.number,
-            Count: mortalityResponse.find((rate) => rate.number == bldg.number)
-              ? mortalityResponse.find((rate) => rate.number == bldg.number)
-                  .average_mortality_count
-              : 0,
-          };
-        })
-      );
-      const sum = mortalityResponse.reduce((total, item) => {
-        return total + parseFloat(item.mortality_rate);
-      }, 0);
-      setMortality(sum / mortalityResponse.length);
-      setDisposed(
-        feedsDisposed.map((item, index) => {
-          return {
-            feeds: item.disposed,
-            medicine: medicineDisposed[index].disposed,
-            month: format(new Date(item.month), "MMM"),
-          };
-        })
-      );
 
-      // const eggSum = classifications.reduce((sum, egg) => {
-      //   return (sum += parseInt(egg.egg_type_total_count));
-      // }, 0);
+      const eggSum = classifications.reduce((sum, egg) => {
+        return (sum += parseInt(egg.egg_type_total_count));
+      }, 0);
       setEggRatio(
         classifications
           .sort((a, b) => {
@@ -163,14 +155,87 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
           })
           .map((egg) => ({
             name: capitalize(toTitle(egg.egg_type_name)),
-            value: egg.egg_type_total_count,
-            color: generateHexWithSameBrightness(255, 0, 0),
+            percentage: parseFloat(
+              parseFloat((egg.egg_type_total_count / eggSum) * 100).toFixed(2)
+            ),
           }))
       );
     };
     setup();
   }, []);
 
+  useEffect(() => {
+    const setup = async () => {
+      const mortalityResponse = await retrieveChickenMortality();
+      const monthlyMortality = await retrieveChickenMonthlyMortality();
+
+      const buildings = await getBuilding();
+      const sum = mortalityResponse.reduce((total, item) => {
+        return total + parseFloat(item.mortality_rate);
+      }, 0);
+      setMortality(sum / mortalityResponse.length);
+      if (mortalityView === "building") {
+        setMortalityRate(
+          buildings.map((bldg) => {
+            return {
+              building_no: bldg.number,
+              Count: mortalityResponse.find(
+                (rate) => rate.number == bldg.number
+              )
+                ? mortalityResponse.find((rate) => rate.number == bldg.number)
+                    .average_mortality_count
+                : 0,
+            };
+          })
+        );
+      } else {
+        setMortalityRate(
+          monthlyMortality.map((month) => {
+            return {
+              count: month.mortality_count,
+              month: format(new Date(month.month), "MMM"),
+            };
+          })
+        );
+      }
+    };
+    setup();
+  }, [mortalityView]);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active) {
+      return (
+        <div className="bg-white p-4 border">
+          <p className="label">{`${label}`}</p>
+          <p
+            className="percentage"
+            style={{ color: payload[0].fill }}
+          >{`Percentage: ${payload[0].value.toFixed(2)}%`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+  const CustomDisposedTooltip = ({ active, payload, label }) => {
+    if (active) {
+      return (
+        <div className="bg-white p-4 border">
+          <p className="label">{`${label}`}</p>
+          <p
+            className="percentage"
+            style={{ color: payload[0].fill }}
+          >{`Feeds: ${payload[0].value}%`}</p>
+          <p
+            className="percentage"
+            style={{ color: payload[1].fill }}
+          >{`Medicine: ${payload[1].value}%`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
   return (
     <>
       <div className="flex flex-col lg:flex-row gap-2 justify-between w-full">
@@ -286,8 +351,8 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
           <ResponsiveContainer width={"100%"} height={400}>
             <BarChart data={disposed}>
               <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+              <YAxis domain={[0, 100]} />
+              <Tooltip content={<CustomDisposedTooltip />} />
               <Legend />
               <Bar dataKey="feeds" fill="#19d137" />
               <Bar dataKey="medicine" fill="#d9a81f" />
@@ -296,24 +361,51 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
         </div>
         <div className=" bg-white p-2 w-full lg:w-1/2 flex flex-col gap-2 rounded shadow-md">
           <h1 className="font-semibold">Chicken Mortality Analysis</h1>
-          <div className="border-b-[1px]">
+          <div className="border-b">
             <p className="flex flex-row gap-1 items-center relative group whitespace-nowrap">
               Mortality Rate
             </p>
             <span className="text-[2rem] font-semibold">
-              {mortality.toString().substring(0, 4)}%
+              {mortality.toString().substring(0, 7)}%
             </span>
           </div>
-          <h1>Mortality Rate per Building</h1>
-          <ResponsiveContainer width={"100%"} height={300}>
-            <BarChart data={mortalityRate}>
-              <XAxis dataKey="building_no" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Count" fill="#a22735" />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="flex flex-row gap-1 items-center">
+            <label htmlFor="mortality">Show: </label>
+            <select
+              name=""
+              id="mortality"
+              onChange={(e) => setMortalityView(e.target.value)}
+              className="outline-none border px-2 p-1 shadow"
+            >
+              <option value="building" selected={mortalityView === "building"}>
+                Mortality Rate per Building
+              </option>
+              <option value="monthly" selected={mortalityView === "monthly"}>
+                Monthly Mortality Rate
+              </option>
+            </select>
+          </div>
+          {mortalityView === "building" ? (
+            <ResponsiveContainer width={"100%"} height={300}>
+              <BarChart data={mortalityRate}>
+                <XAxis dataKey="building_no" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Count" fill="#a22735" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <ResponsiveContainer width={"100%"} height={300}>
+              <BarChart data={mortalityRate}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#a22735" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-2 justify-between w-full">
@@ -323,12 +415,9 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
             <BarChart data={eggRatio} layout="vertical">
               <XAxis type="number" />
               <YAxis dataKey="name" type="category" />
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Bar dataKey="value" fill="#29d8a7" />
-              {eggRatio.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
+              <Bar dataKey="percentage" fill="#29d8a7" />
             </BarChart>
           </ResponsiveContainer>
         </div>

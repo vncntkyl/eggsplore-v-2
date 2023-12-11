@@ -356,6 +356,18 @@ const retrieveChickenMortality = async () => {
     return e.message;
   }
 };
+const retrieveChickenMonthlyMortality = async () => {
+  try {
+    const response = await axios.get(url.manageChickenURL, {
+      params: { retrieveMonthlyMortality: true },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    return e.message;
+  }
+};
 export const values = {
   getSegregatedEggs,
   retrieveProduction,
@@ -380,4 +392,5 @@ export const values = {
   retrieveEggInventoryReport,
   retrieveEggProductionReport,
   retrieveChickenMortality,
+  retrieveChickenMonthlyMortality,
 };

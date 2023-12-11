@@ -59,36 +59,34 @@ export default function Financials() {
 
     Object.keys(incomeStatement).map((amount) => {
       incomeStatement[amount] = formatValues(incomeStatement[amount]);
+    });    
+
+    const response = await createIncomeStatement(
+      incomeStatement,
+      dateRange,
+      format(new Date(), "yyyy-MM-dd HH:mm:ss")
+    );
+    setModalTitle(null);
+    setRange({
+      start_date: "",
+      end_date: "",
     });
-
-    
-
-    // const response = await createIncomeStatement(
-    //   incomeStatement,
-    //   dateRange,
-    //   format(new Date(), "yyyy-MM-dd HH:mm:ss")
-    // );
-    // setModalTitle(null);
-    // setRange({
-    //   start_date: "",
-    //   end_date: "",
-    // });
-    // if (response === 1) {
-    //   toggleAlert({
-    //     type: "success",
-    //     title: "Income Statement Creation Success",
-    //     message: "You have successfully created new income statement.",
-    //     show: true,
-    //   });
-    // } else {
-    //   toggleAlert({
-    //     type: "warning",
-    //     title: "Income Statement Creation Error",
-    //     message:
-    //       "There has been an error on creating income statement. Please try again.",
-    //     show: true,
-    //   });
-    // }
+    if (response === 1) {
+      toggleAlert({
+        type: "success",
+        title: "Income Statement Creation Success",
+        message: "You have successfully created new income statement.",
+        show: true,
+      });
+    } else {
+      toggleAlert({
+        type: "warning",
+        title: "Income Statement Creation Error",
+        message:
+          "There has been an error on creating income statement. Please try again.",
+        show: true,
+      });
+    }
   };
   const handleClose = () => {
     setDateModal(null);
