@@ -84,10 +84,10 @@ export default function SalesInvoice() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setModalTitle(null);
     const data = { ...salesInvoice, items: items };
     data.date = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     const response = await insertSalesInvoice(data);
-    setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
@@ -108,10 +108,10 @@ export default function SalesInvoice() {
   };
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setModalTitle(null);
     const data = { ...selectedInvoice, items: salesItems };
     const response = await updateSalesInvoice(data);
     console.log(response);
-    // setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
@@ -309,7 +309,7 @@ export default function SalesInvoice() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
-          className="w-[95%] max-w-[500px]"
+          className="w-[95%] max-w-[700px]"
           content={
             modalTitle === "date range picker" ? (
               <>
@@ -326,6 +326,7 @@ export default function SalesInvoice() {
                           name={label}
                           type="date"
                           id={label}
+                          important
                           withLabel={capitalize(toTitle(label))}
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap text-start"
@@ -457,7 +458,8 @@ export default function SalesInvoice() {
                             <input
                               type="text"
                               list="locations"
-                              id={label}
+                              id={label} 
+                              required
                               value={
                                 modalTitle === "edit sales invoice"
                                   ? selectedInvoice[label]
@@ -490,6 +492,7 @@ export default function SalesInvoice() {
                             name={label}
                             type={label === "date" ? "date" : "text"}
                             id={label}
+                            important
                             disabled={["invoice_no", "date"].includes(label)}
                             withLabel={capitalize(toTitle(label))}
                             classes="p-1 items-center justify-between"

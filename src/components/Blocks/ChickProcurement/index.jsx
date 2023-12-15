@@ -201,6 +201,7 @@ export default function ChickProcurement() {
                             ? newProcurement[lbl]
                             : null
                         }
+                        important
                         withLabel={capitalize(toTitle(lbl))}
                         orientation="row"
                         classes="p-1 items-center justify-between"

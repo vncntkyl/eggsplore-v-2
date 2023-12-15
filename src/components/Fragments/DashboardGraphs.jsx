@@ -366,7 +366,7 @@ export default function DashboardGraphs({ setEggClassifications, setModal }) {
               Mortality Rate
             </p>
             <span className="text-[2rem] font-semibold">
-              {mortality.toString().substring(0, 7)}%
+              {mortality.toString().substring(0, 4)}%
             </span>
           </div>
           <div className="flex flex-row gap-1 items-center">

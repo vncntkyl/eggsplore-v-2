@@ -165,6 +165,7 @@ export default function ChickenPopulation() {
                           key={index}
                           name={label}
                           type="date"
+                          important
                           id={label}
                           withLabel={capitalize(toTitle(label))}
                           classes="p-1 items-center justify-between"
@@ -205,6 +206,7 @@ export default function ChickenPopulation() {
                             key={index}
                             name={label}
                             id={label}
+                            important
                             value={selectedChicken[label]}
                             withLabel={capitalize(toTitle(label))}
                             classes="p-1 items-center justify-between"
@@ -223,6 +225,7 @@ export default function ChickenPopulation() {
                             name={label}
                             id={label}
                             type="number"
+                            important
                             value={selectedChicken[label]}
                             disabled={["building_id", "remaining"].includes(
                               label

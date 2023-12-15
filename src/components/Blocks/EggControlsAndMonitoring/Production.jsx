@@ -85,7 +85,6 @@ export default function Production() {
       setUsers(userResponse);
     };
     setup();
-   
   }, [refresh]);
 
   return (
@@ -141,6 +140,7 @@ export default function Production() {
                           name={label}
                           type="date"
                           id={label}
+                          important
                           withLabel={capitalize(toTitle(label))}
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap text-start"
@@ -176,6 +176,7 @@ export default function Production() {
                           key={index}
                           name={label}
                           id={label}
+                          important
                           type={label.includes("count") ? "number" : "text"}
                           withLabel={
                             label === "building_id"

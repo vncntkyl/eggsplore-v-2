@@ -107,7 +107,6 @@ export default function Feeds() {
       setFeeds(response);
     };
     setup();
-   
   }, [refresh]);
 
   return (
@@ -207,6 +206,7 @@ export default function Feeds() {
                           }
                           withLabel={capitalize(toTitle(lbl))}
                           orientation="row"
+                          important
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap w-1/3 text-start"
                           inputClasses="bg-default w-2/3 rounded px-2"
@@ -224,6 +224,7 @@ export default function Feeds() {
                           value={
                             modalTitle === "edit feeds" ? newFeed[lbl] : null
                           }
+                          important
                           withLabel={capitalize(toTitle(lbl))}
                           classes="p-1 items-start justify-between"
                           labelClasses="whitespace-nowrap w-1/3 text-start"

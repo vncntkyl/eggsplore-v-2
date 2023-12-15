@@ -211,6 +211,7 @@ export default function Procurement() {
                           name={label}
                           type="date"
                           id={label}
+                          important
                           withLabel={capitalize(toTitle(label))}
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap text-start"
@@ -257,6 +258,7 @@ export default function Procurement() {
                           name={label}
                           type="date"
                           id={label}
+                          important
                           value={procurementInformation[label]}
                           withLabel={capitalize(toTitle(label))}
                           classes="p-1 items-center justify-between"
@@ -274,6 +276,7 @@ export default function Procurement() {
                             </label>
                             <select
                               id={label}
+                              required
                               className="bg-default rounded p-2 w-full disabled:text-gray-500"
                               onChange={(e) => {
                                 setType(e.target.value);
@@ -316,6 +319,7 @@ export default function Procurement() {
                               ? "number"
                               : "text"
                           }
+                          important
                           withLabel={capitalize(toTitle(label))}
                           value={procurementInformation[label]}
                           disabled={label.includes("id")}

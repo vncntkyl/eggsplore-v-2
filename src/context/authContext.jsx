@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
         },
       });
       if (response.status === 200) {
-        console.log(response.data);
+        return response.data;
       }
     } catch (e) {
       return e.message;

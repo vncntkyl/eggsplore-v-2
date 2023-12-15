@@ -60,6 +60,7 @@ export default function SalesItemsTable({
                       <div className="flex flex-col gap-2 w-[150px]">
                         <select
                           id="item"
+                          required
                           className="bg-default rounded p-1 px-2 w-full disabled:text-gray-500"
                           onChange={(e) => {
                             const egg = label.item || label.item_name;
@@ -109,6 +110,7 @@ export default function SalesItemsTable({
                         name="price"
                         type="number"
                         id="price"
+                        important
                         step={0.01}
                         disabled={edit ? !label.item_name : !label.item}
                         classes="p-1 items-center justify-center w-[100px]"
@@ -122,6 +124,7 @@ export default function SalesItemsTable({
                         name="quantity"
                         type="number"
                         id="quantity"
+                        important
                         disabled={edit ? !label.item_name : !label.item}
                         max={
                           edit
@@ -158,6 +161,7 @@ export default function SalesItemsTable({
                     <td align="center">
                       <TextInput
                         name="total"
+                        important
                         type="number"
                         id="total"
                         step={0.01}

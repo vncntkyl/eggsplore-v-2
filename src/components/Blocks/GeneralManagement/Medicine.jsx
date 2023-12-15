@@ -118,7 +118,6 @@ export default function Medicine() {
       setMedicine(response);
     };
     setup();
-   
   }, [refresh]);
 
   return (
@@ -198,7 +197,11 @@ export default function Medicine() {
         <Modal
           title={capitalize(modalTitle)}
           onClose={() => handleClose()}
-          className={["add medicine", "edit medicine"].includes(modalTitle) ? "w-[95%] max-w-[750px]" : "w-[95%] max-w-[300px]"}
+          className={
+            ["add medicine", "edit medicine"].includes(modalTitle)
+              ? "w-[95%] max-w-[750px]"
+              : "w-[95%] max-w-[300px]"
+          }
           content={
             ["add medicine", "edit medicine"].includes(modalTitle) ? (
               <>
@@ -225,6 +228,7 @@ export default function Medicine() {
                           }
                           withLabel={capitalize(toTitle(lbl))}
                           orientation="row"
+                          important
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap w-1/3 text-start"
                           inputClasses="bg-default w-2/3 rounded px-2"
@@ -244,6 +248,7 @@ export default function Medicine() {
                               ? newMedicine[lbl]
                               : null
                           }
+                          important
                           withLabel={capitalize(toTitle(lbl))}
                           classes="p-1 items-start justify-between"
                           labelClasses="whitespace-nowrap w-1/3 text-start"

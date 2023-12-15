@@ -13,6 +13,7 @@ export default function BigTextInput({
   inputRef,
   onChange,
   value,
+  important = false,
 }) {
   return (
     <div className={classNames("flex gap-2", `flex-${orientation}`, classes)}>
@@ -28,6 +29,7 @@ export default function BigTextInput({
         disabled={disabled}
         ref={inputRef}
         onChange={onChange}
+        required={important}
         className={classNames(
           "outline-none border-none p-1 w-full",
           inputClasses

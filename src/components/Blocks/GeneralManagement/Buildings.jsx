@@ -108,7 +108,6 @@ export default function Buildings() {
       setBuildings(response);
     };
     setup();
-   
   }, [refresh]);
 
   return (
@@ -212,6 +211,7 @@ export default function Buildings() {
                               ? newBuilding[lbl]
                               : null
                           }
+                          important
                           withLabel={capitalize(toTitle(lbl))}
                           orientation="row"
                           classes="p-1 items-center justify-between"

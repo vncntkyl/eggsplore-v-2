@@ -254,6 +254,7 @@ export default function MedicineInventory() {
                           </label>
                           <select
                             id={label}
+                            required
                             className="w-full rounded px-2 outline-none border-none p-1 bg-default"
                             onChange={(e) =>
                               setMedicine((current) => ({
@@ -282,6 +283,7 @@ export default function MedicineInventory() {
                         <TextInput
                           key={index}
                           name={label}
+                          important
                           type={
                             label.includes("date")
                               ? "date"

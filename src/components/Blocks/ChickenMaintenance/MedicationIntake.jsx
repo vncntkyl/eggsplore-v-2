@@ -74,7 +74,6 @@ export default function MedicationIntake() {
       setBuildings(buildingResponse);
     };
     setup();
-   
   }, [refresh]);
   return (
     <>
@@ -109,6 +108,7 @@ export default function MedicationIntake() {
                           id={label}
                           disabled
                           className="w-full rounded px-2 outline-none border-none p-1 bg-default"
+                          required
                           onChange={(e) =>
                             setIntake((current) => ({
                               ...current,
@@ -138,6 +138,7 @@ export default function MedicationIntake() {
                       <BigTextInput
                         id={label}
                         key={index}
+                        important
                         withLabel={capitalize(toTitle(label)) + ":"}
                         value={selectedIntake[label]}
                         orientation="row"
@@ -155,6 +156,7 @@ export default function MedicationIntake() {
                       <TextInput
                         key={index}
                         name={label}
+                        required
                         type={label.includes("date") ? "date" : "number"}
                         id={label}
                         withLabel={

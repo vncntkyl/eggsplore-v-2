@@ -109,6 +109,7 @@ export default function FeedsConsumption() {
                         <select
                           id={label}
                           disabled
+                          required
                           className="w-full rounded px-2 outline-none border-none p-1 bg-default"
                           onChange={(e) =>
                             setConsumption((current) => ({
@@ -140,6 +141,7 @@ export default function FeedsConsumption() {
                         withLabel={capitalize(toTitle(label)) + ":"}
                         value={selectedConsumed[label]}
                         orientation="row"
+                        important
                         classes="p-1 items-start"
                         labelClasses="whitespace-nowrap text-start w-1/2"
                         inputClasses="w-full rounded px-2 h-full resize-none min-h-[100px] bg-default"
@@ -156,6 +158,7 @@ export default function FeedsConsumption() {
                         name={label}
                         type={label.includes("date") ? "date" : "number"}
                         id={label}
+                        important
                         withLabel={
                           label === "building_id"
                             ? "Building No."

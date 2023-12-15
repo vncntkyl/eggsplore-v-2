@@ -36,6 +36,7 @@ export default function EggDeliveryMonitoring() {
     message: "",
     show: false,
   });
+  const [disable, toggleDisable] = useState(false);
 
   const {
     insertDeliveryInformation,
@@ -85,6 +86,8 @@ export default function EggDeliveryMonitoring() {
   };
   const handleUpdateDeliveryStatus = async (e) => {
     e.preventDefault();
+    toggleDisable((prev) => !prev);
+    setModalTitle(null);
     let response;
     const arrivalDate = document.querySelector("#arrival_date");
     const arrivalStatus = document.querySelector("#arrival_status");
@@ -106,7 +109,6 @@ export default function EggDeliveryMonitoring() {
       );
     }
     console.log(response);
-    setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
@@ -125,16 +127,19 @@ export default function EggDeliveryMonitoring() {
         show: true,
       });
     }
+    toggleDisable((prev) => !prev);
     doRefresh((count) => (count = count + 1));
   };
   const handleUpdate = async (e) => {
     e.preventDefault();
+    toggleDisable((prev) => !prev);
+    setModalTitle(null);
+
     const response = await updateDeliveryInformation(
       deliveryInformation,
       selectedInvoices
     );
     console.log(response);
-    setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
@@ -151,10 +156,14 @@ export default function EggDeliveryMonitoring() {
         show: true,
       });
     }
+    toggleDisable((prev) => !prev);
     doRefresh((count) => (count = count + 1));
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
+    toggleDisable((prev) => !prev);
+    setModalTitle(null);
+
     const delivery = {
       ...deliveryInformation,
       log_date: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
@@ -168,7 +177,6 @@ export default function EggDeliveryMonitoring() {
       selectedInvoices.map((invoice) => invoice.sales_id)
     );
     console.log(response);
-    setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
@@ -185,6 +193,8 @@ export default function EggDeliveryMonitoring() {
         show: true,
       });
     }
+    toggleDisable((prev) => !prev);
+
     doRefresh((count) => (count = count + 1));
   };
 
@@ -251,18 +261,16 @@ export default function EggDeliveryMonitoring() {
             />
           </div>
           <div className="w-full px-2">
-            <div className="max-h-[500px] overflow-auto rounded-md overflow-y-auto shadow-md">
-              <EggsDeliveryMonitoringTable
-                refresh={refresh}
-                setModal={setModalTitle}
-                setDelivery={setDeliveryInformation}
-                filter={
-                  selectedFilter === "range" && dateRange.end_date != ""
-                    ? dateRange
-                    : selectedFilter
-                }
-              />
-            </div>
+            <EggsDeliveryMonitoringTable
+              refresh={refresh}
+              setModal={setModalTitle}
+              setDelivery={setDeliveryInformation}
+              filter={
+                selectedFilter === "range" && dateRange.end_date != ""
+                  ? dateRange
+                  : selectedFilter
+              }
+            />
           </div>
         </div>
       </div>
@@ -367,6 +375,7 @@ export default function EggDeliveryMonitoring() {
                     type="submit"
                     value="Proceed"
                     className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                    disabled={disable}
                   />
                   <Button
                     value="Cancel"

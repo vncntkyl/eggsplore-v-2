@@ -209,6 +209,7 @@ export default function Locations() {
                           }
                           withLabel={capitalize(toTitle(lbl))}
                           orientation="row"
+                          important
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap w-1/3 text-start"
                           inputClasses="bg-default w-2/3 rounded px-2"

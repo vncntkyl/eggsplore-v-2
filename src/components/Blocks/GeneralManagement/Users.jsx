@@ -37,6 +37,7 @@ export default function Users() {
   const [userBuildings, setUserBuildings] = useState([]);
   const [selectedUser, setUser] = useState(null);
   const [selectedBuildings, setSelectedBuildings] = useState([]);
+  const [disable, toggleDisable] = useState(false);
 
   const { capitalize, getFullName, toTitle } = useFunction();
   const { getUser, getBuilding, registerUser, deleteUser, updateUser } =
@@ -67,6 +68,7 @@ export default function Users() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    toggleDisable((prev) => !prev);
     const tempUser = { ...newUser };
     delete tempUser.building_no;
     let buildings = { addedItems: [], removedItems: [] };
@@ -99,10 +101,12 @@ export default function Users() {
         show: true,
       });
     }
+    toggleDisable((prev) => !prev);
     doRefresh((count) => (count = count + 1));
   };
   const handleRegistration = async (e) => {
     e.preventDefault();
+    toggleDisable((prev) => !prev);
     const user = {
       ...newUser,
       user_type: activePanel,
@@ -127,6 +131,7 @@ export default function Users() {
         show: true,
       });
     }
+    toggleDisable((prev) => !prev);
     doRefresh((count) => (count = count + 1));
   };
 
@@ -153,6 +158,7 @@ export default function Users() {
   };
 
   const handleDelete = async () => {
+    toggleDisable((prev) => !prev);
     const response = await deleteUser(selectedUser.user_id);
     setModalTitle(null);
     if (response == 1) {
@@ -173,6 +179,7 @@ export default function Users() {
         show: true,
       });
     }
+    toggleDisable((prev) => !prev);
     doRefresh((count) => (count = count + 1));
   };
 
@@ -374,6 +381,7 @@ export default function Users() {
                           }
                           withLabel={capitalize(toTitle(lbl))}
                           orientation="row"
+                          important
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap w-1/3 text-start"
                           inputClasses="bg-default w-2/3 rounded px-2"
@@ -419,6 +427,7 @@ export default function Users() {
                                     <input
                                       type="checkbox"
                                       id={bldg.id}
+                                      required
                                       value={bldg.id}
                                       checked={selectedBuildings.some(
                                         (selectedItem) =>
@@ -448,6 +457,7 @@ export default function Users() {
                       type="submit"
                       value={newUser.update ? "Save Changes" : "Register"}
                       className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                      disabled={disable}
                     />
                     <Button
                       value="Cancel"
@@ -473,6 +483,7 @@ export default function Users() {
                     value="Delete"
                     onClick={() => handleDelete()}
                     className="bg-tertiary p-1 px-2 rounded-md hover:bg-main hover:text-white transition-all"
+                    disabled={disable}
                   />
                   <Button
                     value="Cancel"

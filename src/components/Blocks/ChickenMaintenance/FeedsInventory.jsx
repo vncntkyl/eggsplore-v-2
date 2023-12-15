@@ -249,6 +249,7 @@ export default function FeedsInventory() {
                             Feeds
                           </label>
                           <select
+                          required
                             id={label}
                             className="w-full rounded px-2 outline-none border-none p-1 bg-default"
                             onChange={(e) =>
@@ -286,6 +287,7 @@ export default function FeedsInventory() {
                               : "number"
                           }
                           id={label}
+                          important
                           withLabel={capitalize(toTitle(label))}
                           value={feeds[label]}
                           onChange={(e) => {
