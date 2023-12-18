@@ -385,12 +385,12 @@ export const values = {
   updateChickProcurement,
   retrieveSegregationLogs,
   updateChickenPopulation,
+  retrieveChickenMortality,
   insertChickenMaintenance,
   retrieveChickenPopulation,
   retrieveEggClasifications,
   retrieveEggsForSegregation,
   retrieveEggInventoryReport,
   retrieveEggProductionReport,
-  retrieveChickenMortality,
   retrieveChickenMonthlyMortality,
 };

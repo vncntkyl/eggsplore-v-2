@@ -38,14 +38,17 @@ export default function Production() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const data = {
-      egg_count: egg.egg_tray_count,
-      defect_count: egg.defect_egg_trays_count,
-      id: egg.id,
-    };
+    // setModalTitle(null);
+    const data = { ...egg };
+
+    delete data.building_id;
+    delete data.date_procured;
+    delete data.update;
+    delete data.user_id;
+
+    console.log(data);
     const response = await updateEggProduction(data);
     console.log(response);
-    setModalTitle(null);
     if (response === 1) {
       toggleAlert({
         type: "success",
@@ -166,10 +169,48 @@ export default function Production() {
             ) : (
               <>
                 <form className="flex flex-col gap-2" onSubmit={handleUpdate}>
+                  <TextInput
+                    name="building_id"
+                    id="building_id"
+                    important
+                    withLabel={"Building No."}
+                    value={
+                      buildings.find((bldg) => bldg.id === egg["building_id"])
+                        .number
+                    }
+                    disabled
+                    classes="p-1 items-center justify-between"
+                    labelClasses="whitespace-nowrap text-start w-1/2"
+                    inputClasses="bg-default rounded px-2 w-1/2 disabled:text-gray-500"
+                    onChange={(e) =>
+                      setEgg((current) => ({
+                        ...current,
+                        building_id: parseInt(e.target.value),
+                      }))
+                    }
+                  />
+                  <TextInput
+                    name="user_id"
+                    id="user_id"
+                    important
+                    withLabel="Staff"
+                    value={capitalize(
+                      users.find((user) => user.user_id === egg["user_id"])
+                        .first_name
+                    )}
+                    disabled
+                    classes="p-1 items-center justify-between"
+                    labelClasses="whitespace-nowrap text-start w-1/2"
+                    inputClasses="bg-default rounded px-2 w-1/2 disabled:text-gray-500"
+                    onChange={(e) =>
+                      setEgg((current) => ({
+                        ...current,
+                        user_id: parseInt(e.target.value),
+                      }))
+                    }
+                  />
                   {Object.keys(egg)
-                    .filter(
-                      (key) => !["id", "update", "date_procured"].includes(key)
-                    )
+                    .splice(3, 6)
                     .map((label, index) => {
                       return (
                         <TextInput
@@ -177,34 +218,9 @@ export default function Production() {
                           name={label}
                           id={label}
                           important
-                          type={label.includes("count") ? "number" : "text"}
-                          withLabel={
-                            label === "building_id"
-                              ? "Building No."
-                              : label === "user_id"
-                              ? "Staff"
-                              : label.includes("count")
-                              ? capitalize(
-                                  label
-                                    .split("_")
-                                    .filter((word) => word !== "count")
-                                    .join(" ")
-                                )
-                              : capitalize(toString(label))
-                          }
-                          value={
-                            label === "building_id"
-                              ? buildings.find((bldg) => bldg.id === egg[label])
-                                  .number
-                              : label === "user_id"
-                              ? capitalize(
-                                  users.find(
-                                    (user) => user.user_id === egg[label]
-                                  ).first_name
-                                )
-                              : egg[label]
-                          }
-                          disabled={label.includes("id")}
+                          type="number"
+                          withLabel={capitalize(toTitle(label))}
+                          value={egg[label]}
                           classes="p-1 items-center justify-between"
                           labelClasses="whitespace-nowrap text-start w-1/2"
                           inputClasses="bg-default rounded px-2 w-1/2 disabled:text-gray-500"

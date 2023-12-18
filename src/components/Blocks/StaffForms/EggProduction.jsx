@@ -33,7 +33,7 @@ export default function EggProduction({ building }) {
 
   const { toTitle, capitalize } = useFunction();
   const { insertEggProduction, getCurrentUser, getBuilding } = useAuth();
-
+  
   const handleSubmit = async () => {
     setModalTitle(null);
     const building_id = document.querySelector("#building_id");
@@ -66,7 +66,7 @@ export default function EggProduction({ building }) {
           type: "warning",
           title: "Procurement Error",
           message:
-            "There has been an error on submitting your procurement. Please try again.",
+          "There has been an error on submitting your procurement. Please try again.",
           show: true,
         });
       }
@@ -126,7 +126,7 @@ export default function EggProduction({ building }) {
               className="flex flex-col gap-2 bg-default p-2 rounded-md"
               onSubmit={(e) => {
                 e.preventDefault();
-                // setModalTitle("Confirmation");
+                setModalTitle("Confirmation");
               }}
             >
               {Object.keys(eggData).map((eggKey, index) => {
@@ -145,7 +145,6 @@ export default function EggProduction({ building }) {
                       type="number"
                       disabled={true}
                       orientation="row"
-                      
                       classes="p-1 items-center "
                       labelClasses="whitespace-nowrap w-full text-start"
                       inputClasses="w-full rounded px-2"
